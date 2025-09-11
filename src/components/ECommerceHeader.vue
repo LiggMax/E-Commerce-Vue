@@ -32,7 +32,7 @@
             <v-btn
               v-for="item in navItems"
               :key="item.title"
-              class="mx-1"
+              class="mx-1 "
               :to="item.to"
               variant="text"
             >
@@ -146,3 +146,9 @@
     console.log('搜索:', searchQuery.value)
   }
 </script>
+
+<style scoped>
+:deep(.v-field--appended) {
+  padding-inline-end: 0 !important;
+}
+</style>
