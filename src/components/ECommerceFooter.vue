@@ -29,11 +29,11 @@
         <!-- Quick Links -->
         <v-col cols="6" md="2">
           <h3 class="text-h6 font-weight-bold mb-4">快速链接</h3>
-          <v-list color="transparent" density="compact">
+          <v-list bg-color="transparent" density="compact">
             <v-list-item
               v-for="link in quickLinks"
               :key="link.text"
-              class="px-0 text-body-2"
+              class="px-0 text-body-2 text-white"
               :to="link.to"
             >
               {{ link.text }}
@@ -44,11 +44,11 @@
         <!-- Categories -->
         <v-col cols="6" md="2">
           <h3 class="text-h6 font-weight-bold mb-4">商品分类</h3>
-          <v-list color="transparent" density="compact">
+          <v-list bg-color="transparent" density="compact">
             <v-list-item
               v-for="category in footerCategories"
               :key="category.text"
-              class="px-0 text-body-2"
+              class="px-0 text-body-2 text-white"
               :to="category.to"
             >
               {{ category.text }}
@@ -59,11 +59,11 @@
         <!-- Customer Service -->
         <v-col cols="6" md="2">
           <h3 class="text-h6 font-weight-bold mb-4">客户服务</h3>
-          <v-list color="transparent" density="compact">
+          <v-list bg-color="transparent" density="compact">
             <v-list-item
               v-for="service in customerServices"
               :key="service.text"
-              class="px-0 text-body-2"
+              class="px-0 text-body-2 text-white"
               :to="service.to"
             >
               {{ service.text }}
@@ -77,7 +77,7 @@
           <div class="contact-info">
             <div class="d-flex align-center mb-3">
               <v-icon class="mr-3" icon="mdi-map-marker" size="small" />
-              <span class="text-body-2">北京市朝阳区建国路88号</span>
+              <span class="text-body-2">广东珠海</span>
             </div>
             <div class="d-flex align-center mb-3">
               <v-icon class="mr-3" icon="mdi-phone" size="small" />
@@ -128,13 +128,13 @@
         <v-col cols="12">
           <v-divider class="mb-4" />
           <div class="d-flex flex-column flex-md-row justify-space-between align-center">
-            <div class="text-body-2 text-medium-emphasis mb-4 mb-md-0">
+            <div class="text-body-2  mb-4 mb-md-0 ">
               © 2024 ShopVue. 版权所有 |
               <a class="text-decoration-none text-primary" href="/privacy">隐私政策</a> |
               <a class="text-decoration-none text-primary" href="/terms">服务条款</a>
             </div>
             <div class="d-flex align-center">
-              <span class="text-body-2 text-medium-emphasis mr-4">支付方式:</span>
+              <span class="text-body-2  mr-4">支付方式:</span>
               <v-icon
                 v-for="payment in paymentMethods"
                 :key="payment"
@@ -203,11 +203,4 @@
 </script>
 
 <style scoped>
-.contact-info .v-icon {
-  color: rgb(var(--v-theme-primary));
-}
-
-.v-list-item:hover {
-  color: rgb(var(--v-theme-primary));
-}
 </style>

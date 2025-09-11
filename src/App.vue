@@ -2,12 +2,12 @@
   <v-app>
     <!-- Header Navigation -->
     <ECommerceHeader />
-    
+
     <!-- Main Content -->
     <v-main>
       <router-view />
     </v-main>
-    
+
     <!-- Footer -->
     <ECommerceFooter />
   </v-app>
