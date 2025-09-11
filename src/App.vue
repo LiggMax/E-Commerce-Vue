@@ -14,5 +14,9 @@
 </template>
 
 <script lang="ts" setup>
-// Components are auto-imported
+import { useThemeToggle } from '@/composables/useTheme'
+
+// 初始化主题
+const { loadTheme } = useThemeToggle()
+loadTheme()
 </script>

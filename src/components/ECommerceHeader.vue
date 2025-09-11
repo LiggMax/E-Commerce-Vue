@@ -1,6 +1,5 @@
 <template>
   <v-app-bar
-    color="white"
     :elevation="2"
     height="80"
   >
@@ -9,7 +8,7 @@
         <!-- Logo -->
         <v-col cols="2">
           <v-btn
-            class="pa-0"
+            class=""
             to="/"
             variant="text"
           >
@@ -67,6 +66,18 @@
 
         <!-- User Actions -->
         <v-col class="text-right" cols="2">
+          <!-- Theme Toggle -->
+          <v-btn
+            class="mr-2"
+            :icon="isDark ? 'mdi-heart-outline' : 'mdi-heart-outline'"
+            variant="text"
+            @click="toggleTheme"
+          >
+            <v-tooltip activator="parent" location="bottom">
+              {{ isDark ? '切换到浅色模式' : '切换到深色模式' }}
+            </v-tooltip>
+          </v-btn>
+
           <v-btn
             class="mr-2"
             icon="mdi-heart-outline"
@@ -121,10 +132,14 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { useThemeToggle } from '@/composables/useTheme'
 
   const searchQuery = ref('')
   const cartCount = ref(3)
   const wishlistCount = ref(5)
+
+  // 主题切换功能
+  const { isDark, toggleTheme } = useThemeToggle()
 
   const navItems = [
     { title: '首页', to: '/' },

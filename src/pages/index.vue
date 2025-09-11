@@ -1,11 +1,11 @@
 <template>
-  <div class="ecommerce-homepage">
+  <div>
     <!-- Hero Section -->
     <HeroSection />
-    
+
     <!-- Product Categories -->
     <ProductCategories />
-    
+
     <!-- Featured Products -->
     <FeaturedProducts />
   </div>
@@ -16,7 +16,7 @@
 </script>
 
 <style scoped>
-.ecommerce-homepage {
+/* .ecommerce-homepage {
   margin-top: -70px;
-}
+} */
 </style>
