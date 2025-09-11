@@ -69,10 +69,11 @@
           <!-- Theme Toggle -->
           <v-btn
             class="mr-2"
-            :icon="isDark ? 'mdi-heart-outline' : 'mdi-heart-outline'"
+            :icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
             variant="text"
             @click="toggleTheme"
           >
+            <v-icon />
             <v-tooltip activator="parent" location="bottom">
               {{ isDark ? '切换到浅色模式' : '切换到深色模式' }}
             </v-tooltip>
