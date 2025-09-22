@@ -115,7 +115,7 @@
 </template>
 
 <script lang="ts" setup>
-// 路由实例
+  // 路由实例
   const router = useRouter()
 
   // 响应式数据

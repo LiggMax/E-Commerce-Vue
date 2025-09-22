@@ -1,4 +1,6 @@
 <template>
+  <!-- Header Navigation -->
+  <ECommerceHeader />
   <div>
     <!-- Hero Section -->
     <HeroSection />
@@ -9,14 +11,12 @@
     <!-- Featured Products -->
     <FeaturedProducts />
   </div>
+  <!-- Footer -->
+  <ECommerceFooter />
 </template>
 
 <script lang="ts" setup>
-// Components are auto-imported
 </script>
 
 <style scoped>
-/* .ecommerce-homepage {
-  margin-top: -70px;
-} */
 </style>

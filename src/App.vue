@@ -1,34 +1,8 @@
 <template>
-  <v-app>
-    <template v-if="!isAdminRoute">
-      <!-- Header Navigation -->
-      <ECommerceHeader />
-    </template>
-
-    <!-- Main Content -->
-    <v-main>
-      <router-view />
-    </v-main>
-
-    <!-- Footer -->
-    <template v-if="!isAdminRoute">
-      <ECommerceFooter />
-    </template>
-  </v-app>
+  <router-view />
 </template>
 
 <script lang="ts" setup>
-import { useThemeToggle } from '@/composables/useTheme'
-
-// 初始化主题
-const { loadTheme } = useThemeToggle()
-loadTheme()
-
-// 获取当前路由
-const route = useRoute()
-
-// 判断是否为管理后台路由
-const isAdminRoute = computed(() => {
-  return route.path.startsWith('/admin')
-})
+// App.vue 现在只负责最基础的应用启动
+// 具体的布局由各个页面的 layout 配置决定
 </script>
