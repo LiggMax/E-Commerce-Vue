@@ -1,7 +1,7 @@
 <template>
   <v-carousel
     cycle
-    height="500"
+    :height="carouselHeight"
     interval="5000"
     show-arrows="hover"
   >
@@ -12,21 +12,21 @@
       :src="slide.image"
     >
       <v-container class="fill-height" fluid>
-        <v-row align="center" class="fill-height" justify="center">
-          <v-col class="text-center text-md-left" cols="12" md="6">
-            <div class="hero-content">
-              <h1 class="text-h2 text-md-h1 font-weight-bold mb-4 text-white">
+        <v-row align="end" class="fill-height" justify="start">
+          <v-col class="text-left" cols="12" md="6">
+            <div class="hero-content ma-md-7">
+              <h1 class="text-h4 text-md-h3 font-weight-bold mb-4 text-white">
                 {{ slide.title }}
               </h1>
               <p class="text-h6 text-md-h5 mb-6 text-white opacity-90">
                 {{ slide.subtitle }}
               </p>
-              <div class="d-flex flex-column flex-md-row gap-4">
+              <div class="d-flex flex-column flex-md-row gap-4 ">
                 <v-btn
                   color="primary"
                   elevation="4"
                   rounded
-                  size="x-large"
+                  size="large"
                   :to="slide.primaryAction.link"
                 >
                   {{ slide.primaryAction.text }}
@@ -47,13 +47,55 @@
         </v-row>
       </v-container>
 
-      <!-- Gradient overlay for better text readability -->
+      <!-- 渐变叠加以提高文本可读性 -->
       <div class="hero-overlay" />
     </v-carousel-item>
   </v-carousel>
 </template>
 
 <script setup lang="ts">
+
+// 定义 props
+  const props = defineProps({
+    height: {
+      type: [Number, String],
+      default: 600,
+    },
+  })
+
+  // 响应式高度
+  const carouselHeight = ref(Number(props.height))
+
+  // 响应式调整高度的函数
+  function updateCarouselHeight () {
+    const screenWidth = window.innerWidth
+    const baseHeight = Number(props.height)
+
+    if (screenWidth < 600) {
+      // 小屏幕设备
+      carouselHeight.value = baseHeight * 0.5
+    } else if (screenWidth < 960) {
+      // 中等屏幕设备
+      carouselHeight.value = baseHeight * 0.6
+    } else if (screenWidth < 1200) {
+      // 中等屏幕设备
+      carouselHeight.value = baseHeight * 0.8
+    } else {
+      // 大屏幕设备
+      carouselHeight.value = baseHeight
+    }
+  }
+
+  // 监听窗口大小变化
+  onMounted(() => {
+    updateCarouselHeight()
+    window.addEventListener('resize', updateCarouselHeight)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateCarouselHeight)
+  })
+
   const slides = [
     {
       image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
@@ -118,7 +160,4 @@
   z-index: 1;
 }
 
-.gap-4 {
-  gap: 1rem;
-}
 </style>
