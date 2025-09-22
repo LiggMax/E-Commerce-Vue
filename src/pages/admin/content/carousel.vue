@@ -353,7 +353,8 @@
 </template>
 
 <script lang="ts" setup>
-// 响应式数据
+  import { computed, reactive, ref } from 'vue'
+  // 响应式数据
   const dialog = ref(false)
   const previewDialog = ref(false)
   const loading = ref(false)
@@ -586,20 +587,4 @@
 </script>
 
 <style scoped>
-.carousel-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-  padding: 40px 24px 24px;
-}
-
-.v-data-table {
-  border-radius: 8px;
-}
-
-.v-avatar img {
-  object-fit: cover;
-}
 </style>
