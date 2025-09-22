@@ -21,7 +21,7 @@
               <p class="text-h6 text-md-h5 mb-6 text-white opacity-90">
                 {{ slide.subtitle }}
               </p>
-              <div class="d-flex flex-column flex-md-row gap-4 ">
+              <div class="d-flex flex-column flex-md-row ga-4 ">
                 <v-btn
                   color="primary"
                   elevation="4"
