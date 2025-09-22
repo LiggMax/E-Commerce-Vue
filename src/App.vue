@@ -1,7 +1,9 @@
 <template>
   <v-app>
-    <!-- Header Navigation -->
-    <ECommerceHeader />
+    <template v-if="!isAdminRoute">
+      <!-- Header Navigation -->
+      <ECommerceHeader />
+    </template>
 
     <!-- Main Content -->
     <v-main>
@@ -9,7 +11,9 @@
     </v-main>
 
     <!-- Footer -->
-    <ECommerceFooter />
+    <template v-if="!isAdminRoute">
+      <ECommerceFooter />
+    </template>
   </v-app>
 </template>
 
@@ -19,4 +23,12 @@ import { useThemeToggle } from '@/composables/useTheme'
 // 初始化主题
 const { loadTheme } = useThemeToggle()
 loadTheme()
+
+// 获取当前路由
+const route = useRoute()
+
+// 判断是否为管理后台路由
+const isAdminRoute = computed(() => {
+  return route.path.startsWith('/admin')
+})
 </script>
