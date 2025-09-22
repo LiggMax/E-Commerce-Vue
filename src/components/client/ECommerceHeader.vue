@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { useThemeToggle } from '@/composables/useTheme'
+  import { useThemeToggle } from '@/composables/useTheme.ts'
 
   const searchQuery = ref('')
   const cartCount = ref(3)

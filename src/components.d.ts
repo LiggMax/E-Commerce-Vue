@@ -8,11 +8,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ECommerceFooter: typeof import('./components/ECommerceFooter.vue')['default']
-    ECommerceHeader: typeof import('./components/ECommerceHeader.vue')['default']
-    FeaturedProducts: typeof import('./components/FeaturedProducts.vue')['default']
-    HeroSection: typeof import('./components/HeroSection.vue')['default']
-    ProductCategories: typeof import('./components/ProductCategories.vue')['default']
+    ECommerceFooter: typeof import('./components/client/ECommerceFooter.vue')['default']
+    ECommerceHeader: typeof import('./components/client/ECommerceHeader.vue')['default']
+    FeaturedProducts: typeof import('./components/client/FeaturedProducts.vue')['default']
+    HeroSection: typeof import('./components/client/HeroSection.vue')['default']
+    ProductCategories: typeof import('./components/client/ProductCategories.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
