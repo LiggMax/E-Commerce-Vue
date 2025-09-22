@@ -3,10 +3,10 @@
     <!-- 侧边导航栏 -->
     <v-navigation-drawer
       v-model="drawer"
+      color="surface"
       :permanent="!mobile"
       :temporary="mobile"
-      width="280"
-      color="surface"
+      width="240"
     >
       <!-- Logo区域 -->
       <v-list-item class="px-4 py-3">
@@ -22,17 +22,46 @@
 
       <!-- 导航菜单 -->
       <v-list nav>
-        <v-list-item
-          v-for="item in menuItems"
-          :key="item.value"
-          :prepend-icon="item.icon"
-          :title="item.title"
-          :to="item.to"
-          :value="item.value"
-          color="primary"
-          rounded="xl"
-          class="mx-2 my-1"
-        />
+        <template v-for="item in menuItems" :key="item.value">
+          <!-- 有子菜单的项目 -->
+          <v-list-group v-if="item.children" :value="item.value">
+            <template #activator="{ props }">
+              <v-list-item
+                v-bind="props"
+                class="mx-2 my-1"
+                color="primary"
+                :prepend-icon="item.icon"
+                rounded="xl"
+                :title="item.title"
+              />
+            </template>
+
+            <v-list-item
+              v-for="child in item.children"
+              :key="child.value"
+              class="mx-2 my-1 ml-4"
+              color="primary"
+              density="compact"
+              :prepend-icon="child.icon"
+              rounded="xl"
+              :title="child.title"
+              :to="child.to"
+              :value="child.value"
+            />
+          </v-list-group>
+
+          <!-- 没有子菜单的项目 -->
+          <v-list-item
+            v-else
+            class="mx-2 my-1"
+            color="primary"
+            :prepend-icon="item.icon"
+            rounded="xl"
+            :title="item.title"
+            :to="item.to"
+            :value="item.value"
+          />
+        </template>
       </v-list>
 
       <!-- 底部用户信息 -->
@@ -41,14 +70,14 @@
         <v-list>
           <v-list-item
             prepend-icon="mdi-account-circle"
-            title="管理员"
             subtitle="admin@example.com"
+            title="管理员"
           >
             <template #append>
               <v-btn
                 icon="mdi-logout"
-                variant="text"
                 size="small"
+                variant="text"
                 @click="handleLogout"
               />
             </template>
@@ -67,8 +96,8 @@
 
       <!-- 面包屑导航 -->
       <v-breadcrumbs
-        :items="breadcrumbs"
         class="pa-0"
+        :items="breadcrumbs"
       >
         <template #prepend>
           <v-icon size="small">mdi-home</v-icon>
@@ -83,28 +112,28 @@
       <!-- 右侧工具栏 -->
       <v-btn
         icon="mdi-bell"
-        variant="text"
         size="small"
+        variant="text"
       />
-      
+
       <v-btn
         icon="mdi-cog"
-        variant="text"
         size="small"
+        variant="text"
       />
 
       <!-- 主题切换 -->
       <v-btn
         :icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        variant="text"
         size="small"
+        variant="text"
         @click="toggleTheme"
       />
     </v-app-bar>
 
     <!-- 主要内容区域 -->
     <v-main>
-      <v-container fluid class="pa-4">
+      <v-container class="pa-4" fluid>
         <slot />
       </v-container>
     </v-main>
@@ -112,109 +141,139 @@
 </template>
 
 <script lang="ts" setup>
-import { useTheme } from 'vuetify'
-import { useDisplay } from 'vuetify'
+  import { useDisplay, useTheme } from 'vuetify'
 
-// 主题管理
-const theme = useTheme()
-const isDark = computed(() => theme.global.current.value.dark)
+  // 主题管理
+  const theme = useTheme()
+  const isDark = computed(() => theme.global.current.value.dark)
 
-const toggleTheme = () => {
-  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
-}
-
-// 响应式设计
-const { mobile } = useDisplay()
-const drawer = ref(!mobile.value)
-
-// 路由相关
-const router = useRouter()
-const route = useRoute()
-
-// 菜单项配置
-const menuItems = [
-  {
-    title: '仪表盘',
-    icon: 'mdi-view-dashboard',
-    value: 'dashboard',
-    to: '/admin/dashboard'
-  },
-  {
-    title: '用户管理',
-    icon: 'mdi-account-group',
-    value: 'users',
-    to: '/admin/users'
-  },
-  {
-    title: '内容管理',
-    icon: 'mdi-file-document',
-    value: 'content',
-    to: '/admin/content'
-  },
-  {
-    title: '订单管理',
-    icon: 'mdi-shopping',
-    value: 'orders',
-    to: '/admin/orders'
-  },
-  {
-    title: '系统设置',
-    icon: 'mdi-cog',
-    value: 'settings',
-    to: '/admin/settings'
+  function toggleTheme () {
+    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
   }
-]
 
-// 面包屑导航
-const breadcrumbs = computed(() => {
-  const pathSegments = route.path.split('/').filter(Boolean)
-  const crumbs = [
-    { title: '首页', to: '/admin/dashboard' }
+  // 响应式设计
+  const { mobile } = useDisplay()
+  const drawer = ref(!mobile.value)
+
+  // 路由相关
+  const router = useRouter()
+  const route = useRoute()
+
+  // 菜单项配置（支持二级菜单）
+  const menuItems = [
+    {
+      title: '仪表盘',
+      icon: 'mdi-view-dashboard',
+      value: 'dashboard',
+      to: '/admin/dashboard',
+    },
+    {
+      title: '用户管理',
+      icon: 'mdi-account-group',
+      value: 'users',
+      to: '/admin/users',
+    },
+    {
+      title: '内容管理',
+      icon: 'mdi-file-document',
+      value: 'content',
+      children: [
+        {
+          title: '轮播图管理',
+          icon: 'mdi-view-carousel',
+          value: 'carousel',
+          to: '/admin/content/carousel',
+        },
+        {
+          title: '文章管理',
+          icon: 'mdi-post',
+          value: 'articles',
+          to: '/admin/content/articles',
+        },
+        {
+          title: '页面管理',
+          icon: 'mdi-web',
+          value: 'pages',
+          to: '/admin/content/pages',
+        },
+      ],
+    },
+    {
+      title: '订单管理',
+      icon: 'mdi-shopping',
+      value: 'orders',
+      to: '/admin/orders',
+    },
+    {
+      title: '系统设置',
+      icon: 'mdi-cog',
+      value: 'settings',
+      to: '/admin/settings',
+    },
   ]
 
-  if (pathSegments.length > 1) {
-    const currentMenuItem = menuItems.find(item => 
-      item.to === route.path
-    )
-    if (currentMenuItem) {
-      crumbs.push({ 
-        title: currentMenuItem.title, 
-        to: route.path 
-      })
+  // 获取所有菜单项（包括子菜单）
+  function getAllMenuItems () {
+    const allItems: any[] = []
+    for (const item of menuItems) {
+      if (item.children) {
+        allItems.push(...item.children)
+      } else if (item.to) {
+        allItems.push(item)
+      }
     }
+    return allItems
   }
 
-  return crumbs
-})
+  // 面包屑导航
+  const breadcrumbs = computed(() => {
+    const pathSegments = route.path.split('/').filter(Boolean)
+    const crumbs = [
+      { title: '首页', to: '/admin/dashboard' },
+    ]
 
-// 退出登录
-const handleLogout = () => {
-  // 清除登录状态
-  localStorage.removeItem('remember_user')
-  // 跳转到登录页面
-  router.push('/admin/login')
-}
+    if (pathSegments.length > 1) {
+      const allMenuItems = getAllMenuItems()
+      const currentMenuItem = allMenuItems.find(item =>
+        item.to === route.path,
+      )
 
-// 监听屏幕尺寸变化
-watch(mobile, (newVal) => {
-  drawer.value = !newVal
-})
+      if (currentMenuItem) {
+        // 如果是子菜单项，添加父菜单到面包屑
+        const parentMenu = menuItems.find(parent =>
+          parent.children?.some(child => child.to === route.path),
+        )
+
+        if (parentMenu) {
+          crumbs.push({
+            title: parentMenu.title,
+            to: '#',
+          })
+        }
+
+        crumbs.push({
+          title: currentMenuItem.title,
+          to: route.path,
+        })
+      }
+    }
+
+    return crumbs
+  })
+
+  // 退出登录
+  function handleLogout () {
+    // 清除登录状态
+    localStorage.removeItem('remember_user')
+    // 跳转到登录页面
+    router.push('/admin/login')
+  }
+
+  // 监听屏幕尺寸变化
+  watch(mobile, newVal => {
+    drawer.value = !newVal
+  })
 </script>
 
 <style scoped>
-/* 自定义样式 */
-.v-navigation-drawer {
-  border-right: 1px solid rgb(var(--v-theme-surface-variant));
-}
-
-.v-app-bar {
-  border-bottom: 1px solid rgb(var(--v-theme-surface-variant));
-}
-
-/* 优化移动端体验 */
-@media (max-width: 960px) {
-  .v-container {
-    padding: 12px !important;
-  }
-}
-</style> 
+</style>

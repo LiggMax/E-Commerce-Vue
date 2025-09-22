@@ -289,15 +289,4 @@
   transform: translateY(-2px);
 }
 
-.v-timeline-item {
-  margin-bottom: 16px;
-}
-
-.v-list-item {
-  cursor: pointer;
-}
-
-.v-list-item:hover {
-  background-color: rgba(var(--v-theme-primary), 0.04);
-}
 </style>
