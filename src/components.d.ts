@@ -13,6 +13,7 @@ declare module 'vue' {
     ECommerceHeader: typeof import('./components/client/ECommerceHeader.vue')['default']
     FeaturedProducts: typeof import('./components/client/FeaturedProducts.vue')['default']
     HeroSection: typeof import('./components/client/HeroSection.vue')['default']
+    Notification: typeof import('./components/common/Notification.vue')['default']
     ProductCategories: typeof import('./components/client/ProductCategories.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

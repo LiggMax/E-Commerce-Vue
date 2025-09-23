@@ -385,21 +385,21 @@
   ]
 
   // 编辑表单数据
-const editForm = reactive({
-  id: null,
-  title: '',
-  subtitle: '',
-  description: '',
-  image: '',
-  imageFile: null,
-  link: '',
-  buttonText: '了解更多',
-  sort: 1,
-  status: 'active',
-  target: '_self',
-  views: 0,
-  createdAt: '',
-})
+  const editForm = reactive({
+    id: null,
+    title: '',
+    subtitle: '',
+    description: '',
+    image: '',
+    imageFile: null,
+    link: '',
+    buttonText: '了解更多',
+    sort: 1,
+    status: 'active',
+    target: '_self',
+    views: 0,
+    createdAt: '',
+  })
 
   // 模拟轮播图数据
   const carouselList = ref([
@@ -477,22 +477,22 @@ const editForm = reactive({
     if (mode === 'edit' && item) {
       Object.assign(editForm, { ...item, imageFile: null })
     } else {
-          // 重置表单
-    Object.assign(editForm, {
-      id: null,
-      title: '',
-      subtitle: '',
-      description: '',
-      image: '',
-      imageFile: null,
-      link: '',
-      buttonText: '了解更多',
-      sort: carouselList.value.length + 1,
-      status: 'active',
-      target: '_self',
-      views: 0,
-      createdAt: '',
-    })
+      // 重置表单
+      Object.assign(editForm, {
+        id: null,
+        title: '',
+        subtitle: '',
+        description: '',
+        image: '',
+        imageFile: null,
+        link: '',
+        buttonText: '了解更多',
+        sort: carouselList.value.length + 1,
+        status: 'active',
+        target: '_self',
+        views: 0,
+        createdAt: '',
+      })
     }
 
     dialog.value = true
