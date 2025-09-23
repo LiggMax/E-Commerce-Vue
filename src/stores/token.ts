@@ -12,5 +12,5 @@ export const userTokenStore = defineStore('token', () => {
   // 返回响应式变量
   return { token, setToken, removeToken }
 }, {
-  persist: true, // 持久化
+  persist: true,
 })

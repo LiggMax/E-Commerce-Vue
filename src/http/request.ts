@@ -1,9 +1,10 @@
 import axios from 'axios'
-import { BACKEND } from '@/http/admin/api.ts'
+import { userTokenStore } from '@/stores/token.ts'
 import notification from '@/utils/notification'
 
+const { token } = userTokenStore()
 const instance = axios.create({
-  baseURL: BACKEND,
+  baseURL: '/',
   timeout: 30_000,
 })
 
@@ -12,10 +13,9 @@ instance.interceptors.request.use(
   config => {
     // TODO 后续添加认证token等
 
-    // const token = localStorage.getItem('token')
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    if (token) {
+      config.headers.Authorization = token
+    }
     return config
   },
   error => {
@@ -26,11 +26,13 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   response => {
-    // 可以根据后端约定统一处理响应数据
+    if (response.data && response.data.code !== undefined && response.data.code != 200) {
+      return notification.showError(response.data.message)
+    }
     return response.data
   },
   error => {
-    // 统一处理错误
+    // 处理网络错误等其他错误
     if (error.response) {
       // 服务器返回错误状态码
       switch (error.response.status) {
@@ -40,6 +42,7 @@ instance.interceptors.response.use(
           break
         }
         case 403: {
+          // 拒绝访问
           notification.showError('拒绝访问')
           break
         }
@@ -82,10 +85,11 @@ export default {
    * POST 请求
    * @param url 请求地址
    * @param data 请求数据
+   * @param config
    * @returns Promise
    */
-  post<T = any>(url: string, data?: any): Promise<T> {
-    return instance.post(url, data)
+  post<T = any>(url: string, data?: any, config?: any): Promise<T> {
+    return instance.post(url, data, config)
   },
 
   /**

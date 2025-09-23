@@ -115,9 +115,12 @@
 </template>
 
 <script lang="ts" setup>
+  import { login } from '@/http/admin/login.ts'
+  import { userTokenStore } from '@/stores/token.ts'
+
   // 路由实例
   const router = useRouter()
-
+  const { setToken } = userTokenStore()
   // 响应式数据
   const form = ref()
   const valid = ref(false)
@@ -141,13 +144,14 @@
   // 表单验证规则
   const usernameRules = [
     (v: string) => !!v || '请输入用户名',
-    (v: string) => (v && v.length >= 3) || '用户名至少需要3个字符',
-    (v: string) => (v && v.length <= 20) || '用户名不能超过20个字符',
+    (v: string) => (v && v.length >= 6) || '用户名至少需要6个字符',
+    (v: string) => (v && v.length < 30) || '用户名不能超过20个字符',
   ]
 
   const passwordRules = [
     (v: string) => !!v || '请输入密码',
     (v: string) => (v && v.length >= 6) || '密码至少需要6个字符',
+    (v: string) => (v && v.length < 30) || '密码不能超过30个字符',
   ]
 
   // 清除特定字段错误
@@ -164,28 +168,10 @@
     errorMessage.value = ''
 
     try {
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1500))
-
-      // 这里应该调用实际的登录API
-      if (loginForm.username === 'admin' && loginForm.password === '123456') {
-        // 登录成功
-        console.log('登录成功', loginForm)
-
-        // 保存登录状态（这里应该使用实际的状态管理）
-        if (loginForm.remember) {
-          localStorage.setItem('remember_user', loginForm.username)
-        }
-
-        // 重定向到管理面板（需要根据实际路由调整）
-        await router.push('/admin/dashboard')
-      } else {
-        // 登录失败
-        errorMessage.value = '用户名或密码错误，请重试'
-      }
-    } catch (error) {
-      console.error('登录错误:', error)
-      errorMessage.value = '登录失败，请检查网络连接或稍后重试'
+      const response = await login(loginForm.username, loginForm.password)
+      // 保存token
+      setToken(response.data)
+      await router.push('/admin/dashboard')
     } finally {
       loading.value = false
     }
@@ -202,11 +188,11 @@
 
   // 页面挂载时检查是否有记住的用户名
   onMounted(() => {
-    const rememberedUser = localStorage.getItem('remember_user')
-    if (rememberedUser) {
-      loginForm.username = rememberedUser
-      loginForm.remember = true
-    }
+    // const rememberedUser = localStorage.getItem('remember_user')
+    // if (rememberedUser) {
+    //   loginForm.username = rememberedUser
+    //   loginForm.remember = true
+    // }
   })
 </script>
 

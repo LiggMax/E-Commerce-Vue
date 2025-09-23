@@ -215,7 +215,7 @@
                     :alt="editForm.title"
                     class="rounded-lg"
                     cover
-                    height="200"
+                    height="300"
                     :src="editForm.image"
                   />
                 </div>
