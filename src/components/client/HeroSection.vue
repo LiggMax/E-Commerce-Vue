@@ -56,6 +56,8 @@
 <script setup lang="ts">
 
 // 定义 props
+  import { getCarouselServer } from '@/http/client/carousel.ts'
+
   const props = defineProps({
     height: {
       type: [Number, String],
@@ -137,6 +139,12 @@
       },
     },
   ]
+  /**
+   * 获取轮播图
+   */
+  async function getCarouselList () {
+    const response = await getCarouselServer()
+  }
 </script>
 
 <style scoped>

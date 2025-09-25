@@ -11,7 +11,7 @@ import { defineConfig } from 'vite'
 
 import Layouts from 'vite-plugin-vue-layouts-next'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-import { BACKEND } from './src/http/admin/api'
+import { BACKEND } from './src/http/api'
 
 // https://vitejs.dev/config/
 export default defineConfig({
