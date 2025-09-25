@@ -22,7 +22,7 @@
       <v-col cols="12" md="3" sm="6">
         <v-card class="text-center pa-4">
           <v-icon class="mb-2" color="primary" size="48">mdi-view-carousel</v-icon>
-          <div class="text-h4 font-weight-bold">{{ carouselList.length }}</div>
+          <div class="text-h4 font-weight-bold">{{ pagination.totalItems }}</div>
           <div class="text-subtitle-2 text-medium-emphasis">总轮播图</div>
         </v-card>
       </v-col>
@@ -84,15 +84,17 @@
         <v-data-table
           class="elevation-0"
           :headers="headers"
+          hide-default-footer
           :items="filteredCarouselList"
+          :items-per-page="-1"
           :loading="loading"
           :search="search"
         >
           <!-- 轮播图预览 -->
           <template #item.image="{ item }">
-            <v-avatar class="my-2" rounded="lg" size="80">
+            <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 90px;">
               <v-img :alt="item.title" cover :src="item.image" />
-            </v-avatar>
+            </div>
           </template>
 
           <!-- 状态 -->
@@ -145,8 +147,8 @@
                 @click="openDialog('edit', item)"
               />
               <v-btn
-                :color="item.status === 'active' ? 'warning' : 'success'"
-                :icon="item.status === 'active' ? 'mdi-pause' : 'mdi-play'"
+                :color="item.status === 1 ? 'warning' : 'success'"
+                :icon="item.status === 1 ? 'mdi-pause' : 'mdi-play'"
                 size="small"
                 variant="text"
                 @click="toggleStatus(item)"
@@ -161,6 +163,36 @@
             </div>
           </template>
         </v-data-table>
+
+        <!-- 分页控件 -->
+        <div class="d-flex align-center justify-space-between mt-4 px-4">
+          <div class="text-body-2 text-medium-emphasis">
+            共 {{ pagination.totalItems }} 条记录，第 {{ pagination.page }}/{{ pagination.totalPages }} 页
+          </div>
+
+          <v-pagination
+            v-model="pagination.page"
+            density="compact"
+            :length="pagination.totalPages"
+            :total-visible="5"
+            @update:model-value="handlePageChange"
+          />
+
+          <div class="d-flex align-center">
+            <span class="mr-2">每页</span>
+            <v-select
+              v-model="pagination.pageSize"
+              class="pagination-select"
+              density="compact"
+              hide-details
+              :items="[10, 20, 50, 100]"
+              style="width: 100px;"
+              variant="outlined"
+              @update:model-value="handlePageSizeChange"
+            />
+            <span class="ml-2">条</span>
+          </div>
+        </div>
       </v-card-text>
     </v-card>
 
@@ -205,7 +237,7 @@
                   label="轮播图片"
                   prepend-inner-icon="mdi-image"
                   :rules="dialogMode === 'add' ? [v => !!v || '请选择图片'] : []"
-                  variant="outlined"
+                  show-size
                   @change="handleImageUpload"
                 />
 
@@ -227,7 +259,6 @@
                   v-model="editForm.link"
                   label="跳转链接（可选）"
                   prepend-inner-icon="mdi-link"
-                  variant="outlined"
                 />
               </v-col>
 
@@ -236,7 +267,6 @@
                   v-model="editForm.buttonText"
                   label="按钮文字"
                   prepend-inner-icon="mdi-button-cursor"
-                  variant="outlined"
                 />
               </v-col>
 
@@ -247,7 +277,7 @@
                   label="描述"
                   prepend-inner-icon="mdi-text"
                   rows="3"
-                  variant="outlined"
+                  :rules="[v => !!v || '请输入描述信息']"
                 />
               </v-col>
 
@@ -259,20 +289,6 @@
                   prepend-inner-icon="mdi-sort"
                   :rules="[v => v > 0 || '排序必须大于0']"
                   type="number"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <v-col cols="12" md="4">
-                <v-select
-                  v-model="editForm.status"
-                  :items="[
-                    { title: '启用', value: 1 },
-                    { title: '禁用', value: 0 }
-                  ]"
-                  label="状态"
-                  prepend-inner-icon="mdi-toggle-switch"
-                  variant="outlined"
                 />
               </v-col>
 
@@ -285,7 +301,18 @@
                   ]"
                   label="打开方式"
                   prepend-inner-icon="mdi-open-in-new"
-                  variant="outlined"
+                />
+              </v-col>
+
+              <v-col cols="12" md="4">
+                <v-switch
+                  v-model="editForm.status"
+                  color="success"
+                  :false-value="0"
+                  hide-details
+                  inset
+                  :label="editForm.status === 1 ? '启用' : '禁用'"
+                  :true-value="1"
                 />
               </v-col>
             </v-row>
@@ -353,7 +380,24 @@
 </template>
 
 <script lang="ts" setup>
-  import { addCarousel } from '@/http/admin/Carousel'
+  import { addCarousel, getCarousel } from '@/http/admin/Carousel.ts'
+
+  // 定义轮播图项目的接口
+  interface CarouselItem {
+    id: number
+    title: string
+    subtitle: string
+    description: string
+    image: string
+    imageFile?: File | null
+    link: string
+    buttonText: string
+    sort: number
+    status: number
+    target: string
+    views: number
+    createdAt: string
+  }
 
   // 响应式数据
   const dialog = ref(false)
@@ -364,8 +408,16 @@
   const search = ref('')
   const statusFilter = ref('all')
   const dialogMode = ref<'add' | 'edit'>('add')
-  const previewItem = ref<any>(null)
+  const previewItem = ref<CarouselItem | null>(null)
   const form = ref()
+
+  // 分页相关数据
+  const pagination = reactive({
+    page: 1,
+    pageSize: 10,
+    totalItems: 0,
+    totalPages: 0,
+  })
 
   // 表格头部配置
   const headers = [
@@ -378,16 +430,16 @@
     { title: '操作', key: 'actions', sortable: false, width: 200 },
   ]
 
-  // 状态筛选选项
+  // 修复状态筛选选项
   const statusOptions = [
     { title: '全部', value: 'all' },
-    { title: '启用', value: 'active' },
-    { title: '禁用', value: 'inactive' },
+    { title: '启用', value: 1 },
+    { title: '禁用', value: 0 },
   ]
 
   // 编辑表单数据
-  const editForm = reactive({
-    id: null,
+  const editForm = reactive<CarouselItem>({
+    id: 0,
     title: '',
     subtitle: '',
     description: '',
@@ -402,51 +454,63 @@
     createdAt: '',
   })
 
-  // 模拟轮播图数据
-  const carouselList = ref([
-    {
-      id: 1,
-      title: '春季新品上市',
-      subtitle: '全场8折优惠',
-      description: '精选春季新品，品质保证，限时优惠',
-      image: 'https://picsum.photos/800/400?random=1',
-      link: '/products/spring',
-      buttonText: '立即购买',
-      sort: 1,
-      status: 1,
-      target: '_self',
-      views: 1234,
-      createdAt: '2024-01-01',
-    },
-    {
-      id: 2,
-      title: '夏日清仓大促',
-      subtitle: '低至3折起',
-      description: '夏季商品清仓，机会难得',
-      image: 'https://picsum.photos/800/400?random=2',
-      link: '/products/summer',
-      buttonText: '查看详情',
-      sort: 2,
-      status: 'active',
-      target: '_blank',
-      views: 856,
-      createdAt: '2024-01-02',
-    },
-    {
-      id: 3,
-      title: '会员专享',
-      subtitle: 'VIP特权',
-      description: '会员专享优惠，更多特权等你来',
-      image: 'https://picsum.photos/800/400?random=3',
-      link: '/vip',
-      buttonText: '成为会员',
-      sort: 3,
-      status: 'inactive',
-      target: '_self',
-      views: 423,
-      createdAt: '2024-01-03',
-    },
-  ])
+  // 轮播图数据
+  const carouselList = ref<CarouselItem[]>([])
+
+  // 获取轮播图数据
+  async function fetchCarouselList () {
+    loading.value = true
+    try {
+      const response = await getCarousel(pagination.page, pagination.pageSize)
+      const carouselData = response.data.list || []
+      // 更新分页信息
+      pagination.totalItems = response.data.total || 0
+      pagination.totalPages = response.data.pages || 1
+
+      carouselList.value = carouselData.map((item: {
+        id: number
+        title: string
+        subtitle: string
+        description: string
+        imagePath: string
+        link: string
+        buttonText: string
+        sort: number
+        status: number
+        target: string
+      }) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        description: item.description,
+        image: item.imagePath,
+        link: item.link,
+        buttonText: item.buttonText,
+        sort: item.sort,
+        status: item.status,
+        target: item.target,
+        views: 0,
+        createdAt: '',
+      }))
+    } catch (error) {
+      console.error('获取轮播图数据失败:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 页码变化处理
+  function handlePageChange (newPage: number) {
+    pagination.page = newPage
+    fetchCarouselList()
+  }
+
+  // 每页条数变化处理
+  function handlePageSizeChange (newSize: number) {
+    pagination.pageSize = newSize
+    pagination.page = 1 // 重置为第一页
+    fetchCarouselList()
+  }
 
   // 计算属性
   const activeCount = computed(() =>
@@ -465,14 +529,14 @@
     let filtered = carouselList.value
 
     if (statusFilter.value !== 'all') {
-      filtered = filtered.filter(item => item.status === statusFilter.value)
+      filtered = filtered.filter(item => item.status === Number(statusFilter.value))
     }
 
     return filtered
   })
 
   // 打开对话框
-  function openDialog (mode: 'add' | 'edit', item?: any) {
+  function openDialog (mode: 'add' | 'edit', item?: CarouselItem) {
     dialogMode.value = mode
 
     if (mode === 'edit' && item) {
@@ -480,7 +544,7 @@
     } else {
       // 重置表单
       Object.assign(editForm, {
-        id: null,
+        id: 0,
         title: '',
         subtitle: '',
         description: '',
@@ -543,32 +607,20 @@
 
       if (dialogMode.value === 'add') {
         const result = await addCarousel(formData)
-        // 刷新列表
-        const newItem = {
-          ...editForm,
-          id: result.data.id || Date.now(),
-          image: result.data.imagePath || editForm.image,
-          createdAt: new Date().toISOString().split('T')[0],
-        }
-        carouselList.value.push(newItem)
+        // 添加成功后刷新列表
+        await fetchCarouselList()
+        closeDialog()
       } else {
         // 编辑模式
         if (editForm.id) {
           // TODO 实现编辑
           // const result = await updateCarousel(formData)
 
-          const index = carouselList.value.findIndex(item => item.id === editForm.id)
-          if (index !== -1) {
-            carouselList.value[index] = {
-              ...carouselList.value[index],
-              ...editForm,
-              id: editForm.id,
-            }
-          }
+          // 编辑成功后刷新列表
+          await fetchCarouselList()
+          closeDialog()
         }
       }
-
-      closeDialog()
     } catch (error) {
       console.error('保存失败:', error)
     } finally {
@@ -577,22 +629,32 @@
   }
 
   // 切换状态
-  function toggleStatus (item: any) {
+  async function toggleStatus (item: CarouselItem) {
     item.status = item.status === 1 ? 0 : 1
+    // TODO: 调用后端API更新状态
+    // await updateCarouselStatus(item.id, item.status)
+
+    // 刷新数据
+    await fetchCarouselList()
   }
 
   // 删除轮播图
-  function deleteCarousel (item: any) {
+  async function deleteCarousel (item: CarouselItem) {
     if (confirm('确定要删除这个轮播图吗？')) {
-      const index = carouselList.value.findIndex(i => i.id === item.id)
-      if (index !== -1) {
-        carouselList.value.splice(index, 1)
+      try {
+        // TODO: 调用后端API删除轮播图
+        // await deleteCarouselById(item.id)
+
+        // 刷新数据
+        await fetchCarouselList()
+      } catch (error) {
+        console.error('删除失败:', error)
       }
     }
   }
 
   // 调整排序
-  function changeSort (item: any, direction: 'up' | 'down') {
+  async function changeSort (item: CarouselItem, direction: 'up' | 'down') {
     const currentIndex = carouselList.value.findIndex(i => i.id === item.id)
     const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
 
@@ -606,15 +668,26 @@
       for (const [index, item] of carouselList.value.entries()) {
         item.sort = index + 1
       }
+
+      // TODO: 调用后端API更新排序
+      // await updateCarouselSort(carouselList.value.map(item => ({ id: item.id, sort: item.sort })))
+
+      // 刷新数据
+      await fetchCarouselList()
     }
   }
 
   // 预览轮播图
-  function previewCarousel (item: any) {
+  function previewCarousel (item: CarouselItem) {
     previewItem.value = item
     previewDialog.value = true
   }
+
+  onMounted(() => {
+    fetchCarouselList()
+  })
 </script>
 
 <style scoped>
+
 </style>
