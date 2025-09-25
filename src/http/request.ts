@@ -1,8 +1,11 @@
 import axios from 'axios'
 import { userTokenStore } from '@/stores/token.ts'
+import { storeToRefs } from 'pinia'
 import notification from '@/utils/notification'
 
-const { token } = userTokenStore()
+const store = userTokenStore()
+const { token } = storeToRefs(store)
+console.log('获取的token', token.value)
 const instance = axios.create({
   baseURL: '/',
   timeout: 30_000,
@@ -11,10 +14,8 @@ const instance = axios.create({
 // 请求拦截器
 instance.interceptors.request.use(
   config => {
-    // TODO 后续添加认证token等
-
-    if (token) {
-      config.headers.Authorization = token
+    if (token.value) {
+      config.headers.Authorization = token.value
     }
     return config
   },

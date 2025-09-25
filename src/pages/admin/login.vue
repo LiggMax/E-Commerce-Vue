@@ -170,6 +170,7 @@
     try {
       const response = await login(loginForm.username, loginForm.password)
       // 保存token
+      console.log('接收到的token:', response.data)
       setToken(response.data)
       await router.push('/admin/dashboard')
     } finally {

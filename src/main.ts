@@ -19,10 +19,7 @@ import App from './App.vue'
 import 'unfonts.css'
 
 const app = createApp(App)
-const pinia = createPinia()
 
-pinia.use(piniaPluginPersistedstate)
-app.use(pinia)
 registerPlugins(app)
 
 app.mount('#app')

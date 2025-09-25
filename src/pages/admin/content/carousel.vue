@@ -98,11 +98,11 @@
           <!-- 状态 -->
           <template #item.status="{ item }">
             <v-chip
-              :color="item.status === 'active' ? 'success' : 'warning'"
+              :color="item.status === 1 ? 'success' : 'warning'"
               size="small"
               variant="tonal"
             >
-              {{ item.status === 'active' ? '启用' : '禁用' }}
+              {{ item.status === 1 ? '启用' : '禁用' }}
             </v-chip>
           </template>
 
@@ -267,8 +267,8 @@
                 <v-select
                   v-model="editForm.status"
                   :items="[
-                    { title: '启用', value: 'active' },
-                    { title: '禁用', value: 'inactive' }
+                    { title: '启用', value: 1 },
+                    { title: '禁用', value: 0 }
                   ]"
                   label="状态"
                   prepend-inner-icon="mdi-toggle-switch"
@@ -353,8 +353,9 @@
 </template>
 
 <script lang="ts" setup>
+  import { addCarousel } from '@/http/admin/Carousel'
 
-// 响应式数据
+  // 响应式数据
   const dialog = ref(false)
   const previewDialog = ref(false)
   const loading = ref(false)
@@ -395,7 +396,7 @@
     link: '',
     buttonText: '了解更多',
     sort: 1,
-    status: 'active',
+    status: 1,
     target: '_self',
     views: 0,
     createdAt: '',
@@ -412,7 +413,7 @@
       link: '/products/spring',
       buttonText: '立即购买',
       sort: 1,
-      status: 'active',
+      status: 1,
       target: '_self',
       views: 1234,
       createdAt: '2024-01-01',
@@ -449,11 +450,11 @@
 
   // 计算属性
   const activeCount = computed(() =>
-    carouselList.value.filter(item => item.status === 'active').length,
+    carouselList.value.filter(item => item.status === 1).length,
   )
 
   const inactiveCount = computed(() =>
-    carouselList.value.filter(item => item.status === 'inactive').length,
+    carouselList.value.filter(item => item.status === 0).length,
   )
 
   const totalViews = computed(() =>
@@ -488,7 +489,7 @@
         link: '',
         buttonText: '了解更多',
         sort: carouselList.value.length + 1,
-        status: 'active',
+        status: 1,
         target: '_self',
         views: 0,
         createdAt: '',
@@ -523,20 +524,47 @@
     saving.value = true
 
     try {
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const formData = new FormData()
+
+      // 添加表单数据
+      formData.append('title', editForm.title)
+      formData.append('subtitle', editForm.subtitle)
+      formData.append('description', editForm.description)
+      formData.append('link', editForm.link)
+      formData.append('buttonText', editForm.buttonText)
+      formData.append('sort', editForm.sort.toString())
+      formData.append('status', editForm.status.toString())
+      formData.append('target', editForm.target)
+
+      // 添加图片文件
+      if (editForm.imageFile) {
+        formData.append('imageFile', editForm.imageFile)
+      }
 
       if (dialogMode.value === 'add') {
+        const result = await addCarousel(formData)
+        // 刷新列表
         const newItem = {
           ...editForm,
-          id: Date.now(),
+          id: result.data.id || Date.now(),
+          image: result.data.imagePath || editForm.image,
           createdAt: new Date().toISOString().split('T')[0],
         }
         carouselList.value.push(newItem)
       } else {
-        const index = carouselList.value.findIndex(item => item.id === editForm.id)
-        if (index !== -1) {
-          carouselList.value[index] = { ...editForm }
+        // 编辑模式
+        if (editForm.id) {
+          // TODO 实现编辑
+          // const result = await updateCarousel(formData)
+
+          const index = carouselList.value.findIndex(item => item.id === editForm.id)
+          if (index !== -1) {
+            carouselList.value[index] = {
+              ...carouselList.value[index],
+              ...editForm,
+              id: editForm.id,
+            }
+          }
         }
       }
 
@@ -550,7 +578,7 @@
 
   // 切换状态
   function toggleStatus (item: any) {
-    item.status = item.status === 'active' ? 'inactive' : 'active'
+    item.status = item.status === 1 ? 0 : 1
   }
 
   // 删除轮播图
