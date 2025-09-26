@@ -1,15 +1,16 @@
 <template>
   <v-carousel
+    class="rounded-carousel"
     cycle
     :height="carouselHeight"
     interval="5000"
     show-arrows="hover"
   >
     <v-carousel-item
-      v-for="(slide, index) in slides"
+      v-for="(slide, index) in slidesList"
       :key="index"
       cover
-      :src="slide.image"
+      :src="slide.images.largeImage"
     >
       <v-container class="fill-height" fluid>
         <v-row align="end" class="fill-height" justify="start">
@@ -54,7 +55,6 @@
 </template>
 
 <script setup lang="ts">
-
 // 定义 props
   import { getCarouselServer } from '@/http/client/carousel.ts'
 
@@ -88,63 +88,59 @@
     }
   }
 
-  // 监听窗口大小变化
+  interface CarouselItem {
+    images: {
+      largeImage: string
+      smallImage: string
+    }
+    title: string
+    subtitle: string
+    primaryAction: {
+      text: string
+      link: string
+    }
+    secondaryAction: {
+      text: string
+      link: string
+    }
+  }
+  const slidesList = ref<CarouselItem[]>([])
+
+  /**
+   * 获取轮播图
+   */
+  async function getCarouselList () {
+    try {
+      const response = await getCarouselServer()
+      // 将获取到的数据映射为组件需要的格式
+      slidesList.value = response.data.map((item: any) => ({
+        images: item.images,
+        title: item.title,
+        subtitle: item.subtitle,
+        primaryAction: {
+          text: item.buttonText,
+          link: item.link || '/',
+        },
+        secondaryAction: {
+          text: '了解更多',
+          link: item.link || '/',
+        },
+      }))
+    } catch (error) {
+      console.error('获取轮播图失败:', error)
+    }
+  }
+
   onMounted(() => {
     updateCarouselHeight()
     window.addEventListener('resize', updateCarouselHeight)
+    // 获取轮播图数据
+    getCarouselList()
   })
 
   onUnmounted(() => {
     window.removeEventListener('resize', updateCarouselHeight)
   })
-
-  const slides = [
-    {
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      title: '夏季大促销',
-      subtitle: '精选商品低至3折，限时优惠不容错过',
-      primaryAction: {
-        text: '立即购买',
-        link: '/deals',
-      },
-      secondaryAction: {
-        text: '查看详情',
-        link: '/summer-sale',
-      },
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-      title: '新品上市',
-      subtitle: '最新时尚单品，引领潮流趋势',
-      primaryAction: {
-        text: '探索新品',
-        link: '/new-arrivals',
-      },
-      secondaryAction: {
-        text: '了解更多',
-        link: '/about-new',
-      },
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80',
-      title: '品质保证',
-      subtitle: '精选优质商品，为您提供最佳购物体验',
-      primaryAction: {
-        text: '精品推荐',
-        link: '/featured',
-      },
-      secondaryAction: {
-        text: '品质承诺',
-        link: '/quality',
-      },
-    },
-  ]
-  /**
-   * 获取轮播图
-   */
-  async function getCarouselList () {
-    const response = await getCarouselServer()
-  }
 </script>
 
 <style scoped>
@@ -168,4 +164,9 @@
   z-index: 1;
 }
 
+.rounded-carousel {
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 15px;
+}
 </style>

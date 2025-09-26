@@ -1,17 +1,13 @@
 <template>
-  <!-- Header Navigation -->
+  <!-- 头部标题导航 -->
   <ECommerceHeader />
-  <div>
-    <!-- Hero Section -->
-    <HeroSection />
-
-    <!-- Product Categories -->
-    <ProductCategories />
-
-    <!-- Featured Products -->
-    <FeaturedProducts />
-  </div>
-  <!-- Footer -->
+  <!-- 轮播图 -->
+  <HeroSection />
+  <!-- 产品分类 -->
+  <ProductCategories />
+  <!-- 热门推荐 -->
+  <FeaturedProducts />
+  <!-- 页脚 -->
   <ECommerceFooter />
 </template>
 
