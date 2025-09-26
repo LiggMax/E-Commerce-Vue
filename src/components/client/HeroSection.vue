@@ -3,6 +3,7 @@
     class="rounded-carousel"
     cycle
     :height="carouselHeight"
+    hide-delimiters
     interval="5000"
     show-arrows="hover"
   >
@@ -10,7 +11,7 @@
       v-for="(slide, index) in slidesList"
       :key="index"
       cover
-      :src="slide.images.largeImage"
+      :src="slide.currentImage"
     >
       <v-container class="fill-height" fluid>
         <v-row align="end" class="fill-height" justify="start">
@@ -22,7 +23,7 @@
               <p class="text-h6 text-md-h5 mb-6 text-white opacity-90">
                 {{ slide.subtitle }}
               </p>
-              <div class="d-flex flex-column flex-md-row ga-4 ">
+              <div class="d-flex flex-md-row ga-4 ">
                 <v-btn
                   color="primary"
                   elevation="4"
@@ -93,6 +94,7 @@
       largeImage: string
       smallImage: string
     }
+    currentImage: string // 当前显示的图片
     title: string
     subtitle: string
     primaryAction: {
@@ -107,14 +109,33 @@
   const slidesList = ref<CarouselItem[]>([])
 
   /**
+   * 预加载大图并在加载完成后替换
+   */
+  function preloadLargeImages (items: CarouselItem[]) {
+    for (const item of items) {
+      const img = new Image()
+      img.addEventListener('load', () => {
+        // 大图加载完成后，替换当前显示的图片
+        item.currentImage = item.images.largeImage
+      })
+      // 设置图片源，开始加载
+      img.src = item.images.largeImage
+    }
+  }
+
+  /**
    * 获取轮播图
    */
   async function getCarouselList () {
     try {
       const response = await getCarouselServer()
       // 将获取到的数据映射为组件需要的格式
-      slidesList.value = response.data.map((item: any) => ({
-        images: item.images,
+      const carouselItems = response.data.map((item: any) => ({
+        images: {
+          largeImage: item.images.largeImage,
+          smallImage: item.images.smallImage,
+        },
+        currentImage: item.images.smallImage, // 初始显示小图
         title: item.title,
         subtitle: item.subtitle,
         primaryAction: {
@@ -126,6 +147,11 @@
           link: item.link || '/',
         },
       }))
+
+      slidesList.value = carouselItems
+
+      // 预加载大图
+      preloadLargeImages(carouselItems)
     } catch (error) {
       console.error('获取轮播图失败:', error)
     }
