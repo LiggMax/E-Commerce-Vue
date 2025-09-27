@@ -487,7 +487,7 @@
       const formData = new FormData()
 
       // 添加表单数据
-      formData.append('name', editForm.name)
+      formData.append('title', editForm.name)
       formData.append('originalPrice', editForm.originalPrice.toString())
       formData.append('currentPrice', editForm.currentPrice.toString())
       formData.append('reviews', editForm.reviews.toString())
