@@ -28,7 +28,7 @@
               class="product-image"
               cover
               height="240"
-              :src="product.image"
+              :src="product.images.largeImage"
             />
 
             <!-- Discount Badge -->
@@ -67,7 +67,7 @@
 
           <v-card-title class="pa-4 pb-2">
             <h3 class="text-subtitle-1 font-weight-bold text-truncate">
-              {{ product.name }}
+              {{ product.title }}
             </h3>
           </v-card-title>
 
@@ -132,91 +132,23 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { getFeaturedServer } from '@/http/client/featured.ts'
 
   const favoriteProducts = ref<number[]>([])
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: 'iPhone 15 Pro Max 256GB',
-      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 9999,
-      originalPrice: 10_999,
-      discount: 9,
-      rating: 4.8,
-      reviews: 1247,
-    },
-    {
-      id: 2,
-      name: 'MacBook Air M3 芯片',
-      image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 8999,
-      originalPrice: null,
-      discount: null,
-      rating: 4.9,
-      reviews: 856,
-    },
-    {
-      id: 3,
-      name: 'Nike Air Max 270 运动鞋',
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 899,
-      originalPrice: 1299,
-      discount: 31,
-      rating: 4.6,
-      reviews: 2341,
-    },
-    {
-      id: 4,
-      name: '戴森 V15 无线吸尘器',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 3999,
-      originalPrice: 4599,
-      discount: 13,
-      rating: 4.7,
-      reviews: 567,
-    },
-    {
-      id: 5,
-      name: 'AirPods Pro 第三代',
-      image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 1899,
-      originalPrice: null,
-      discount: null,
-      rating: 4.8,
-      reviews: 1893,
-    },
-    {
-      id: 6,
-      name: 'Kindle Paperwhite 电子书',
-      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 899,
-      originalPrice: 1099,
-      discount: 18,
-      rating: 4.5,
-      reviews: 3421,
-    },
-    {
-      id: 7,
-      name: 'Sony WH-1000XM5 耳机',
-      image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 2399,
-      originalPrice: 2799,
-      discount: 14,
-      rating: 4.9,
-      reviews: 1156,
-    },
-    {
-      id: 8,
-      name: '小米智能手环 8',
-      image: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      currentPrice: 299,
-      originalPrice: 399,
-      discount: 25,
-      rating: 4.4,
-      reviews: 5672,
-    },
-  ]
+  interface CarouselItem {
+    id: string
+    title: string
+    images: {
+      largeImage: string
+      smallImage: string
+    }
+    originalPrice: number
+    currentPrice: number
+    reviews: number
+    rating: number
+  }
+  const featuredProducts = ref<CarouselItem[]>([])
 
   function toggleFavorite (productId: number) {
     const index = favoriteProducts.value.indexOf(productId)
@@ -236,6 +168,19 @@
     console.log('快速预览:', product.name)
   // 这里可以打开产品详情弹窗
   }
+
+  /**
+   * 获取精选商品列表
+   */
+  async function getFeaturedProducts () {
+    try {
+      const data = await getFeaturedServer()
+      featuredProducts.value = data.data
+    } finally {}
+  }
+  onMounted(() => {
+    getFeaturedProducts()
+  })
 </script>
 
 <style scoped>
