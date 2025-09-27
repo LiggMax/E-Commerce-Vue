@@ -1,20 +1,21 @@
 <template>
-  <v-container class="py-12">
+  <v-container>
+
     <v-row>
-      <v-col class="text-center mb-8" cols="12">
+      <v-col class="text-center mb-2" cols="12">
         <h2 class="text-h3 font-weight-bold mb-4">热门精选</h2>
         <p class="text-h6 text-medium-emphasis">精选优质商品，为您精选最受欢迎的产品</p>
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="featuredProducts.length > 0">
       <v-col
         v-for="product in featuredProducts"
         :key="product.id"
         cols="12"
-        lg="3"
-        md="4"
-        sm="6"
+        lg="2"
+        md="3"
+        sm="5"
       >
         <v-card
           class="product-card mx-auto"
@@ -27,7 +28,7 @@
             <v-img
               class="product-image"
               cover
-              height="240"
+              height="230"
               :src="product.images.largeImage"
             />
 
@@ -43,14 +44,14 @@
             </v-chip>
 
             <!-- Favorite Button -->
-            <v-btn
-              class="favorite-btn"
-              color="white"
-              elevation="2"
-              icon="mdi-heart-outline"
-              size="small"
-              @click.stop="toggleFavorite(product.id)"
-            />
+            <!--            <v-btn-->
+            <!--              class="favorite-btn"-->
+            <!--              color="white"-->
+            <!--              elevation="2"-->
+            <!--              icon="mdi-heart-outline"-->
+            <!--              size="small"-->
+            <!--              @click.stop="toggleFavorite(product.id)"-->
+            <!--            />-->
 
             <!-- Quick View Overlay -->
             <div class="quick-view-overlay">
@@ -147,17 +148,18 @@
     currentPrice: number
     reviews: number
     rating: number
+    discount: number
   }
   const featuredProducts = ref<CarouselItem[]>([])
 
-  function toggleFavorite (productId: number) {
-    const index = favoriteProducts.value.indexOf(productId)
-    if (index === -1) {
-      favoriteProducts.value.push(productId)
-    } else {
-      favoriteProducts.value.splice(index, 1)
-    }
-  }
+  // function toggleFavorite (productId: string) {
+  //   const index = favoriteProducts.value.indexOf(productId)
+  //   if (index === -1) {
+  //     favoriteProducts.value.push(productId)
+  //   } else {
+  //     favoriteProducts.value.splice(index, 1)
+  //   }
+  // }
 
   function addToCart (product: any) {
     console.log('添加到购物车:', product.name)

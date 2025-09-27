@@ -1,65 +1,144 @@
 <template>
-  <v-container class="py-12">
-    <v-row>
-      <v-col class="text-center mb-8" cols="12">
-        <h2 class="text-h3 font-weight-bold mb-4">商品分类</h2>
-        <p class="text-h6 text-medium-emphasis">探索我们精心挑选的各类商品</p>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col
-        v-for="category in categories"
-        :key="category.id"
-        cols="12"
-        lg="3"
-        md="4"
-        sm="6"
-      >
-        <v-card
-          class="category-card mx-auto"
-          elevation="4"
-          hover
-          max-width="300"
-          rounded="lg"
-          :to="category.link"
-        >
-          <v-img
-            class="category-image"
-            cover
-            height="200"
-            :src="category.image"
-          >
-            <div class="category-overlay d-flex align-center justify-center">
-              <v-icon
-                class="category-icon"
-                color="white"
-                :icon="category.icon"
-                size="48"
-              />
-            </div>
-          </v-img>
-
-          <v-card-title class="text-center pa-4">
-            <h3 class="text-h6 font-weight-bold">{{ category.name }}</h3>
-          </v-card-title>
-
-          <v-card-subtitle class="text-center pb-4">
-            {{ category.description }}
-          </v-card-subtitle>
-
-          <v-card-actions class="justify-center pb-4">
-            <v-btn
-              append-icon="mdi-arrow-right"
-              color="primary"
-              rounded
-              :to="category.link"
-              variant="outlined"
-            >
-              浏览商品
-            </v-btn>
-          </v-card-actions>
+  <v-container class="pa-0" fluid>
+    <!-- Main Layout: Sidebar + Content -->
+    <v-row no-gutters>
+      <!-- Left Sidebar -->
+      <v-col class="pa-4" cols="12" md="3">
+        <v-card class="pa-4" elevation="2" rounded="lg">
+          <h3 class="text-h6 font-weight-bold mb-4">商品分类</h3>
+          <v-list density="compact">
+            <v-list-item
+              v-for="sidebarCategory in sidebarCategories"
+              :key="sidebarCategory.id"
+              class="mb-1"
+              hover
+              :prepend-icon="sidebarCategory.icon"
+              rounded="lg"
+              :title="sidebarCategory.name"
+            />
+          </v-list>
         </v-card>
+      </v-col>
+
+      <!-- Main Content Area -->
+      <v-col class="pa-4" cols="12" md="9">
+
+        <!-- 2x2 Category Grid -->
+        <v-row v-if="categories.length > 0" class="mb-6">
+          <v-col
+            v-for="category in categories"
+            :key="category.id"
+            class="pa-2"
+            cols="12"
+            md="6"
+          >
+            <v-card
+              class="category-card"
+              elevation="4"
+              hover
+              rounded="xl"
+              :to="category.link"
+            >
+              <v-card-text class="pa-6">
+                <!-- Category Header -->
+                <v-row align="center" class="mb-4">
+                  <v-col cols="8">
+                    <h3 class="text-h5 font-weight-bold mb-1">
+                      {{ category.name }}
+                    </h3>
+                    <p class="text-body-1 mb-2">{{ category.description }}</p>
+                  </v-col>
+                  <v-col class="text-center" cols="4">
+                    <v-img
+                      class="mx-auto"
+                      height="80"
+                      :src="category.iconImage"
+                      width="80"
+                    />
+                  </v-col>
+                </v-row>
+
+                <!-- Product Previews -->
+                <v-row>
+                  <v-col
+                    v-for="product in category.products"
+                    :key="product.id"
+                    class="pa-1"
+                    cols="4"
+                  >
+                    <v-card
+                      class="pa-2"
+                      color="white"
+                      elevation="2"
+                      rounded="lg"
+                    >
+                      <v-img
+                        class="rounded mb-2"
+                        cover
+                        height="80"
+                        :src="product.image"
+                      />
+                      <div class="text-center">
+                        <span class="text-body-2 font-weight-bold text-pink">
+                          ¥{{ product.price }}
+                        </span>
+                      </div>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <!-- Product Listings Grid -->
+        <v-row>
+          <v-col
+            v-for="product in productListings"
+            :key="product.id"
+            class="pa-2"
+            cols="12"
+            lg="2"
+            md="4"
+            sm="6"
+          >
+            <v-card
+              class="product-card"
+              elevation="2"
+              hover
+              rounded="lg"
+            >
+              <v-img
+                class="rounded-t-lg"
+                cover
+                height="200"
+                :src="product.image"
+              />
+              <v-card-text class="pa-3">
+                <h4 class="text-body-1 font-weight-medium mb-2 line-clamp-2">
+                  {{ product.title }}
+                </h4>
+                <div class="d-flex align-center justify-space-between">
+                  <span class="text-h6 font-weight-bold text-pink">
+                    ¥{{ product.price }}
+                  </span>
+                  <span
+                    v-if="product.originalPrice"
+                    class="text-caption text-grey text-decoration-line-through"
+                  >
+                    ¥{{ product.originalPrice }}
+                  </span>
+                </div>
+                <div
+                  v-if="product.wantedCount"
+                  class="text-caption text-grey mt-1"
+                >
+                  {{ product.wantedCount }}人想要
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -69,109 +148,90 @@
   const categories = [
     {
       id: 1,
-      name: '时尚服装',
-      description: '最新潮流服饰，展现个人风格',
-      image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-tshirt-crew',
-      link: '/category/fashion',
+      name: '衣橱捡漏',
+      englishTitle: 'APPAREL',
+      description: '时尚美衣低价淘',
+      bgClass: 'apparel-bg',
+      iconImage: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+      link: '/category/apparel',
+      products: [
+        {
+          id: 1,
+          image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 69,
+        },
+        {
+          id: 2,
+          image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 58,
+        },
+      ],
     },
     {
       id: 2,
-      name: '数码电子',
-      description: '前沿科技产品，智能生活必备',
-      image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-laptop',
-      link: '/category/electronics',
+      name: '手机数码',
+      englishTitle: 'DIGITAL',
+      description: '热门装备省心入',
+      bgClass: 'digital-bg',
+      iconImage: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+      link: '/category/digital',
+      products: [
+        {
+          id: 3,
+          image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 7699,
+        },
+        {
+          id: 4,
+          image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 85,
+        },
+      ],
     },
     {
       id: 3,
-      name: '家居用品',
-      description: '温馨家居，打造舒适生活空间',
-      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-sofa',
-      link: '/category/home',
+      name: '二次元',
+      englishTitle: 'MODEL',
+      description: '烫门新品随手入',
+      bgClass: 'anime-bg',
+      iconImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+      link: '/category/anime',
+      products: [
+        {
+          id: 5,
+          image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 1000,
+        },
+        {
+          id: 6,
+          image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 190,
+        },
+      ],
     },
     {
       id: 4,
-      name: '运动健身',
-      description: '专业运动装备，助力健康生活',
-      image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-dumbbell',
-      link: '/category/sports',
-    },
-    {
-      id: 5,
-      name: '美妆护肤',
-      description: '精选美妆产品，绽放自然美丽',
-      image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-lipstick',
-      link: '/category/beauty',
-    },
-    {
-      id: 6,
-      name: '图书文具',
-      description: '知识的海洋，学习的伙伴',
-      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-book-open-page-variant',
-      link: '/category/books',
-    },
-    {
-      id: 7,
-      name: '食品饮料',
-      description: '优质食材，享受美味生活',
-      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-food-apple',
-      link: '/category/food',
-    },
-    {
-      id: 8,
-      name: '母婴用品',
-      description: '安全放心，呵护宝宝成长',
-      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      icon: 'mdi-baby-face-outline',
-      link: '/category/baby',
+      name: '省钱卡券',
+      englishTitle: 'COUPON',
+      description: '吃喝玩乐放心购',
+      bgClass: 'coupon-bg',
+      iconImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
+      link: '/category/coupon',
+      products: [
+        {
+          id: 7,
+          image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 10,
+        },
+        {
+          id: 8,
+          image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+          price: 96.88,
+        },
+      ],
     },
   ]
 </script>
 
 <style scoped>
-.category-card {
-  transition: all 0.3s ease;
-}
-
-.category-card:hover {
-  transform: translateY(-8px);
-}
-
-.category-image {
-  position: relative;
-}
-
-.category-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.2) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.category-card:hover .category-overlay {
-  opacity: 1;
-}
-
-.category-icon {
-  transform: scale(0);
-  transition: transform 0.3s ease;
-}
-
-.category-card:hover .category-icon {
-  transform: scale(1);
-}
 </style>

@@ -1,58 +1,62 @@
 <template>
-  <v-carousel
-    class="rounded-carousel"
-    cycle
-    :height="carouselHeight"
-    hide-delimiters
-    interval="5000"
-    show-arrows="hover"
-  >
-    <v-carousel-item
-      v-for="(slide, index) in slidesList"
-      :key="index"
-      cover
-      :src="slide.currentImage"
+  <v-container>
+    <v-carousel
+      v-if="slidesList.length > 0"
+      class="rounded-carousel"
+      cycle
+      :height="carouselHeight"
+      hide-delimiters
+      interval="5000"
+      show-arrows="hover"
     >
-      <v-container class="fill-height" fluid>
-        <v-row align="end" class="fill-height" justify="start">
-          <v-col class="text-left" cols="12" md="6">
-            <div class="hero-content ma-md-7">
-              <h1 class="text-h4 text-md-h3 font-weight-bold mb-4 text-white">
-                {{ slide.title }}
-              </h1>
-              <p class="text-h6 text-md-h5 mb-6 text-white opacity-90">
-                {{ slide.subtitle }}
-              </p>
-              <div class="d-flex flex-md-row ga-4 ">
-                <v-btn
-                  color="primary"
-                  elevation="4"
-                  rounded
-                  size="large"
-                  :to="slide.primaryAction.link"
-                >
-                  {{ slide.primaryAction.text }}
-                  <v-icon end icon="mdi-arrow-right" />
-                </v-btn>
-                <v-btn
-                  color="white"
-                  rounded
-                  size="large"
-                  :to="slide.secondaryAction.link"
-                  variant="outlined"
-                >
-                  {{ slide.secondaryAction.text }}
-                </v-btn>
+      <v-carousel-item
+        v-for="(slide, index) in slidesList"
+        :key="index"
+        cover
+        :src="slide.currentImage"
+      >
+        <v-container class="fill-height" fluid>
+          <v-row align="end" class="fill-height" justify="start">
+            <v-col class="text-left" cols="12" md="6">
+              <div class="hero-content ma-md-7">
+                <h1 class="text-h4 text-md-h3 font-weight-bold mb-1 text-white">
+                  {{ slide.title }}
+                </h1>
+                <p class="text-h6 text-md-h5 mb-1 text-white opacity-90">
+                  {{ slide.subtitle }}
+                </p>
+                <div class="d-flex flex-md-row ga-4 ">
+                  <v-btn
+                    color="primary"
+                    elevation="4"
+                    rounded
+                    size="large"
+                    :to="slide.primaryAction.link"
+                  >
+                    {{ slide.primaryAction.text }}
+                    <v-icon end icon="mdi-arrow-right" />
+                  </v-btn>
+                  <v-btn
+                    color="white"
+                    rounded
+                    size="large"
+                    :to="slide.secondaryAction.link"
+                    variant="outlined"
+                  >
+                    {{ slide.secondaryAction.text }}
+                  </v-btn>
+                </div>
               </div>
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
+            </v-col>
+          </v-row>
+        </v-container>
 
-      <!-- 渐变叠加以提高文本可读性 -->
-      <div class="hero-overlay" />
-    </v-carousel-item>
-  </v-carousel>
+        <!-- 渐变叠加以提高文本可读性 -->
+        <div class="hero-overlay" />
+      </v-carousel-item>
+    </v-carousel>
+  </v-container>
+
 </template>
 
 <script setup lang="ts">
@@ -129,7 +133,8 @@
   async function getCarouselList () {
     try {
       const response = await getCarouselServer()
-      // 将获取到的数据映射为组件需要的格式
+
+      // 先设置小图作为占位
       const carouselItems = response.data.map((item: any) => ({
         images: {
           largeImage: item.images.largeImage,
@@ -148,6 +153,7 @@
         },
       }))
 
+      // 立即更新列表，避免空白
       slidesList.value = carouselItems
 
       // 预加载大图
@@ -193,6 +199,5 @@
 .rounded-carousel {
   border-radius: 20px;
   overflow: hidden;
-  margin-top: 15px;
 }
 </style>
