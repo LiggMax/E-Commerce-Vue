@@ -2,7 +2,7 @@
   <v-container class="pa-0" fluid>
     <!-- Main Layout: Sidebar + Content -->
     <v-row no-gutters>
-      <!-- Left Sidebar -->
+      <!-- 左侧边栏 -->
       <v-col class="pa-4" cols="12" md="3">
         <v-card class="pa-4" elevation="2" rounded="lg">
           <h3 class="text-h6 font-weight-bold mb-4">商品分类</h3>
@@ -20,10 +20,10 @@
         </v-card>
       </v-col>
 
-      <!-- Main Content Area -->
+      <!-- 右侧主要内容领域 -->
       <v-col class="pa-4" cols="12" md="9">
 
-        <!-- 2x2 Category Grid -->
+        <!-- 2x2 类别网格 -->
         <v-row v-if="categories.length > 0" class="mb-6">
           <v-col
             v-for="category in categories"
@@ -34,107 +34,38 @@
           >
             <v-card
               class="category-card"
+              :color="category.color"
               elevation="4"
               hover
               rounded="xl"
               :to="category.link"
             >
               <v-card-text class="pa-6">
-                <!-- Category Header -->
-                <v-row align="center" class="mb-4">
-                  <v-col cols="8">
-                    <h3 class="text-h5 font-weight-bold mb-1">
-                      {{ category.name }}
-                    </h3>
-                    <p class="text-body-1 mb-2">{{ category.description }}</p>
+                <v-row align="center" class="h-100">
+                  <!-- 左侧文案区域 -->
+                  <v-col cols="6">
+                    <div class="d-flex flex-column h-100 justify-center">
+                      <h3 class="text-h4 font-weight-bold mb-2 text-white">
+                        {{ category.name }}
+                      </h3>
+                      <p class="text-h6 mb-1 text-white opacity-80">
+                        {{ category.englishTitle }}
+                      </p>
+                      <p class="text-body-1 mb-4 text-white">
+                        {{ category.description }}
+                      </p>
+                    </div>
                   </v-col>
-                  <v-col class="text-center" cols="4">
+                  <!-- 右侧图片区域 -->
+                  <v-col class="text-center" cols="6">
                     <v-img
                       class="mx-auto"
-                      height="80"
+                      height="120"
                       :src="category.iconImage"
-                      width="80"
+                      width="120"
                     />
                   </v-col>
                 </v-row>
-
-                <!-- Product Previews -->
-                <v-row>
-                  <v-col
-                    v-for="product in category.products"
-                    :key="product.id"
-                    class="pa-1"
-                    cols="4"
-                  >
-                    <v-card
-                      class="pa-2"
-                      color="white"
-                      elevation="2"
-                      rounded="lg"
-                    >
-                      <v-img
-                        class="rounded mb-2"
-                        cover
-                        height="80"
-                        :src="product.image"
-                      />
-                      <div class="text-center">
-                        <span class="text-body-2 font-weight-bold text-pink">
-                          ¥{{ product.price }}
-                        </span>
-                      </div>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-
-        <!-- Product Listings Grid -->
-        <v-row>
-          <v-col
-            v-for="product in productListings"
-            :key="product.id"
-            class="pa-2"
-            cols="12"
-            lg="2"
-            md="4"
-            sm="6"
-          >
-            <v-card
-              class="product-card"
-              elevation="2"
-              hover
-              rounded="lg"
-            >
-              <v-img
-                class="rounded-t-lg"
-                cover
-                height="200"
-                :src="product.image"
-              />
-              <v-card-text class="pa-3">
-                <h4 class="text-body-1 font-weight-medium mb-2 line-clamp-2">
-                  {{ product.title }}
-                </h4>
-                <div class="d-flex align-center justify-space-between">
-                  <span class="text-h6 font-weight-bold text-pink">
-                    ¥{{ product.price }}
-                  </span>
-                  <span
-                    v-if="product.originalPrice"
-                    class="text-caption text-grey text-decoration-line-through"
-                  >
-                    ¥{{ product.originalPrice }}
-                  </span>
-                </div>
-                <div
-                  v-if="product.wantedCount"
-                  class="text-caption text-grey mt-1"
-                >
-                  {{ product.wantedCount }}人想要
-                </div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -145,13 +76,25 @@
 </template>
 
 <script setup lang="ts">
+  // 侧边栏分类数据
+  const sidebarCategories = [
+    { id: 1, name: '手机/数码/电脑', icon: 'mdi-cellphone' },
+    { id: 2, name: '服饰/箱包/运动', icon: 'mdi-tshirt-crew' },
+    { id: 3, name: '技能/卡券/潮玩', icon: 'mdi-gift' },
+    { id: 4, name: '母婴/美妆/个护', icon: 'mdi-baby-face' },
+    { id: 5, name: '家具/家电/家装', icon: 'mdi-sofa' },
+    { id: 6, name: '文玩/珠宝/礼品', icon: 'mdi-diamond-stone' },
+    { id: 7, name: '食品/宠物/花卉', icon: 'mdi-food-apple' },
+  ]
+
+  // 主要分类数据
   const categories = [
     {
       id: 1,
       name: '衣橱捡漏',
       englishTitle: 'APPAREL',
       description: '时尚美衣低价淘',
-      bgClass: 'apparel-bg',
+      color: 'orange',
       iconImage: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
       link: '/category/apparel',
       products: [
@@ -172,7 +115,7 @@
       name: '手机数码',
       englishTitle: 'DIGITAL',
       description: '热门装备省心入',
-      bgClass: 'digital-bg',
+      color: 'blue',
       iconImage: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
       link: '/category/digital',
       products: [
@@ -193,7 +136,7 @@
       name: '二次元',
       englishTitle: 'MODEL',
       description: '烫门新品随手入',
-      bgClass: 'anime-bg',
+      color: 'green',
       iconImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
       link: '/category/anime',
       products: [
@@ -214,7 +157,7 @@
       name: '省钱卡券',
       englishTitle: 'COUPON',
       description: '吃喝玩乐放心购',
-      bgClass: 'coupon-bg',
+      color: 'pink',
       iconImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80',
       link: '/category/coupon',
       products: [
@@ -231,6 +174,7 @@
       ],
     },
   ]
+
 </script>
 
 <style scoped>
