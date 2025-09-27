@@ -12,3 +12,8 @@ export const ADD_CAROUSEL = '/api/admin/carousel'
  * 获取轮播图
  */
 export const GET_CAROUSEL = '/api/admin/carousel'
+
+/**
+ * 精选商品
+ */
+export const FEATURED = '/api/admin/featured'

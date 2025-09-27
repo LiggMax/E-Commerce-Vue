@@ -101,7 +101,7 @@
           <v-divider class="mb-6" />
           <div class="text-center mb-6">
             <h3 class="text-h6 font-weight-bold mb-2">订阅我们的邮件</h3>
-            <p class="text-body-2 mb-4">获取最新优惠信息和新品推荐</p>
+            <p class="text-body-2 mb-4">获取最新优惠信息和新品精选</p>
             <div class="d-flex justify-center">
               <v-text-field
                 v-model="email"

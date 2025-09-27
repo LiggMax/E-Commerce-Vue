@@ -2,8 +2,8 @@
   <v-container class="py-12">
     <v-row>
       <v-col class="text-center mb-8" cols="12">
-        <h2 class="text-h3 font-weight-bold mb-4">热门推荐</h2>
-        <p class="text-h6 text-medium-emphasis">精选优质商品，为您推荐最受欢迎的产品</p>
+        <h2 class="text-h3 font-weight-bold mb-4">热门精选</h2>
+        <p class="text-h6 text-medium-emphasis">精选优质商品，为您精选最受欢迎的产品</p>
       </v-col>
     </v-row>
 

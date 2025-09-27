@@ -5,7 +5,7 @@
   <HeroSection />
   <!-- 产品分类 -->
   <ProductCategories />
-  <!-- 热门推荐 -->
+  <!-- 热门精选 -->
   <FeaturedProducts />
   <!-- 页脚 -->
   <ECommerceFooter />
