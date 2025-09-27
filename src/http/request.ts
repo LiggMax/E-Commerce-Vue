@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { userTokenStore } from '@/stores/token.ts'
 import { storeToRefs } from 'pinia'
+import router from '@/router'
+import { userTokenStore } from '@/stores/token.ts'
 import notification from '@/utils/notification'
 
 const store = userTokenStore()
@@ -38,8 +39,9 @@ instance.interceptors.response.use(
       // 服务器返回错误状态码
       switch (error.response.status) {
         case 401: {
-          // 未授权，可能需要重新登录
           notification.showError('未授权，请重新登录')
+          store.removeToken()
+          router.push('/admin/login')
           break
         }
         case 403: {
