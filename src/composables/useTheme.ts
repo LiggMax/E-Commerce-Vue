@@ -1,4 +1,3 @@
-import { ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
 
 const THEME_STORAGE_KEY = 'shopvue-theme'
