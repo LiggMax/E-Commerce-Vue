@@ -1,11 +1,22 @@
-import { ADD_CAROUSEL, GET_CAROUSEL } from '@/http/admin/api.ts'
+import { CAROUSEL } from '@/http/admin/api.ts'
 import request from '@/http/request.ts'
 
 /**
  * 添加轮播图
  */
 export async function addCarousel (data: any) {
-  return await request.post(ADD_CAROUSEL, data, {
+  return await request.post(CAROUSEL, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
+/**
+ * 编辑轮播图数据
+ */
+export async function updateCarousel (data: any) {
+  return await request.put(CAROUSEL, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -16,7 +27,7 @@ export async function addCarousel (data: any) {
  * 获取轮播图数据
  */
 export async function getCarousel (pageNumber: number, pageSize: number) {
-  return await request.get(GET_CAROUSEL, {
+  return await request.get(CAROUSEL, {
     pageNumber,
     pageSize,
   })

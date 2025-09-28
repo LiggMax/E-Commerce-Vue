@@ -99,10 +99,11 @@ export default {
    * PUT 请求
    * @param url 请求地址
    * @param data 请求数据
+   * @param config 配置项
    * @returns Promise
    */
-  put<T = any>(url: string, data?: any): Promise<T> {
-    return instance.put(url, data)
+  put<T = any>(url: string, data?: any, config?: any): Promise<T> {
+    return instance.put(url, data, config)
   },
 
   /**

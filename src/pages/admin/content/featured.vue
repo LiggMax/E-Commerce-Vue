@@ -85,7 +85,13 @@
           <!-- 商品图片 -->
           <template #item.image="{ item }">
             <div class="my-2 rounded-lg overflow-hidden" style="width: 80px; height: 80px;">
-              <v-img :alt="item.name" cover :src="item.images?.largeImage || ''" />
+              <v-img :alt="item.title" cover :src="item.images?.largeImage || ''" />
+            </div>
+          </template>
+
+          <template #item.title="{ item }">
+            <div class="my-2 rounded-lg overflow-hidden">
+              <div class="text-sm-h6 font-weight-bold">{{ item.title }}</div>
             </div>
           </template>
 
@@ -93,7 +99,10 @@
           <template #item.price="{ item }">
             <div>
               <div class="text-success font-weight-bold">¥{{ item.currentPrice }}</div>
-              <div v-if="item.originalPrice !== item.currentPrice" class="text-decoration-line-through text-medium-emphasis">
+              <div
+                v-if="item.originalPrice !== item.currentPrice"
+                class="text-decoration-line-through text-medium-emphasis"
+              >
                 ¥{{ item.originalPrice }}
               </div>
             </div>
@@ -111,6 +120,11 @@
               />
               <span class="ml-2 text-body-2">({{ item.reviews }})</span>
             </div>
+          </template>
+
+          <!-- 创建时间-->
+          <template #item.createdAt="{item}">
+            <div>{{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '' }}</div>
           </template>
 
           <!-- 操作 -->
@@ -182,7 +196,7 @@
               <!-- 商品名称 -->
               <v-col cols="12">
                 <v-text-field
-                  v-model="editForm.name"
+                  v-model="editForm.title"
                   label="商品名称"
                   prepend-inner-icon="mdi-tag"
                   :rules="[v => !!v || '请输入商品名称']"
@@ -205,7 +219,7 @@
                 <!-- 图片预览 -->
                 <div v-if="editForm.images?.largeImage" class="mt-4">
                   <v-img
-                    :alt="editForm.name"
+                    :alt="editForm.title"
                     class="rounded-lg"
                     cover
                     height="200"
@@ -249,7 +263,7 @@
                   min="0"
                   prepend-inner-icon="mdi-star"
                   :rules="[
-                    v => v >= 0 && v <= 5 || '评分范围为0-5'
+                    v => v >= 0 && v <= 10 || '评分范围为0-10'
                   ]"
                   step="0.1"
                   type="number"
@@ -295,12 +309,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { addFeatured, deleteFeaturedById, getFeatured } from '@/http/admin/featured.ts'
+  import { addFeatured, deleteFeaturedById, getFeatured, updateFeatured } from '@/http/admin/featured.ts'
 
   // 定义精选商品项目的接口
   interface FeaturedItem {
     id: string
-    name: string
+    title: string
     images: {
       largeImage: string
       smallImage: string
@@ -333,17 +347,17 @@
   // 表格头部配置
   const headers = [
     { title: '图片', key: 'image', sortable: false, width: 100 },
-    { title: '商品名称', key: 'name', sortable: true },
-    { title: '价格', key: 'price', sortable: true, width: 120 },
+    { title: '商品名称', key: 'title', sortable: true, minWidth: 150 },
+    { title: '价格', key: 'price', sortable: true, minWidth: 100 },
     { title: '评分', key: 'rating', sortable: true, width: 200 },
-    { title: '创建时间', key: 'createdAt', sortable: true, width: 150 },
+    { title: '创建时间', key: 'createdAt', sortable: true, minWidth: 150 },
     { title: '操作', key: 'actions', sortable: false, width: 120 },
   ]
 
   // 编辑表单数据
   const editForm = reactive<FeaturedItem>({
     id: '',
-    name: '',
+    title: '',
     images: {
       largeImage: '',
       smallImage: '',
@@ -371,7 +385,7 @@
 
       featuredList.value = featuredData.map((item: {
         id: string
-        name: string
+        title: string
         images: {
           largeImage: string
           smallImage: string
@@ -383,13 +397,13 @@
         createdAt?: string
       }) => ({
         id: item.id,
-        name: item.name,
+        title: item.title,
         images: item.images,
         originalPrice: item.originalPrice,
         currentPrice: item.currentPrice,
         reviews: item.reviews,
         rating: item.rating,
-        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
+        createdAt: item.createdAt,
       }))
     } catch (error) {
       console.error('获取精选商品数据失败:', error)
@@ -442,7 +456,7 @@
       // 重置表单
       Object.assign(editForm, {
         id: '',
-        name: '',
+        title: '',
         images: {
           largeImage: '',
           smallImage: '',
@@ -487,7 +501,7 @@
       const formData = new FormData()
 
       // 添加表单数据
-      formData.append('title', editForm.name)
+      formData.append('title', editForm.title)
       formData.append('originalPrice', editForm.originalPrice.toString())
       formData.append('currentPrice', editForm.currentPrice.toString())
       formData.append('reviews', editForm.reviews.toString())
@@ -499,16 +513,15 @@
       }
 
       if (dialogMode.value === 'add') {
-        const result = await addFeatured(formData)
+        await addFeatured(formData)
         // 添加成功后刷新列表
         await fetchFeaturedList()
         closeDialog()
       } else {
         // 编辑模式
         if (editForm.id) {
-          // TODO 实现编辑
-          // const result = await updateFeatured(formData)
-
+          formData.append('id', editForm.id)
+          await updateFeatured(formData)
           // 编辑成功后刷新列表
           await fetchFeaturedList()
           closeDialog()

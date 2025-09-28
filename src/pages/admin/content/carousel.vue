@@ -380,7 +380,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { addCarousel, getCarousel } from '@/http/admin/carousel.ts'
+  import { addCarousel, getCarousel, updateCarousel } from '@/http/admin/carousel.ts'
 
   // 定义轮播图项目的接口
   interface CarouselItem {
@@ -606,16 +606,15 @@
       }
 
       if (dialogMode.value === 'add') {
-        const result = await addCarousel(formData)
+        await addCarousel(formData)
         // 添加成功后刷新列表
         await fetchCarouselList()
         closeDialog()
       } else {
         // 编辑模式
         if (editForm.id) {
-          // TODO 实现编辑
-          // const result = await updateCarousel(formData)
-
+          formData.append('id', editForm.id.toString())
+          await updateCarousel(formData)
           // 编辑成功后刷新列表
           await fetchCarouselList()
           closeDialog()

@@ -13,6 +13,17 @@ export async function addFeatured (data: any) {
 }
 
 /**
+ * 更新精选商品
+ */
+export async function updateFeatured (data: any) {
+  return await request.put(FEATURED, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
+/**
  * 获取精选商品数据
  */
 export async function getFeatured (pageNumber: number, pageSize: number) {
