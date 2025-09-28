@@ -380,7 +380,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { addCarousel, getCarousel } from '@/http/admin/Carousel.ts'
+  import { addCarousel, getCarousel } from '@/http/admin/carousel.ts'
 
   // 定义轮播图项目的接口
   interface CarouselItem {

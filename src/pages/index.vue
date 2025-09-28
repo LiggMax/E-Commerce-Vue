@@ -1,7 +1,7 @@
 <template>
   <!-- 头部标题导航 -->
   <ECommerceHeader />
-  <v-container class="py-12" max-width="1700">
+  <v-container class="py-1" max-width="1700">
     <!-- 轮播图 -->
     <HeroSection />
     <!-- 产品分类 -->

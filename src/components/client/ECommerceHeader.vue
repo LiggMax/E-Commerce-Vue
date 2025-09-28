@@ -132,7 +132,6 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
   import { useThemeToggle } from '@/composables/useTheme.ts'
 
   const searchQuery = ref('')

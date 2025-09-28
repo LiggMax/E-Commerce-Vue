@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container v-if="featuredProducts.length > 0">
 
     <v-row>
       <v-col class="text-center mb-2" cols="12">
@@ -8,7 +8,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="featuredProducts.length > 0">
+    <v-row>
       <v-col
         v-for="product in featuredProducts"
         :key="product.id"
@@ -132,7 +132,6 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
   import { getFeaturedServer } from '@/http/client/featured.ts'
 
   const favoriteProducts = ref<number[]>([])
