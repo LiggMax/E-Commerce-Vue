@@ -100,11 +100,11 @@
           <!-- 状态 -->
           <template #item.status="{ item }">
             <v-chip
-              :color="item.status === 1 ? 'success' : 'warning'"
+              :color="item.status === 'ENABLED'? 'success' : 'warning'"
               size="small"
               variant="tonal"
             >
-              {{ item.status === 1 ? '启用' : '禁用' }}
+              {{ item.status === 'ENABLED' ? '启用' : '禁用' }}
             </v-chip>
           </template>
 
@@ -147,8 +147,8 @@
                 @click="openDialog('edit', item)"
               />
               <v-btn
-                :color="item.status === 1 ? 'warning' : 'success'"
-                :icon="item.status === 1 ? 'mdi-pause' : 'mdi-play'"
+                :color="item.status === 'ENABLED' ? 'warning' : 'success'"
+                :icon="item.status === 'ENABLED' ? 'mdi-pause' : 'mdi-play'"
                 size="small"
                 variant="text"
                 @click="toggleStatus(item)"
@@ -311,7 +311,7 @@
                   :false-value="0"
                   hide-details
                   inset
-                  :label="editForm.status === 1 ? '启用' : '禁用'"
+                  :label="editForm.status === 'ENABLED' ? '启用' : '禁用'"
                   :true-value="1"
                 />
               </v-col>
@@ -382,6 +382,12 @@
 <script lang="ts" setup>
   import { addCarousel, getCarousel, updateCarousel } from '@/http/admin/carousel.ts'
 
+  // 定义状态枚举
+  enum CarouselStatus {
+    DISABLED = 'DISABLED',
+    ENABLED = 'ENABLED',
+  }
+
   // 定义轮播图项目的接口
   interface CarouselItem {
     id: number
@@ -393,7 +399,7 @@
     link: string
     buttonText: string
     sort: number
-    status: number
+    status: CarouselStatus
     target: string
     views: number
     createdAt: string
@@ -433,8 +439,8 @@
   // 修复状态筛选选项
   const statusOptions = [
     { title: '全部', value: 'all' },
-    { title: '启用', value: 1 },
-    { title: '禁用', value: 0 },
+    { title: '启用', value: CarouselStatus.ENABLED },
+    { title: '禁用', value: CarouselStatus.DISABLED },
   ]
 
   // 编辑表单数据
@@ -448,7 +454,7 @@
     link: '',
     buttonText: '了解更多',
     sort: 1,
-    status: 1,
+    status: CarouselStatus.ENABLED,
     target: '_self',
     views: 0,
     createdAt: '',
@@ -476,7 +482,7 @@
         link: string
         buttonText: string
         sort: number
-        status: number
+        status: string
         target: string
       }) => ({
         id: item.id,
@@ -487,7 +493,9 @@
         link: item.link,
         buttonText: item.buttonText,
         sort: item.sort,
-        status: item.status,
+        status: item.status === '1'
+          ? CarouselStatus.ENABLED
+          : CarouselStatus.DISABLED,
         target: item.target,
         views: 0,
         createdAt: '',
@@ -514,11 +522,11 @@
 
   // 计算属性
   const activeCount = computed(() =>
-    carouselList.value.filter(item => item.status === 1).length,
+    carouselList.value.filter(item => item.status === CarouselStatus.ENABLED).length,
   )
 
   const inactiveCount = computed(() =>
-    carouselList.value.filter(item => item.status === 0).length,
+    carouselList.value.filter(item => item.status === CarouselStatus.DISABLED).length,
   )
 
   const totalViews = computed(() =>
@@ -529,7 +537,7 @@
     let filtered = carouselList.value
 
     if (statusFilter.value !== 'all') {
-      filtered = filtered.filter(item => item.status === Number(statusFilter.value))
+      filtered = filtered.filter(item => item.status === statusFilter.value)
     }
 
     return filtered
@@ -553,7 +561,7 @@
         link: '',
         buttonText: '了解更多',
         sort: carouselList.value.length + 1,
-        status: 1,
+        status: CarouselStatus.ENABLED,
         target: '_self',
         views: 0,
         createdAt: '',
@@ -597,7 +605,7 @@
       formData.append('link', editForm.link)
       formData.append('buttonText', editForm.buttonText)
       formData.append('sort', editForm.sort.toString())
-      formData.append('status', editForm.status.toString())
+      formData.append('status', editForm.status)
       formData.append('target', editForm.target)
 
       // 添加图片文件
@@ -629,7 +637,9 @@
 
   // 切换状态
   async function toggleStatus (item: CarouselItem) {
-    item.status = item.status === 1 ? 0 : 1
+    item.status = item.status === CarouselStatus.ENABLED
+      ? CarouselStatus.DISABLED
+      : CarouselStatus.ENABLED
     // TODO: 调用后端API更新状态
     // await updateCarouselStatus(item.id, item.status)
 
