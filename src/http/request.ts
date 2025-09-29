@@ -119,9 +119,10 @@ export default {
    * PATCH 请求
    * @param url 请求地址
    * @param data 请求数据
+   * @param config 配置项
    * @returns Promise
    */
-  patch<T = any>(url: string, data?: any): Promise<T> {
-    return instance.patch(url, data)
+  patch<T = any>(url: string, data?: any, config?: any): Promise<T> {
+    return instance.patch(url, data, config)
   },
 }

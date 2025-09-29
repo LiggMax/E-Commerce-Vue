@@ -93,18 +93,18 @@
           <!-- 轮播图预览 -->
           <template #item.image="{ item }">
             <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 90px;">
-              <v-img :alt="item.title" cover :src="item.image" />
+              <v-img :alt="item.title" cover :src="item.images?.largeImage" />
             </div>
           </template>
 
           <!-- 状态 -->
           <template #item.status="{ item }">
             <v-chip
-              :color="item.status === 'ENABLED'? 'success' : 'warning'"
+              :color="item.status ? 'success' : 'warning'"
               size="small"
               variant="tonal"
             >
-              {{ item.status === 'ENABLED' ? '启用' : '禁用' }}
+              {{ item.status ? '启用' : '禁用' }}
             </v-chip>
           </template>
 
@@ -147,8 +147,8 @@
                 @click="openDialog('edit', item)"
               />
               <v-btn
-                :color="item.status === 'ENABLED' ? 'warning' : 'success'"
-                :icon="item.status === 'ENABLED' ? 'mdi-pause' : 'mdi-play'"
+                :color="item.status ? 'warning' : 'success'"
+                :icon="item.status ? 'mdi-pause' : 'mdi-play'"
                 size="small"
                 variant="text"
                 @click="toggleStatus(item)"
@@ -242,13 +242,13 @@
                 />
 
                 <!-- 图片预览 -->
-                <div v-if="editForm.image" class="mt-4">
+                <div v-if="editForm.images" class="mt-4">
                   <v-img
                     :alt="editForm.title"
                     class="rounded-lg"
                     cover
                     height="300"
-                    :src="editForm.image"
+                    :src="editForm.images?.largeImage"
                   />
                 </div>
               </v-col>
@@ -308,11 +308,9 @@
                 <v-switch
                   v-model="editForm.status"
                   color="success"
-                  :false-value="0"
                   hide-details
                   inset
-                  :label="editForm.status === 'ENABLED' ? '启用' : '禁用'"
-                  :true-value="1"
+                  :label="editForm.status ? '启用' : '禁用'"
                 />
               </v-col>
             </v-row>
@@ -350,7 +348,7 @@
               class="rounded-lg"
               cover
               height="400"
-              :src="previewItem.image"
+              :src="previewItem.images?.largeImage"
             >
               <!-- 轮播图内容覆盖层 -->
               <div class="carousel-overlay">
@@ -380,13 +378,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { addCarousel, getCarousel, updateCarousel } from '@/http/admin/carousel.ts'
-
-  // 定义状态枚举
-  enum CarouselStatus {
-    DISABLED = 'DISABLED',
-    ENABLED = 'ENABLED',
-  }
+  import {
+    addCarousel,
+    getCarousel,
+    updateCarousel,
+    updateCarouselSort,
+    updateCarouselStatus,
+  } from '@/http/admin/carousel.ts'
 
   // 定义轮播图项目的接口
   interface CarouselItem {
@@ -394,12 +392,15 @@
     title: string
     subtitle: string
     description: string
-    image: string
+    images: {
+      largeImage: string
+      smallImage: string
+    }
     imageFile?: File | null
     link: string
     buttonText: string
     sort: number
-    status: CarouselStatus
+    status: boolean
     target: string
     views: number
     createdAt: string
@@ -412,7 +413,7 @@
   const saving = ref(false)
   const valid = ref(false)
   const search = ref('')
-  const statusFilter = ref('all')
+  const statusFilter = ref<'all' | boolean>('all')
   const dialogMode = ref<'add' | 'edit'>('add')
   const previewItem = ref<CarouselItem | null>(null)
   const form = ref()
@@ -436,11 +437,11 @@
     { title: '操作', key: 'actions', sortable: false, width: 200 },
   ]
 
-  // 修复状态筛选选项
+  // 状态筛选选项
   const statusOptions = [
     { title: '全部', value: 'all' },
-    { title: '启用', value: CarouselStatus.ENABLED },
-    { title: '禁用', value: CarouselStatus.DISABLED },
+    { title: '启用', value: true },
+    { title: '禁用', value: false },
   ]
 
   // 编辑表单数据
@@ -449,12 +450,15 @@
     title: '',
     subtitle: '',
     description: '',
-    image: '',
+    images: {
+      largeImage: '',
+      smallImage: '',
+    },
     imageFile: null,
     link: '',
     buttonText: '了解更多',
     sort: 1,
-    status: CarouselStatus.ENABLED,
+    status: true,
     target: '_self',
     views: 0,
     createdAt: '',
@@ -478,24 +482,25 @@
         title: string
         subtitle: string
         description: string
-        imagePath: string
+        images: {
+          largeImage: string
+          smallImage: string
+        }
         link: string
         buttonText: string
         sort: number
-        status: string
+        status: boolean
         target: string
       }) => ({
         id: item.id,
         title: item.title,
         subtitle: item.subtitle,
         description: item.description,
-        image: item.imagePath,
+        images: item.images,
         link: item.link,
         buttonText: item.buttonText,
         sort: item.sort,
-        status: item.status === '1'
-          ? CarouselStatus.ENABLED
-          : CarouselStatus.DISABLED,
+        status: item.status,
         target: item.target,
         views: 0,
         createdAt: '',
@@ -522,11 +527,11 @@
 
   // 计算属性
   const activeCount = computed(() =>
-    carouselList.value.filter(item => item.status === CarouselStatus.ENABLED).length,
+    carouselList.value.filter(item => item.status).length,
   )
 
   const inactiveCount = computed(() =>
-    carouselList.value.filter(item => item.status === CarouselStatus.DISABLED).length,
+    carouselList.value.filter(item => !item.status).length,
   )
 
   const totalViews = computed(() =>
@@ -556,12 +561,15 @@
         title: '',
         subtitle: '',
         description: '',
-        image: '',
+        images: {
+          largeImage: '',
+          smallImage: '',
+        },
         imageFile: null,
         link: '',
         buttonText: '了解更多',
         sort: carouselList.value.length + 1,
-        status: CarouselStatus.ENABLED,
+        status: true,
         target: '_self',
         views: 0,
         createdAt: '',
@@ -583,7 +591,7 @@
     if (file) {
       const reader = new FileReader()
       reader.addEventListener('load', e => {
-        editForm.image = e.target?.result as string
+        editForm.images.largeImage = e.target?.result as string
       })
       reader.readAsDataURL(file)
     }
@@ -605,7 +613,7 @@
       formData.append('link', editForm.link)
       formData.append('buttonText', editForm.buttonText)
       formData.append('sort', editForm.sort.toString())
-      formData.append('status', editForm.status)
+      formData.append('status', editForm.status.toString())
       formData.append('target', editForm.target)
 
       // 添加图片文件
@@ -637,12 +645,8 @@
 
   // 切换状态
   async function toggleStatus (item: CarouselItem) {
-    item.status = item.status === CarouselStatus.ENABLED
-      ? CarouselStatus.DISABLED
-      : CarouselStatus.ENABLED
-    // TODO: 调用后端API更新状态
-    // await updateCarouselStatus(item.id, item.status)
-
+    item.status = !item.status
+    await updateCarouselStatus(item.id, item.status)
     // 刷新数据
     await fetchCarouselList()
   }
@@ -678,11 +682,8 @@
         item.sort = index + 1
       }
 
-      // TODO: 调用后端API更新排序
-      // await updateCarouselSort(carouselList.value.map(item => ({ id: item.id, sort: item.sort })))
-
-      // 刷新数据
-      await fetchCarouselList()
+      // 只更新当前轮播图的排序
+      await updateCarouselSort(item.id, item.sort)
     }
   }
 
