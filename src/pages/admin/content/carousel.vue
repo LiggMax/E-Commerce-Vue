@@ -158,7 +158,7 @@
                 icon="mdi-delete"
                 size="small"
                 variant="text"
-                @click="deleteCarousel(item)"
+                @click="confirmDelete(item)"
               />
             </div>
           </template>
@@ -374,17 +374,48 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- 删除确认对话框 -->
+    <v-dialog v-model="deleteDialog" max-width="500px">
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2" color="warning">mdi-alert</v-icon>
+          确认删除
+        </v-card-title>
+        <v-card-text>
+          <p>确定要删除轮播图 "{{ itemToDelete?.title }}" 吗？</p>
+          <p class="text-medium-emphasis">此操作无法撤销。</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            @click="deleteDialog = false"
+          >
+            取消
+          </v-btn>
+          <v-btn
+            color="error"
+            :loading="deleting"
+            @click="deleteCarousel"
+          >
+            确认删除
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </AdminLayout>
 </template>
 
 <script lang="ts" setup>
   import {
-    addCarousel,
+    addCarousel, deleteCarouselById,
     getCarousel,
     updateCarousel,
     updateCarouselSort,
     updateCarouselStatus,
   } from '@/http/admin/carousel.ts'
+  import { useNotification } from '@/utils/notification'
 
   // 定义轮播图项目的接口
   interface CarouselItem {
@@ -406,17 +437,23 @@
     createdAt: string
   }
 
+  // 使用通知
+  const { showSuccess, showError } = useNotification()
+
   // 响应式数据
   const dialog = ref(false)
   const previewDialog = ref(false)
+  const deleteDialog = ref(false)
   const loading = ref(false)
   const saving = ref(false)
+  const deleting = ref(false)
   const valid = ref(false)
   const search = ref('')
   const statusFilter = ref<'all' | boolean>('all')
   const dialogMode = ref<'add' | 'edit'>('add')
   const previewItem = ref<CarouselItem | null>(null)
   const form = ref()
+  const itemToDelete = ref<CarouselItem | null>(null)
 
   // 分页相关数据
   const pagination = reactive({
@@ -626,6 +663,7 @@
         // 添加成功后刷新列表
         await fetchCarouselList()
         closeDialog()
+        showSuccess('轮播图添加成功')
       } else {
         // 编辑模式
         if (editForm.id) {
@@ -634,10 +672,12 @@
           // 编辑成功后刷新列表
           await fetchCarouselList()
           closeDialog()
+          showSuccess('轮播图更新成功')
         }
       }
     } catch (error) {
       console.error('保存失败:', error)
+      showError('保存失败')
     } finally {
       saving.value = false
     }
@@ -645,24 +685,39 @@
 
   // 切换状态
   async function toggleStatus (item: CarouselItem) {
-    item.status = !item.status
-    await updateCarouselStatus(item.id, item.status)
-    // 刷新数据
-    await fetchCarouselList()
+    try {
+      item.status = !item.status
+      await updateCarouselStatus(item.id, item.status)
+      showSuccess(`轮播图已${item.status ? '启用' : '禁用'}`)
+    } catch (error) {
+      console.error('状态更新失败:', error)
+      showError('状态更新失败')
+    }
+  }
+
+  // 确认删除
+  function confirmDelete (item: CarouselItem) {
+    itemToDelete.value = item
+    deleteDialog.value = true
   }
 
   // 删除轮播图
-  async function deleteCarousel (item: CarouselItem) {
-    if (confirm('确定要删除这个轮播图吗？')) {
-      try {
-        // TODO: 调用后端API删除轮播图
-        // await deleteCarouselById(item.id)
+  async function deleteCarousel () {
+    if (!itemToDelete.value) return
 
-        // 刷新数据
-        await fetchCarouselList()
-      } catch (error) {
-        console.error('删除失败:', error)
-      }
+    deleting.value = true
+    try {
+      await deleteCarouselById(itemToDelete.value.id)
+
+      // 删除表单中的数据
+      carouselList.value = carouselList.value.filter(i => i.id !== itemToDelete.value!.id)
+      deleteDialog.value = false
+      showSuccess('轮播图删除成功')
+    } catch (error) {
+      console.error('删除失败:', error)
+      showError('删除失败')
+    } finally {
+      deleting.value = false
     }
   }
 
@@ -683,7 +738,13 @@
       }
 
       // 只更新当前轮播图的排序
-      await updateCarouselSort(item.id, item.sort)
+      try {
+        await updateCarouselSort(item.id, item.sort)
+        showSuccess('排序更新成功')
+      } catch (error) {
+        console.error('排序更新失败:', error)
+        showError('排序更新失败')
+      }
     }
   }
 

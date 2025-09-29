@@ -46,3 +46,10 @@ export async function updateCarouselStatus (id: number, status: boolean) {
 export async function updateCarouselSort (id: number, sort: number) {
   return await request.patch(UPDATE_CAROUSEL_SORT, { id, sort })
 }
+
+/**
+ * 删除轮播图
+ */
+export async function deleteCarouselById (id: number) {
+  return await request.delete(`${CAROUSEL}/${id}`)
+}

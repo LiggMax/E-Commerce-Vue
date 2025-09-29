@@ -1,5 +1,3 @@
-import { reactive } from 'vue'
-
 // 通知状态管理
 const snackbar = reactive({
   show: false,
