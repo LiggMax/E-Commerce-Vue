@@ -1,7 +1,7 @@
 <template>
   <v-app-bar
     :elevation="2"
-    height="80"
+    height="70"
   >
     <v-container class="px-4" fluid>
       <v-row align="center" no-gutters>
@@ -152,38 +152,21 @@
   </v-navigation-drawer>
 
   <!-- 移动搜索对话框 -->
-  <v-dialog v-model="searchDialog" fullscreen transition="dialog-bottom-transition">
-    <v-card>
-      <v-toolbar color="primary">
-        <v-btn icon="mdi-close" @click="searchDialog = false" />
-        <v-toolbar-title>搜索产品</v-toolbar-title>
-      </v-toolbar>
-
-      <v-card-text class="pa-4">
-        <v-text-field
-          v-model="searchQuery"
-          autofocus
-          clearable
-          hide-details
-          placeholder="输入产品名称..."
-          prepend-inner-icon="mdi-magnify"
-          variant="outlined"
-          @keyup.enter="handleSearch"
-        >
-          <template #append-inner>
-            <v-btn color="primary" variant="flat" @click="handleSearch">
-              搜索
-            </v-btn>
-          </template>
-        </v-text-field>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <v-navigation-drawer v-model="searchDialog" location="end">
+    <v-text-field
+      class="ma-5"
+      label="搜索商品"
+      prepend-inner-icon="mdi-magnify"
+      variant="outlined"
+    />
+  </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
+  import { useDisplay } from 'vuetify'
   import { useThemeToggle } from '@/composables/useTheme.ts'
 
+  const display = useDisplay()
   const searchQuery = ref('')
   const drawer = ref(false)
   const searchDialog = ref(false)
@@ -206,25 +189,26 @@
     { title: '设置', icon: 'mdi-cog', action: () => console.log('设置') },
     { title: '退出登录', icon: 'mdi-logout', action: () => console.log('退出') },
   ]
-
-  function openSearchDialog () {
-    searchDialog.value = true
-  }
-
   function closeSearchDialog () {
     searchDialog.value = false
   }
 
   function handleSearch () {
     if (!searchQuery.value.trim()) return
-    searching.value = true
     console.log('搜索:', searchQuery.value)
     // 这里可以添加实际的搜索逻辑
     setTimeout(() => {
-      searching.value = false
       closeSearchDialog()
     }, 1000)
   }
+
+  watch(() => display.mdAndUp.value, isMdAndUp => {
+    if (isMdAndUp) {
+      // 切换到桌面端时，关闭所有移动端抽屉
+      drawer.value = false
+      searchDialog.value = false
+    }
+  })
 </script>
 
 <style scoped>
