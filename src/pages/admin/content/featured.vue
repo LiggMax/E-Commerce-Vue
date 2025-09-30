@@ -517,7 +517,7 @@
 
       if (dialogMode.value === 'add') {
         await addFeatured(formData)
-        // 添加成功后刷新列表
+        // 添加成功后刷新数据
         await fetchFeaturedList()
         closeDialog()
       } else {

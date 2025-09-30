@@ -1,8 +1,7 @@
 <template>
-  <v-container v-if="featuredProducts.length > 0">
-
+  <div v-if="featuredProducts.length > 0">
     <v-row>
-      <v-col class="text-center mb-2" cols="12">
+      <v-col class="text-center" cols="12">
         <h2 class="text-h3 font-weight-bold mb-4">热门精选</h2>
         <p class="text-h6 text-medium-emphasis">精选优质商品，为您精选最受欢迎的产品</p>
       </v-col>
@@ -128,7 +127,7 @@
         </v-btn>
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -149,6 +148,7 @@
     rating: number
     discount: number
   }
+
   const featuredProducts = ref<CarouselItem[]>([])
 
   // function toggleFavorite (productId: string) {
@@ -179,6 +179,7 @@
       featuredProducts.value = data.data
     } finally {}
   }
+
   onMounted(() => {
     getFeaturedProducts()
   })

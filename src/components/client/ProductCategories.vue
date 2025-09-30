@@ -71,7 +71,7 @@
 
         <!-- 第二行卡片 -->
         <v-col class="pa-2" cols="6">
-          <!-- 二次元 -->
+          <!-- Anime -->
           <v-card
             class="h-100 category-card"
             color="green-lighten-5"
@@ -82,7 +82,7 @@
               <div class="d-flex align-center mb-3">
                 <v-icon class="mr-2" color="green" size="24">mdi-heart</v-icon>
                 <div>
-                  <div class="text-h6 font-weight-bold text-green-darken-2">二次元</div>
+                  <div class="text-h6 font-weight-bold text-green-darken-2">动漫</div>
                   <div class="text-caption text-green-darken-1">烫门新品随手入</div>
                 </div>
               </div>

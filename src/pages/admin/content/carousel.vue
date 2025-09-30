@@ -411,8 +411,7 @@
   import {
     addCarousel, deleteCarouselById,
     getCarousel,
-    updateCarousel,
-    updateCarouselSort,
+    updateCarousel, updateCarouselSort,
     updateCarouselStatus,
   } from '@/http/admin/carousel.ts'
   import { useNotification } from '@/utils/notification'

@@ -23,7 +23,7 @@
     </v-row>
 
     <!-- 热门精选 -->
-    <FeaturedProducts />
+    <FeaturedProducts class="my-8" />
   </v-container>
   <!-- 页脚 -->
   <ECommerceFooter />
