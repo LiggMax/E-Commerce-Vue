@@ -5,18 +5,18 @@
     <v-row align="stretch" no-gutters>
       <!-- 轮播图 -->
       <v-col
-        class="d-flex pa-3"
+        class="d-flex pa-2"
         cols="12"
-        md="8"
+        lg="8"
       >
         <HeroSection />
       </v-col>
 
       <!-- 产品分类 -->
       <v-col
-        class="d-flex pa-3"
+        class="d-flex pa-2"
         cols="12"
-        md="4"
+        lg="4"
       >
         <ProductCategories />
       </v-col>
