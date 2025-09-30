@@ -5,7 +5,7 @@
     <v-row align="stretch" no-gutters>
       <!-- 轮播图 -->
       <v-col
-        class="d-flex pa-2"
+        class="d-flex pa-2 my-2"
         cols="12"
         lg="7"
       >

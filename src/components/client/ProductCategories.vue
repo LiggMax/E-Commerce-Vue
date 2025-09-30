@@ -9,6 +9,7 @@
             class="h-100 category-card"
             color="orange-lighten-5"
             elevation="2"
+            rounded="xl"
             @click="navigateToCategory('wardrobe')"
           >
             <v-card-text class="pa-4 h-100 d-flex flex-column">
@@ -42,6 +43,7 @@
             class="h-100 category-card"
             color="blue-lighten-5"
             elevation="2"
+            rounded="xl"
             @click="navigateToCategory('digital')"
           >
             <v-card-text class="pa-4 h-100 d-flex flex-column">
@@ -76,6 +78,7 @@
             class="h-100 category-card"
             color="green-lighten-5"
             elevation="2"
+            rounded="xl"
             @click="navigateToCategory('anime')"
           >
             <v-card-text class="pa-4 h-100 d-flex flex-column">
@@ -109,6 +112,7 @@
             class="h-100 category-card"
             color="pink-lighten-5"
             elevation="2"
+            rounded="xl"
             @click="navigateToCategory('coupons')"
           >
             <v-card-text class="pa-4 h-100 d-flex flex-column">

@@ -55,7 +55,7 @@
             </div>
           </div>
 
-          <v-card-title class="pa-4 pb-2">
+          <v-card-title class="pa-4 pb-0">
             <h3 class="text-subtitle-1 font-weight-bold text-truncate">
               {{ product.title }}
             </h3>
@@ -73,7 +73,7 @@
             <span class="text-caption ml-2">({{ product.reviews }})</span>
           </v-card-subtitle>
 
-          <v-card-text class="px-4 py-2">
+          <v-card-text class="px-4 py-0">
             <div class="d-flex align-center">
               <span class="text-h6 font-weight-bold text-primary">
                 ¥{{ product.currentPrice }}
