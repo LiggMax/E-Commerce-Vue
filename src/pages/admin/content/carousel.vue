@@ -242,7 +242,7 @@
                 />
 
                 <!-- 图片预览 -->
-                <div v-if="editForm.images" class="mt-4">
+                <div v-if="editForm.imageFile" class="mt-4">
                   <v-img
                     :alt="editForm.title"
                     class="rounded-lg"

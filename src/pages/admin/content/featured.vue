@@ -204,6 +204,18 @@
                 />
               </v-col>
 
+              <v-col cols="12">
+                <v-textarea
+                  v-model="editForm.description"
+                  label="商品描述"
+                  prepend-inner-icon="mdi-text"
+                  rows="3"
+                  :rules="[v => !!v || '请输入描述信息',
+                           v => (v && v.length <= 200 || '商品描述不能超过200个字符')]"
+                  variant="outlined"
+                />
+              </v-col>
+
               <!-- 图片上传 -->
               <v-col cols="12">
                 <v-file-input
@@ -318,6 +330,7 @@
   interface FeaturedItem {
     id: string
     title: string
+    description: string
     images: {
       largeImage: string
       smallImage: string
@@ -363,6 +376,7 @@
   const editForm = reactive<FeaturedItem>({
     id: '',
     title: '',
+    description: '',
     images: {
       largeImage: '',
       smallImage: '',
@@ -520,6 +534,7 @@
 
       // 添加表单数据
       formData.append('title', editForm.title)
+      formData.append('description', editForm.description)
       formData.append('originalPrice', editForm.originalPrice.toString())
       formData.append('currentPrice', editForm.currentPrice.toString())
       formData.append('reviews', editForm.reviews.toString())

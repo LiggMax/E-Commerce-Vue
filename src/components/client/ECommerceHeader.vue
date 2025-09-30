@@ -26,8 +26,17 @@
         <template v-if="$vuetify.display.mdAndUp">
           <!-- Logo -->
           <v-col cols="2">
-            <v-btn to="/" variant="text">
-              <v-icon class="mr-2" color="primary" icon="mdi-storefront" size="32" />
+            <v-btn
+              class=""
+              to="/"
+              variant="text"
+            >
+              <v-icon
+                class="mr-2"
+                color="primary"
+                icon="mdi-storefront"
+                size="32"
+              />
               <span class="text-h5 font-weight-bold primary--text">ShopVue</span>
             </v-btn>
           </v-col>
@@ -152,7 +161,7 @@
   </v-navigation-drawer>
 
   <!-- 移动搜索对话框 -->
-  <v-navigation-drawer v-model="searchDialog" location="end">
+  <v-navigation-drawer v-model="searchDialog" location="end" temporary>
     <v-text-field
       class="ma-5"
       label="搜索商品"
