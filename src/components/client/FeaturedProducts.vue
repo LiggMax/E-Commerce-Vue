@@ -11,23 +11,22 @@
       <v-col
         v-for="product in featuredProducts"
         :key="product.id"
-        cols="12"
+        cols="6"
         lg="2"
         md="3"
-        sm="5"
+        sm="4"
       >
         <v-card
-          class="product-card mx-auto"
+          class="product-card"
           elevation="4"
           hover
-          max-width="320"
           rounded="lg"
         >
           <div class="product-image-container">
             <v-img
               class="product-image"
               cover
-              height="230"
+              height="200"
               :src="product.images.largeImage"
             />
 
@@ -42,21 +41,12 @@
               -{{ product.discount }}%
             </v-chip>
 
-            <!-- Favorite Button -->
-            <!--            <v-btn-->
-            <!--              class="favorite-btn"-->
-            <!--              color="white"-->
-            <!--              elevation="2"-->
-            <!--              icon="mdi-heart-outline"-->
-            <!--              size="small"-->
-            <!--              @click.stop="toggleFavorite(product.id)"-->
-            <!--            />-->
-
             <!-- Quick View Overlay -->
             <div class="quick-view-overlay">
               <v-btn
                 color="primary"
                 rounded
+                size="small"
                 @click.stop="quickView(product)"
               >
                 <v-icon icon="mdi-eye" start />
@@ -102,6 +92,7 @@
               block
               color="primary"
               rounded
+              size="small"
               variant="flat"
               @click="addToCart(product)"
             >
@@ -151,28 +142,14 @@
 
   const featuredProducts = ref<CarouselItem[]>([])
 
-  // function toggleFavorite (productId: string) {
-  //   const index = favoriteProducts.value.indexOf(productId)
-  //   if (index === -1) {
-  //     favoriteProducts.value.push(productId)
-  //   } else {
-  //     favoriteProducts.value.splice(index, 1)
-  //   }
-  // }
-
   function addToCart (product: any) {
     console.log('添加到购物车:', product.name)
-  // 这里可以添加实际的购物车逻辑
   }
 
   function quickView (product: any) {
     console.log('快速预览:', product.name)
-  // 这里可以打开产品详情弹窗
   }
 
-  /**
-   * 获取精选商品列表
-   */
   async function getFeaturedProducts () {
     try {
       const data = await getFeaturedServer()
@@ -186,15 +163,12 @@
 </script>
 
 <style scoped>
-.product-card {
-  transition: all 0.3s ease;
-  position: relative;
-}
 
 .product-card:hover {
   transform: translateY(-4px);
 }
 
+/* 图片容器 */
 .product-image-container {
   position: relative;
   overflow: hidden;
@@ -208,20 +182,15 @@
   transform: scale(1.05);
 }
 
+/* 折扣徽章 */
 .discount-badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 8px;
+  left: 8px;
   z-index: 2;
 }
 
-.favorite-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 2;
-}
-
+/* 快速预览覆盖层 */
 .quick-view-overlay {
   position: absolute;
   top: 0;
@@ -239,4 +208,5 @@
 .product-card:hover .quick-view-overlay {
   opacity: 1;
 }
+
 </style>

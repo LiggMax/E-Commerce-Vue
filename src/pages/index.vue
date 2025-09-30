@@ -7,7 +7,7 @@
       <v-col
         class="d-flex pa-2"
         cols="12"
-        lg="8"
+        lg="7"
       >
         <HeroSection />
       </v-col>
@@ -16,14 +16,14 @@
       <v-col
         class="d-flex pa-2"
         cols="12"
-        lg="4"
+        lg="5"
       >
         <ProductCategories />
       </v-col>
     </v-row>
 
     <!-- 热门精选 -->
-    <FeaturedProducts class="my-8" />
+    <FeaturedProducts class="my-8 pa-2" />
   </v-container>
   <!-- 页脚 -->
   <ECommerceFooter />
