@@ -6,7 +6,6 @@ import notification from '@/utils/notification'
 
 const store = userTokenStore()
 const { token } = storeToRefs(store)
-console.log('获取的token', token.value)
 const instance = axios.create({
   baseURL: '/',
   timeout: 30_000,

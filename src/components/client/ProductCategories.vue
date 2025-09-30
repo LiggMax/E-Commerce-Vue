@@ -1,287 +1,257 @@
 <template>
-  <v-container class="py-8">
-    <v-row no-gutters>
-      <!-- 左侧分类侧边栏 -->
-      <v-col class="pr-4" cols="3">
-        <v-card elevation="2" rounded="lg">
-          <v-card-title class="bg-primary text-white">
-            <v-icon left>mdi-menu</v-icon>
-            商品分类
-          </v-card-title>
-          <v-list density="compact">
-            <v-list-item
-              v-for="category in sidebarCategories"
-              :key="category.id"
-              class="ma-1 rounded"
-              @click="selectCategory(category)"
-            >
-              <template #prepend>
-                <v-icon color="grey-darken-1" :icon="category.icon" />
-              </template>
-              <v-list-item-title class="text-body-2">
-                {{ category.name }}
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
+  <v-container class="py-8 fill-height">
+    <v-row class="fill-height" no-gutters>
+      <!-- 衣橱捡漏 -->
+      <v-col class="pa-2" cols="6">
+        <v-card
+          class="bg-warning-lighten-4"
+          elevation="3"
+          height="200"
+          rounded="lg"
+        >
+          <v-card-text class="d-flex flex-column h-100 pa-4">
+            <div class="d-flex flex-column h-100">
+              <div class="mb-4">
+                <h3 class="text-h6 font-weight-bold d-flex align-center">
+                  衣橱捡漏
+                  <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
+                </h3>
+                <p class="text-caption text-medium-emphasis">时尚美衣低价淘</p>
+              </div>
+              <div class="d-flex align-center ga-3 flex-1">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  src="https://via.placeholder.com/80x80/FFB6C1/FFFFFF?text=鞋"
+                  width="80"
+                />
+                <div class="position-relative">
+                  <v-img
+                    class="elevation-2"
+                    height="80"
+                    rounded="lg"
+                    src="https://via.placeholder.com/60x80/000000/FFFFFF?text=裙"
+                    width="60"
+                  />
+                  <v-chip
+                    class="position-absolute"
+                    color="black"
+                    size="x-small"
+                    style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                  >
+                    ¥69
+                  </v-chip>
+                </div>
+                <div class="position-relative">
+                  <v-img
+                    class="elevation-2"
+                    height="80"
+                    rounded="lg"
+                    src="https://via.placeholder.com/60x80/333333/FFFFFF?text=鞋"
+                    width="60"
+                  />
+                  <v-chip
+                    class="position-absolute"
+                    color="black"
+                    size="x-small"
+                    style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                  >
+                    ¥58
+                  </v-chip>
+                </div>
+              </div>
+            </div>
+          </v-card-text>
         </v-card>
       </v-col>
 
-      <!-- 右侧特色商品区域 -->
-      <v-col class="pl-4" cols="9">
-        <v-row no-gutters>
-          <!-- 衣橱捡漏 -->
-          <v-col class="pa-2" cols="6">
-            <v-card
-              class="bg-warning-lighten-4"
-              elevation="3"
-              height="200"
-              rounded="lg"
-            >
-              <v-card-text class="d-flex flex-column h-100 pa-4">
-                <div class="d-flex flex-column h-100">
-                  <div class="mb-4">
-                    <h3 class="text-h6 font-weight-bold d-flex align-center">
-                      衣橱捡漏
-                      <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-                    </h3>
-                    <p class="text-caption text-medium-emphasis">时尚美衣低价淘</p>
-                  </div>
-                  <div class="d-flex align-center ga-3 flex-1">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      src="https://via.placeholder.com/80x80/FFB6C1/FFFFFF?text=鞋"
-                      width="80"
-                    />
-                    <div class="position-relative">
-                      <v-img
-                        class="elevation-2"
-                        height="80"
-                        rounded="lg"
-                        src="https://via.placeholder.com/60x80/000000/FFFFFF?text=裙"
-                        width="60"
-                      />
-                      <v-chip
-                        class="position-absolute"
-                        color="black"
-                        size="x-small"
-                        style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                      >
-                        ¥69
-                      </v-chip>
-                    </div>
-                    <div class="position-relative">
-                      <v-img
-                        class="elevation-2"
-                        height="80"
-                        rounded="lg"
-                        src="https://via.placeholder.com/60x80/333333/FFFFFF?text=鞋"
-                        width="60"
-                      />
-                      <v-chip
-                        class="position-absolute"
-                        color="black"
-                        size="x-small"
-                        style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                      >
-                        ¥58
-                      </v-chip>
-                    </div>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
+      <!-- 手机数码 -->
+      <v-col class="pa-2" cols="6">
+        <v-card
+          class="bg-info-lighten-4"
+          elevation="3"
+          height="200"
+          rounded="lg"
+        >
+          <v-card-text class="d-flex flex-column h-100 pa-4">
+            <div class="mb-4">
+              <h3 class="text-h6 font-weight-bold d-flex align-center">
+                手机数码
+                <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
+              </h3>
+              <p class="text-caption text-medium-emphasis">热门装备省心入</p>
+            </div>
+            <div class="d-flex align-center ga-3 flex-1">
+              <v-img
+                class="elevation-2"
+                height="80"
+                rounded="lg"
+                src="https://via.placeholder.com/80x80/4CAF50/FFFFFF?text=相机"
+                width="80"
+              />
+              <div class="position-relative">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  rounded="lg"
+                  src="https://via.placeholder.com/60x80/666666/FFFFFF?text=手机"
+                  width="60"
+                />
+                <v-chip
+                  class="position-absolute"
+                  color="black"
+                  size="x-small"
+                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                >
+                  ¥7699
+                </v-chip>
+              </div>
+              <div class="position-relative">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  rounded="lg"
+                  src="https://via.placeholder.com/60x80/999999/FFFFFF?text=手机"
+                  width="60"
+                />
+                <v-chip
+                  class="position-absolute"
+                  color="black"
+                  size="x-small"
+                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                >
+                  ¥85
+                </v-chip>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-          <!-- 手机数码 -->
-          <v-col class="pa-2" cols="6">
-            <v-card
-              class="bg-info-lighten-4"
-              elevation="3"
-              height="200"
-              rounded="lg"
-            >
-              <v-card-text class="d-flex flex-column h-100 pa-4">
-                <div class="mb-4">
-                  <h3 class="text-h6 font-weight-bold d-flex align-center">
-                    手机数码
-                    <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-                  </h3>
-                  <p class="text-caption text-medium-emphasis">热门装备省心入</p>
-                </div>
-                <div class="d-flex align-center ga-3 flex-1">
-                  <v-img
-                    class="elevation-2"
-                    height="80"
-                    rounded="lg"
-                    src="https://via.placeholder.com/80x80/4CAF50/FFFFFF?text=相机"
-                    width="80"
-                  />
-                  <div class="position-relative">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      rounded="lg"
-                      src="https://via.placeholder.com/60x80/666666/FFFFFF?text=手机"
-                      width="60"
-                    />
-                    <v-chip
-                      class="position-absolute"
-                      color="black"
-                      size="x-small"
-                      style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                    >
-                      ¥7699
-                    </v-chip>
-                  </div>
-                  <div class="position-relative">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      rounded="lg"
-                      src="https://via.placeholder.com/60x80/999999/FFFFFF?text=手机"
-                      width="60"
-                    />
-                    <v-chip
-                      class="position-absolute"
-                      color="black"
-                      size="x-small"
-                      style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                    >
-                      ¥85
-                    </v-chip>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
+      <!-- 二次元 -->
+      <v-col class="pa-2" cols="6">
+        <v-card
+          class="bg-success-lighten-4"
+          elevation="3"
+          height="200"
+          rounded="lg"
+        >
+          <v-card-text class="d-flex flex-column h-100 pa-4">
+            <div class="mb-4">
+              <h3 class="text-h6 font-weight-bold d-flex align-center">
+                二次元
+                <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
+              </h3>
+              <p class="text-caption text-medium-emphasis">烫门新品随手入</p>
+            </div>
+            <div class="d-flex align-center ga-3 flex-1">
+              <v-img
+                class="elevation-2"
+                height="80"
+                rounded="lg"
+                src="https://via.placeholder.com/80x80/FFEB3B/000000?text=角色"
+                width="80"
+              />
+              <div class="position-relative">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  rounded="lg"
+                  src="https://via.placeholder.com/60x80/FF69B4/FFFFFF?text=手办"
+                  width="60"
+                />
+                <v-chip
+                  class="position-absolute"
+                  color="black"
+                  size="x-small"
+                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                >
+                  ¥1000
+                </v-chip>
+              </div>
+              <div class="position-relative">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  rounded="lg"
+                  src="https://via.placeholder.com/60x80/2196F3/FFFFFF?text=插画"
+                  width="60"
+                />
+                <v-chip
+                  class="position-absolute"
+                  color="black"
+                  size="x-small"
+                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                >
+                  ¥190
+                </v-chip>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-          <!-- 二次元 -->
-          <v-col class="pa-2" cols="6">
-            <v-card
-              class="bg-success-lighten-4"
-              elevation="3"
-              height="200"
-              rounded="lg"
-            >
-              <v-card-text class="d-flex flex-column h-100 pa-4">
-                <div class="mb-4">
-                  <h3 class="text-h6 font-weight-bold d-flex align-center">
-                    二次元
-                    <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-                  </h3>
-                  <p class="text-caption text-medium-emphasis">烫门新品随手入</p>
-                </div>
-                <div class="d-flex align-center ga-3 flex-1">
-                  <v-img
-                    class="elevation-2"
-                    height="80"
-                    rounded="lg"
-                    src="https://via.placeholder.com/80x80/FFEB3B/000000?text=角色"
-                    width="80"
-                  />
-                  <div class="position-relative">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      rounded="lg"
-                      src="https://via.placeholder.com/60x80/FF69B4/FFFFFF?text=手办"
-                      width="60"
-                    />
-                    <v-chip
-                      class="position-absolute"
-                      color="black"
-                      size="x-small"
-                      style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                    >
-                      ¥1000
-                    </v-chip>
-                  </div>
-                  <div class="position-relative">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      rounded="lg"
-                      src="https://via.placeholder.com/60x80/2196F3/FFFFFF?text=插画"
-                      width="60"
-                    />
-                    <v-chip
-                      class="position-absolute"
-                      color="black"
-                      size="x-small"
-                      style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                    >
-                      ¥190
-                    </v-chip>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-
-          <!-- 省钱卡券 -->
-          <v-col class="pa-2" cols="6">
-            <v-card
-              class="bg-success-lighten-4"
-              elevation="3"
-              height="200"
-              rounded="lg"
-            >
-              <v-card-text class="d-flex flex-column h-100 pa-4">
-                <div class="mb-4">
-                  <h3 class="text-h6 font-weight-bold d-flex align-center">
-                    省钱卡券
-                    <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-                  </h3>
-                  <p class="text-caption text-medium-emphasis">吃喝玩乐放心购</p>
-                </div>
-                <div class="d-flex align-center ga-3 flex-1">
-                  <v-img
-                    class="elevation-2"
-                    height="80"
-                    rounded="lg"
-                    src="https://via.placeholder.com/80x80/9C27B0/FFFFFF?text=钱包"
-                    width="80"
-                  />
-                  <div class="position-relative">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      rounded="lg"
-                      src="https://via.placeholder.com/60x80/00BCD4/FFFFFF?text=游泳"
-                      width="60"
-                    />
-                    <v-chip
-                      class="position-absolute"
-                      color="black"
-                      size="x-small"
-                      style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                    >
-                      ¥10
-                    </v-chip>
-                  </div>
-                  <div class="position-relative">
-                    <v-img
-                      class="elevation-2"
-                      height="80"
-                      rounded="lg"
-                      src="https://via.placeholder.com/60x80/4CAF50/FFFFFF?text=充值"
-                      width="60"
-                    />
-                    <v-chip
-                      class="position-absolute"
-                      color="black"
-                      size="x-small"
-                      style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                    >
-                      ¥96.88
-                    </v-chip>
-                  </div>
-                </div>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+      <!-- 省钱卡券 -->
+      <v-col class="pa-2" cols="6">
+        <v-card
+          class="bg-success-lighten-4"
+          elevation="3"
+          height="200"
+          rounded="lg"
+        >
+          <v-card-text class="d-flex flex-column h-100 pa-4">
+            <div class="mb-4">
+              <h3 class="text-h6 font-weight-bold d-flex align-center">
+                省钱卡券
+                <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
+              </h3>
+              <p class="text-caption text-medium-emphasis">吃喝玩乐放心购</p>
+            </div>
+            <div class="d-flex align-center ga-3 flex-1">
+              <v-img
+                class="elevation-2"
+                height="80"
+                rounded="lg"
+                src="https://via.placeholder.com/80x80/9C27B0/FFFFFF?text=钱包"
+                width="80"
+              />
+              <div class="position-relative">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  rounded="lg"
+                  src="https://via.placeholder.com/60x80/00BCD4/FFFFFF?text=游泳"
+                  width="60"
+                />
+                <v-chip
+                  class="position-absolute"
+                  color="black"
+                  size="x-small"
+                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                >
+                  ¥10
+                </v-chip>
+              </div>
+              <div class="position-relative">
+                <v-img
+                  class="elevation-2"
+                  height="80"
+                  rounded="lg"
+                  src="https://via.placeholder.com/60x80/4CAF50/FFFFFF?text=充值"
+                  width="60"
+                />
+                <v-chip
+                  class="position-absolute"
+                  color="black"
+                  size="x-small"
+                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
+                >
+                  ¥96.88
+                </v-chip>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>

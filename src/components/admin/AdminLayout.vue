@@ -145,10 +145,10 @@
 
   // 主题管理
   const theme = useTheme()
-  const isDark = computed(() => theme.global.current.value.dark)
+  const isDark = computed(() => theme.current.value.dark)
 
   function toggleTheme () {
-    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+    theme.change(theme.current.value.dark ? 'light' : 'dark')
   }
 
   // 响应式设计

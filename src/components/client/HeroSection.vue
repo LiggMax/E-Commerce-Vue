@@ -4,7 +4,6 @@
       v-if="slidesList.length > 0"
       class="rounded-carousel"
       cycle
-      :height="carouselHeight"
       hide-delimiters
       interval="5000"
       show-arrows="hover"

@@ -11,7 +11,7 @@ export function useThemeToggle () {
     try {
       const savedTheme = localStorage.getItem(THEME_STORAGE_KEY)
       isDark.value = savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
-      theme.global.name.value = isDark.value ? 'dark' : 'light'
+      theme.change(isDark.value ? 'dark' : 'light')
     } catch (error) {
       console.warn('无法加载主题设置:', error)
     }
@@ -20,7 +20,7 @@ export function useThemeToggle () {
   // 切换主题
   const toggleTheme = () => {
     isDark.value = !isDark.value
-    theme.global.name.value = isDark.value ? 'dark' : 'light'
+    theme.change(isDark.value ? 'dark' : 'light')
     try {
       localStorage.setItem(THEME_STORAGE_KEY, isDark.value ? 'dark' : 'light')
     } catch (error) {
@@ -30,7 +30,7 @@ export function useThemeToggle () {
 
   // 监听主题变化
   watch(isDark, newValue => {
-    theme.global.name.value = newValue ? 'dark' : 'light'
+    theme.change(newValue ? 'dark' : 'light')
   })
 
   return {
