@@ -2,17 +2,26 @@
   <!-- 头部标题导航 -->
   <ECommerceHeader />
   <v-container class="py-1" max-width="1700">
-    <v-row align="stretch">
+    <v-row align="stretch" no-gutters>
       <!-- 轮播图 -->
-      <v-col class="d-flex">
+      <v-col
+        class="d-flex pa-3"
+        cols="12"
+        md="8"
+      >
         <HeroSection />
       </v-col>
 
       <!-- 产品分类 -->
-      <v-col class="d-flex">
+      <v-col
+        class="d-flex pa-3"
+        cols="12"
+        md="4"
+      >
         <ProductCategories />
       </v-col>
     </v-row>
+
     <!-- 热门精选 -->
     <FeaturedProducts />
   </v-container>

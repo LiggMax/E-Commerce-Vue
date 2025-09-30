@@ -1,283 +1,174 @@
 <template>
-  <v-container class="py-8 fill-height">
-    <v-row class="fill-height" no-gutters>
-      <!-- 衣橱捡漏 -->
-      <v-col class="pa-2" cols="6">
-        <v-card
-          class="bg-warning-lighten-4"
-          elevation="3"
-          height="200"
-          rounded="lg"
-        >
-          <v-card-text class="d-flex flex-column h-100 pa-4">
-            <div class="d-flex flex-column h-100">
-              <div class="mb-4">
-                <h3 class="text-h6 font-weight-bold d-flex align-center">
-                  衣橱捡漏
-                  <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-                </h3>
-                <p class="text-caption text-medium-emphasis">时尚美衣低价淘</p>
-              </div>
-              <div class="d-flex align-center ga-3 flex-1">
-                <v-img
-                  class="elevation-2"
-                  height="80"
-                  src="https://via.placeholder.com/80x80/FFB6C1/FFFFFF?text=鞋"
-                  width="80"
-                />
-                <div class="position-relative">
-                  <v-img
-                    class="elevation-2"
-                    height="80"
-                    rounded="lg"
-                    src="https://via.placeholder.com/60x80/000000/FFFFFF?text=裙"
-                    width="60"
-                  />
-                  <v-chip
-                    class="position-absolute"
-                    color="black"
-                    size="x-small"
-                    style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                  >
-                    ¥69
-                  </v-chip>
-                </div>
-                <div class="position-relative">
-                  <v-img
-                    class="elevation-2"
-                    height="80"
-                    rounded="lg"
-                    src="https://via.placeholder.com/60x80/333333/FFFFFF?text=鞋"
-                    width="60"
-                  />
-                  <v-chip
-                    class="position-absolute"
-                    color="black"
-                    size="x-small"
-                    style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                  >
-                    ¥58
-                  </v-chip>
+  <v-row class="fill-height" no-gutters>
+    <v-col>
+      <v-row class="fill-height" no-gutters>
+        <!-- 第一行卡片 -->
+        <v-col class="pa-2" cols="6">
+          <!-- 衣橱捡漏 -->
+          <v-card
+            class="h-100 category-card"
+            color="orange-lighten-5"
+            elevation="2"
+            @click="navigateToCategory('wardrobe')"
+          >
+            <v-card-text class="pa-4 h-100 d-flex flex-column">
+              <div class="d-flex align-center mb-3">
+                <v-icon class="mr-2" color="orange" size="24">mdi-wardrobe</v-icon>
+                <div>
+                  <div class="text-h6 font-weight-bold text-orange-darken-2">衣橱捡漏</div>
+                  <div class="text-caption text-orange-darken-1">时尚美衣低价淘</div>
                 </div>
               </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+              <div class="flex-grow-1 d-flex align-center justify-center">
+                <v-img
+                  class="rounded"
+                  max-height="80"
+                  max-width="120"
+                  src="https://via.placeholder.com/120x80/FF6B6B/FFFFFF?text=👗"
+                />
+              </div>
+              <div class="mt-3">
+                <v-chip class="mr-2" color="orange" size="small" variant="tonal">¥310</v-chip>
+                <v-chip class="mr-2" color="orange" size="small" variant="tonal">¥100</v-chip>
+                <v-chip color="orange" size="small" variant="tonal">¥50</v-chip>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-      <!-- 手机数码 -->
-      <v-col class="pa-2" cols="6">
-        <v-card
-          class="bg-info-lighten-4"
-          elevation="3"
-          height="200"
-          rounded="lg"
-        >
-          <v-card-text class="d-flex flex-column h-100 pa-4">
-            <div class="mb-4">
-              <h3 class="text-h6 font-weight-bold d-flex align-center">
-                手机数码
-                <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-              </h3>
-              <p class="text-caption text-medium-emphasis">热门装备省心入</p>
-            </div>
-            <div class="d-flex align-center ga-3 flex-1">
-              <v-img
-                class="elevation-2"
-                height="80"
-                rounded="lg"
-                src="https://via.placeholder.com/80x80/4CAF50/FFFFFF?text=相机"
-                width="80"
-              />
-              <div class="position-relative">
-                <v-img
-                  class="elevation-2"
-                  height="80"
-                  rounded="lg"
-                  src="https://via.placeholder.com/60x80/666666/FFFFFF?text=手机"
-                  width="60"
-                />
-                <v-chip
-                  class="position-absolute"
-                  color="black"
-                  size="x-small"
-                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                >
-                  ¥7699
-                </v-chip>
+        <v-col class="pa-2" cols="6">
+          <!-- 手机数码 -->
+          <v-card
+            class="h-100 category-card"
+            color="blue-lighten-5"
+            elevation="2"
+            @click="navigateToCategory('digital')"
+          >
+            <v-card-text class="pa-4 h-100 d-flex flex-column">
+              <div class="d-flex align-center mb-3">
+                <v-icon class="mr-2" color="blue" size="24">mdi-cellphone</v-icon>
+                <div>
+                  <div class="text-h6 font-weight-bold text-blue-darken-2">手机数码</div>
+                  <div class="text-caption text-blue-darken-1">热门装备省心入</div>
+                </div>
               </div>
-              <div class="position-relative">
+              <div class="flex-grow-1 d-flex align-center justify-center">
                 <v-img
-                  class="elevation-2"
-                  height="80"
-                  rounded="lg"
-                  src="https://via.placeholder.com/60x80/999999/FFFFFF?text=手机"
-                  width="60"
+                  class="rounded"
+                  max-height="80"
+                  max-width="120"
+                  src="https://via.placeholder.com/120x80/4ECDC4/FFFFFF?text=📱"
                 />
-                <v-chip
-                  class="position-absolute"
-                  color="black"
-                  size="x-small"
-                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                >
-                  ¥85
-                </v-chip>
               </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+              <div class="mt-3">
+                <v-chip class="mr-2" color="blue" size="small" variant="tonal">¥1028</v-chip>
+                <v-chip class="mr-2" color="blue" size="small" variant="tonal">¥1488</v-chip>
+                <v-chip color="blue" size="small" variant="tonal">¥8800</v-chip>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-      <!-- 二次元 -->
-      <v-col class="pa-2" cols="6">
-        <v-card
-          class="bg-success-lighten-4"
-          elevation="3"
-          height="200"
-          rounded="lg"
-        >
-          <v-card-text class="d-flex flex-column h-100 pa-4">
-            <div class="mb-4">
-              <h3 class="text-h6 font-weight-bold d-flex align-center">
-                二次元
-                <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-              </h3>
-              <p class="text-caption text-medium-emphasis">烫门新品随手入</p>
-            </div>
-            <div class="d-flex align-center ga-3 flex-1">
-              <v-img
-                class="elevation-2"
-                height="80"
-                rounded="lg"
-                src="https://via.placeholder.com/80x80/FFEB3B/000000?text=角色"
-                width="80"
-              />
-              <div class="position-relative">
-                <v-img
-                  class="elevation-2"
-                  height="80"
-                  rounded="lg"
-                  src="https://via.placeholder.com/60x80/FF69B4/FFFFFF?text=手办"
-                  width="60"
-                />
-                <v-chip
-                  class="position-absolute"
-                  color="black"
-                  size="x-small"
-                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                >
-                  ¥1000
-                </v-chip>
+        <!-- 第二行卡片 -->
+        <v-col class="pa-2" cols="6">
+          <!-- 二次元 -->
+          <v-card
+            class="h-100 category-card"
+            color="green-lighten-5"
+            elevation="2"
+            @click="navigateToCategory('anime')"
+          >
+            <v-card-text class="pa-4 h-100 d-flex flex-column">
+              <div class="d-flex align-center mb-3">
+                <v-icon class="mr-2" color="green" size="24">mdi-heart</v-icon>
+                <div>
+                  <div class="text-h6 font-weight-bold text-green-darken-2">二次元</div>
+                  <div class="text-caption text-green-darken-1">烫门新品随手入</div>
+                </div>
               </div>
-              <div class="position-relative">
+              <div class="flex-grow-1 d-flex align-center justify-center">
                 <v-img
-                  class="elevation-2"
-                  height="80"
-                  rounded="lg"
-                  src="https://via.placeholder.com/60x80/2196F3/FFFFFF?text=插画"
-                  width="60"
+                  class="rounded"
+                  max-height="80"
+                  max-width="120"
+                  src="https://via.placeholder.com/120x80/45B7D1/FFFFFF?text=🎌"
                 />
-                <v-chip
-                  class="position-absolute"
-                  color="black"
-                  size="x-small"
-                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                >
-                  ¥190
-                </v-chip>
               </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+              <div class="mt-3">
+                <v-chip class="mr-2" color="green" size="small" variant="tonal">¥1000</v-chip>
+                <v-chip class="mr-2" color="green" size="small" variant="tonal">¥1</v-chip>
+                <v-chip color="green" size="small" variant="tonal">¥25.5</v-chip>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-      <!-- 省钱卡券 -->
-      <v-col class="pa-2" cols="6">
-        <v-card
-          class="bg-success-lighten-4"
-          elevation="3"
-          height="200"
-          rounded="lg"
-        >
-          <v-card-text class="d-flex flex-column h-100 pa-4">
-            <div class="mb-4">
-              <h3 class="text-h6 font-weight-bold d-flex align-center">
-                省钱卡券
-                <v-icon class="ml-2" small>mdi-arrow-right</v-icon>
-              </h3>
-              <p class="text-caption text-medium-emphasis">吃喝玩乐放心购</p>
-            </div>
-            <div class="d-flex align-center ga-3 flex-1">
-              <v-img
-                class="elevation-2"
-                height="80"
-                rounded="lg"
-                src="https://via.placeholder.com/80x80/9C27B0/FFFFFF?text=钱包"
-                width="80"
-              />
-              <div class="position-relative">
-                <v-img
-                  class="elevation-2"
-                  height="80"
-                  rounded="lg"
-                  src="https://via.placeholder.com/60x80/00BCD4/FFFFFF?text=游泳"
-                  width="60"
-                />
-                <v-chip
-                  class="position-absolute"
-                  color="black"
-                  size="x-small"
-                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                >
-                  ¥10
-                </v-chip>
+        <v-col class="pa-2" cols="6">
+          <!-- 省钱卡券 -->
+          <v-card
+            class="h-100 category-card"
+            color="pink-lighten-5"
+            elevation="2"
+            @click="navigateToCategory('coupons')"
+          >
+            <v-card-text class="pa-4 h-100 d-flex flex-column">
+              <div class="d-flex align-center mb-3">
+                <v-icon class="mr-2" color="pink" size="24">mdi-ticket</v-icon>
+                <div>
+                  <div class="text-h6 font-weight-bold text-pink-darken-2">省钱卡券</div>
+                  <div class="text-caption text-pink-darken-1">吃喝玩乐放心购</div>
+                </div>
               </div>
-              <div class="position-relative">
+              <div class="flex-grow-1 d-flex align-center justify-center">
                 <v-img
-                  class="elevation-2"
-                  height="80"
-                  rounded="lg"
-                  src="https://via.placeholder.com/60x80/4CAF50/FFFFFF?text=充值"
-                  width="60"
+                  class="rounded"
+                  max-height="80"
+                  max-width="120"
+                  src="https://via.placeholder.com/120x80/F8BBD9/FFFFFF?text=🎫"
                 />
-                <v-chip
-                  class="position-absolute"
-                  color="black"
-                  size="x-small"
-                  style="bottom: -20px; left: 50%; transform: translateX(-50%);"
-                >
-                  ¥96.88
-                </v-chip>
               </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+              <div class="mt-3">
+                <v-chip class="mr-2" color="pink" size="small" variant="tonal">¥5</v-chip>
+                <v-chip class="mr-2" color="pink" size="small" variant="tonal">¥799</v-chip>
+                <v-chip color="pink" size="small" variant="tonal">¥35</v-chip>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-col>
+  </v-row>
 </template>
 
 <script setup lang="ts">
-  // 侧边栏分类数据
-  const sidebarCategories = [
-    { id: 1, name: '手机/数码/电脑', icon: 'mdi-camera' },
-    { id: 2, name: '服饰/箱包/运动', icon: 'mdi-shoe-print' },
-    { id: 3, name: '技能/卡券/潮玩', icon: 'mdi-wallet' },
-    { id: 4, name: '母婴/美妆/个护', icon: 'mdi-baby-bottle' },
-    { id: 5, name: '家具/家电/家装', icon: 'mdi-lamp' },
-    { id: 6, name: '文玩/珠宝/礼品', icon: 'mdi-gift' },
-    { id: 7, name: '食品/宠物/花卉', icon: 'mdi-food' },
-    { id: 8, name: '图书/游戏/音像', icon: 'mdi-book-open' },
-    { id: 9, name: '汽车/电动车/租房', icon: 'mdi-car' },
-    { id: 10, name: '五金/设备/农牧', icon: 'mdi-wrench' },
-  ]
+  const selectedCategory = ref<number | null>(null)
 
   // 选择分类
   function selectCategory (category: any) {
+    selectedCategory.value = category.id
     console.log('选择分类:', category.name)
     // 这里可以添加路由跳转或状态管理逻辑
+  }
+
+  // 导航到分类页面
+  function navigateToCategory (category: string) {
+    console.log('导航到分类:', category)
+    // 这里可以添加路由跳转逻辑
   }
 </script>
 
 <style scoped>
+  .category-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .category-card:active {
+    transform: translateY(-2px);
+  }
 </style>

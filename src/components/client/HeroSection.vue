@@ -1,93 +1,97 @@
 <template>
-  <v-container>
-    <v-carousel
-      v-if="slidesList.length > 0"
-      class="rounded-carousel"
-      cycle
-      hide-delimiters
-      interval="5000"
-      show-arrows="hover"
+  <v-carousel
+    v-if="slidesList.length > 0"
+    class="rounded-carousel"
+    cycle
+    :height="carouselHeight"
+    hide-delimiters
+    interval="5000"
+    show-arrows="hover"
+  >
+    <v-carousel-item
+      v-for="(slide, index) in slidesList"
+      :key="index"
+      cover
+      :src="slide.currentImage"
     >
-      <v-carousel-item
-        v-for="(slide, index) in slidesList"
-        :key="index"
-        cover
-        :src="slide.currentImage"
-      >
-        <v-container class="fill-height" fluid>
-          <v-row align="end" class="fill-height" justify="start">
-            <v-col class="text-left" cols="12" md="6">
-              <div class="hero-content ma-md-7">
-                <h1 class="text-h4 text-md-h3 font-weight-bold mb-1 text-white">
-                  {{ slide.title }}
-                </h1>
-                <p class="text-h6 text-md-h5 mb-1 text-white opacity-90">
-                  {{ slide.subtitle }}
-                </p>
-                <div class="d-flex flex-md-row ga-4 ">
-                  <v-btn
-                    color="primary"
-                    elevation="4"
-                    rounded
-                    size="large"
-                    :to="slide.primaryAction.link"
-                  >
-                    {{ slide.primaryAction.text }}
-                    <v-icon end icon="mdi-arrow-right" />
-                  </v-btn>
-                  <v-btn
-                    color="white"
-                    rounded
-                    size="large"
-                    :to="slide.secondaryAction.link"
-                    variant="outlined"
-                  >
-                    {{ slide.secondaryAction.text }}
-                  </v-btn>
-                </div>
+      <v-container class="fill-height" fluid>
+        <v-row align="end" class="fill-height" justify="start">
+          <v-col class="text-left" cols="12" md="6">
+            <div class="hero-content ma-md-7">
+              <h1 class="text-h4 text-md-h3 font-weight-bold mb-1 text-white">
+                {{ slide.title }}
+              </h1>
+              <p class="text-h6 text-md-h5 mb-1 text-white opacity-90">
+                {{ slide.subtitle }}
+              </p>
+              <div class="d-flex flex-md-row ga-4">
+                <v-btn
+                  color="primary"
+                  elevation="4"
+                  rounded
+                  size="large"
+                  :to="slide.primaryAction.link"
+                >
+                  {{ slide.primaryAction.text }}
+                  <v-icon end icon="mdi-arrow-right" />
+                </v-btn>
+                <v-btn
+                  color="white"
+                  rounded
+                  size="large"
+                  :to="slide.secondaryAction.link"
+                  variant="outlined"
+                >
+                  {{ slide.secondaryAction.text }}
+                </v-btn>
               </div>
-            </v-col>
-          </v-row>
-        </v-container>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
 
-        <!-- 渐变叠加以提高文本可读性 -->
-        <div class="hero-overlay" />
-      </v-carousel-item>
-    </v-carousel>
-  </v-container>
-
+      <!-- 渐变叠加以提高文本可读性 -->
+      <div class="hero-overlay" />
+    </v-carousel-item>
+  </v-carousel>
 </template>
 
 <script setup lang="ts">
-// 定义 props
+  import { useDisplay } from 'vuetify'
+  // 定义 props
   import { getCarouselServer } from '@/http/client/carousel.ts'
 
   const props = defineProps({
     height: {
       type: [Number, String],
-      default: 600,
+      default: 500,
     },
   })
+
+  // 使用 Vuetify 的 display 组合式函数
+  const display = useDisplay()
 
   // 响应式高度
   const carouselHeight = ref(Number(props.height))
 
   // 响应式调整高度的函数
   function updateCarouselHeight () {
-    const screenWidth = window.innerWidth
     const baseHeight = Number(props.height)
 
-    if (screenWidth < 600) {
-      // 小屏幕设备
-      carouselHeight.value = baseHeight * 0.5
-    } else if (screenWidth < 960) {
-      // 中等屏幕设备
-      carouselHeight.value = baseHeight * 0.6
-    } else if (screenWidth < 1200) {
-      // 中等屏幕设备
-      carouselHeight.value = baseHeight * 0.8
+    if (display.xs.value) {
+      // 超小屏幕设备 < 600px
+      carouselHeight.value = 300
+    } else if (display.sm.value) {
+      // 小屏幕设备 600px - 959px
+      carouselHeight.value = 350
+    } else if (display.md.value) {
+      // 中等屏幕设备 960px - 1279px
+      carouselHeight.value = 400
+    } else if (display.lg.value) {
+      // 大屏幕设备 1280px - 1919px
+      carouselHeight.value = 450
     } else {
-      // 大屏幕设备
+      // 超大屏幕设备 >= 1920px
       carouselHeight.value = baseHeight
     }
   }
@@ -162,6 +166,11 @@
     }
   }
 
+  // 监听屏幕尺寸变化
+  watch([display.xs, display.sm, display.md, display.lg, display.xl], () => {
+    updateCarouselHeight()
+  })
+
   onMounted(() => {
     updateCarouselHeight()
     window.addEventListener('resize', updateCarouselHeight)
@@ -198,5 +207,6 @@
 .rounded-carousel {
   border-radius: 20px;
   overflow: hidden;
+  width: 100%;
 }
 </style>
