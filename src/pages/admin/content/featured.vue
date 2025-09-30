@@ -211,7 +211,10 @@
                   accept="image/*"
                   label="商品图片"
                   prepend-inner-icon="mdi-image"
-                  :rules="dialogMode === 'add' ? [v => !!v || '请选择图片'] : []"
+                  :rules="dialogMode === 'add' ? [
+                    v => !!v || '请选择图片',
+                    v => !v || (v.size <= 2 * 1024 * 1024) || '文件大小不能超过2MB'
+                  ] : []"
                   show-size
                   @change="handleImageUpload"
                 />
