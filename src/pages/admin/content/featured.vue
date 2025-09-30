@@ -71,7 +71,7 @@
         </div>
       </v-card-title>
 
-      <v-card-text>
+      <v-card-text class="overflow-y-auto" style="max-height: 600px;">
         <!-- 数据表格 -->
         <v-data-table
           class="elevation-0"
@@ -148,36 +148,36 @@
           </template>
         </v-data-table>
 
-        <!-- 分页控件 -->
-        <div class="d-flex align-center justify-space-between mt-4 px-4">
-          <div class="text-body-2 text-medium-emphasis">
-            共 {{ pagination.totalItems }} 条记录，第 {{ pagination.page }}/{{ pagination.totalPages }} 页
-          </div>
-
-          <v-pagination
-            v-model="pagination.page"
-            density="compact"
-            :length="pagination.totalPages"
-            :total-visible="5"
-            @update:model-value="handlePageChange"
-          />
-
-          <div class="d-flex align-center">
-            <span class="mr-2">每页</span>
-            <v-select
-              v-model="pagination.pageSize"
-              class="pagination-select"
-              density="compact"
-              hide-details
-              :items="[10, 20, 50, 100]"
-              style="width: 100px;"
-              variant="outlined"
-              @update:model-value="handlePageSizeChange"
-            />
-            <span class="ml-2">条</span>
-          </div>
-        </div>
       </v-card-text>
+      <!-- 分页控件 -->
+      <div class="my-3 d-flex align-center justify-space-between mt-4 px-4">
+        <div class="text-body-2 text-medium-emphasis">
+          共 {{ pagination.totalItems }} 条记录，第 {{ pagination.page }}/{{ pagination.totalPages }} 页
+        </div>
+
+        <v-pagination
+          v-model="pagination.page"
+          density="compact"
+          :length="pagination.totalPages"
+          :total-visible="5"
+          @update:model-value="handlePageChange"
+        />
+
+        <div class="d-flex align-center">
+          <span class="mr-2">每页</span>
+          <v-select
+            v-model="pagination.pageSize"
+            class="pagination-select"
+            density="compact"
+            hide-details
+            :items="[10, 20, 50, 100]"
+            style="width: 100px;"
+            variant="outlined"
+            @update:model-value="handlePageSizeChange"
+          />
+          <span class="ml-2">条</span>
+        </div>
+      </div>
     </v-card>
 
     <!-- 添加/编辑对话框 -->
