@@ -338,11 +338,13 @@
   const search = ref('')
   const dialogMode = ref<'add' | 'edit'>('add')
   const form = ref()
+  const route = useRoute()
+  const router = useRouter()
 
   // 分页相关数据
   const pagination = reactive({
-    page: 1,
-    pageSize: 10,
+    page: Number.parseInt(route.query.page as string) || 1,
+    pageSize: Number.parseInt(route.query.pageSize as string) || 10,
     totalItems: 0,
     totalPages: 0,
   })
@@ -418,14 +420,27 @@
   // 页码变化处理
   function handlePageChange (newPage: number) {
     pagination.page = newPage
-    fetchFeaturedList()
+    // 更新路由中的页码参数
+    router.push({
+      query: {
+        ...route.query,
+        page: newPage.toString(),
+        pageSize: pagination.pageSize.toString(),
+      },
+    })
   }
-
   // 每页条数变化处理
   function handlePageSizeChange (newSize: number) {
     pagination.pageSize = newSize
     pagination.page = 1 // 重置为第一页
-    fetchFeaturedList()
+    // 更新路由中的每页条数参数
+    router.push({
+      query: {
+        ...route.query,
+        pageSize: newSize.toString(),
+        page: '1',
+      },
+    })
   }
 
   // 计算属性
@@ -554,6 +569,21 @@
   onMounted(() => {
     fetchFeaturedList()
   })
+
+  // 监听路由变化
+  watch(
+    () => route.query,
+    newQuery => {
+      if (newQuery.page) {
+        pagination.page = Number.parseInt(newQuery.page as string)
+      }
+      if (newQuery.pageSize) {
+        pagination.pageSize = Number.parseInt(newQuery.pageSize as string)
+      }
+      fetchFeaturedList()
+    },
+    { immediate: true },
+  )
 </script>
 
 <style scoped>
