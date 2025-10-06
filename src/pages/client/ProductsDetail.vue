@@ -48,7 +48,7 @@
             <div class="d-flex align-end ga-3">
               <div class="text-h4 font-weight-bold text-primary">¥{{ productDetail.currentPrice }}</div>
               <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ productDetail.originalPrice }}</div>
-              <v-chip color="error" size="small" variant="flat">直降 ¥{{ product.originalPrice - product.price }}</v-chip>
+              <v-chip color="error" size="small" variant="flat">直降 {{ productDetail.discount }}%</v-chip>
             </div>
             <div class="mt-2 text-body-2 text-medium-emphasis">{{ product.delivery }}</div>
           </v-sheet>
