@@ -142,6 +142,7 @@
 
 <script lang="ts" setup>
   import { useDisplay, useTheme } from 'vuetify'
+  import { cleanToken } from '@/http/admin/login.ts'
   import { userTokenStore } from '@/stores/token.ts'
   // 主题管理
   const theme = useTheme()
@@ -262,6 +263,8 @@
     removeToken()
     // 跳转到登录页面
     router.push('/admin/login')
+    // 调用接口清除Token
+    cleanToken()
   }
 
   // 监听屏幕尺寸变化
