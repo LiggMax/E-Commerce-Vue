@@ -21,6 +21,7 @@
           elevation="4"
           hover
           rounded="lg"
+          @click="viewDetail(product.id)"
         >
           <div class="product-image-container">
             <v-img
@@ -47,7 +48,7 @@
                 color="primary"
                 rounded
                 size="small"
-                @click.stop="quickView(product)"
+                @click.stop="viewDetail(product.id)"
               >
                 <v-icon icon="mdi-eye" start />
                 快速预览
@@ -123,6 +124,7 @@
 
 <script setup lang="ts">
   import { getFeaturedServer } from '@/http/client/featured.ts'
+  import router from '@/router'
 
   const favoriteProducts = ref<number[]>([])
 
@@ -146,8 +148,11 @@
     console.log('添加到购物车:', product.name)
   }
 
-  function quickView (product: any) {
-    console.log('快速预览:', product.name)
+  function viewDetail (productId: string) {
+    console.log('查看详情:', productId)
+    router.push({ path: `/client/ProductsDetail`,
+                  query: { productId: productId },
+    })
   }
 
   async function getFeaturedProducts () {

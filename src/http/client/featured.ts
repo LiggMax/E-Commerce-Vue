@@ -1,4 +1,4 @@
-import { FEATURED } from '@/http/client/api.ts'
+import { FEATURED, PRODUCT_DETAIL } from '@/http/client/api.ts'
 import request from '@/http/request.ts'
 
 /**
@@ -6,4 +6,13 @@ import request from '@/http/request.ts'
  */
 export async function getFeaturedServer () {
   return request.get(FEATURED)
+}
+
+/**
+ * 获取精选商品详情
+ */
+export async function getFeaturedDetailServer (productId: string) {
+  return request.get(PRODUCT_DETAIL, {
+    productId,
+  })
 }

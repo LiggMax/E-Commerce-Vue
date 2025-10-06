@@ -120,7 +120,9 @@
 
   // 路由实例
   const router = useRouter()
+
   const { setToken } = userTokenStore()
+
   // 响应式数据
   const form = ref()
   const valid = ref(false)

@@ -14,6 +14,10 @@ import { routes } from 'vue-router/auto-routes'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: setupLayouts(routes),
+  // 让页面滚动到顶部
+  scrollBehavior () {
+    return { top: 0 }
+  },
 })
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
