@@ -191,7 +191,7 @@
     // 如果正在上传中，禁用按钮
     if (uploading.value) return false
 
-    // 简化逻辑：只有所有文件都未开始上传时才允许点击
+    // 只有所有文件都未开始上传时才允许点击
     return fileProgress.value.every(progress => progress === undefined)
   })
 
