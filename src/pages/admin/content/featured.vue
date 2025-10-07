@@ -226,6 +226,15 @@
                   title="将文件拖放到此处"
                   variant="compact"
                 />
+                <!-- 文件要求提示 -->
+                <div class="text-caption text-medium-emphasis mt-1">
+                  <v-icon :class="[isFileError? 'text-error mr-1' : 'mr-1']" size="small">
+                    mdi-information
+                  </v-icon>
+                  <span :class="[isFileError? 'text-error text-caption mt-1' : '']">
+                    {{ isFileError? imageFileError : '支持 JPG、PNG、GIF、WebP 格式，文件大小不超过 2MB' }}
+                  </span>
+                </div>
               </v-col>
 
               <!-- 价格信息 -->
@@ -311,6 +320,10 @@
 <script lang="ts" setup>
   import { addFeatured, deleteFeaturedById, getFeatured, updateFeatured } from '@/http/admin/featured.ts'
 
+  // 响应数据
+  const imageFileError = ref('')
+  const isFileError = ref(false)
+
   // 定义精选商品项目的接口
   interface FeaturedItem {
     id: string
@@ -320,7 +333,7 @@
       largeImage: string
       smallImage: string
     }
-    imageFile?: File
+    imageFile?: File | undefined
     originalPrice: number
     currentPrice: number
     reviews: number
@@ -376,6 +389,36 @@
 
   // 精选商品数据
   const featuredList = ref<FeaturedItem[]>([])
+
+  // 校验图片文件类型
+  function validateImageType (file: File): boolean {
+    imageFileError.value = ''
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    return allowedTypes.includes(file.type)
+  }
+
+  // 校验文件大小
+  function validateFileSize (file: File): boolean {
+    const maxSize = 2 * 1024 * 1024
+    return file.size <= maxSize
+  }
+
+  // 文件上传校验
+  function validateImageFile (file: File): boolean {
+    if (!validateImageType(file)) {
+      imageFileError.value = '只支持 JPG、PNG、GIF、WebP 格式的图片文件'
+      isFileError.value = true
+      return false
+    }
+
+    if (!validateFileSize(file)) {
+      imageFileError.value = '文件大小不能超过 2MB'
+      isFileError.value = true
+      return false
+    }
+
+    return true
+  }
 
   // 获取精选商品数据
   async function fetchFeaturedList () {
@@ -499,6 +542,11 @@
   // 保存精选商品
   async function saveFeatured () {
     if (!valid.value) return
+
+    // 校验文件
+    if (editForm.imageFile && !validateImageFile(editForm.imageFile)) {
+      return
+    }
 
     saving.value = true
 
