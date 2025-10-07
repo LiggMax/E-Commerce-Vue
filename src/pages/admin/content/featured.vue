@@ -218,29 +218,14 @@
 
               <!-- 图片上传 -->
               <v-col cols="12">
-                <v-file-input
+                <v-file-upload
                   v-model="editForm.imageFile"
-                  accept="image/*"
-                  label="商品图片"
-                  prepend-inner-icon="mdi-image"
-                  :rules="dialogMode === 'add' ? [
-                    v => !!v || '请选择图片',
-                    v => !v || (v.size <= 2 * 1024 * 1024) || '文件大小不能超过2MB'
-                  ] : []"
+                  clearable
+                  density="compact"
                   show-size
-                  @change="handleImageUpload"
+                  title="将文件拖放到此处"
+                  variant="compact"
                 />
-
-                <!-- 图片预览 -->
-                <div v-if="editForm.images?.largeImage" class="mt-4">
-                  <v-img
-                    :alt="editForm.title"
-                    class="rounded-lg"
-                    cover
-                    height="200"
-                    :src="editForm.images.largeImage"
-                  />
-                </div>
               </v-col>
 
               <!-- 价格信息 -->
@@ -335,7 +320,7 @@
       largeImage: string
       smallImage: string
     }
-    imageFile?: File | null
+    imageFile?: File
     originalPrice: number
     currentPrice: number
     reviews: number
@@ -381,7 +366,7 @@
       largeImage: '',
       smallImage: '',
     },
-    imageFile: null,
+    imageFile: undefined,
     originalPrice: 0,
     currentPrice: 0,
     reviews: 0,
@@ -509,18 +494,6 @@
   function closeDialog () {
     dialog.value = false
     form.value?.reset()
-  }
-
-  // 处理图片上传
-  function handleImageUpload (event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.addEventListener('load', e => {
-        editForm.images.largeImage = e.target?.result as string
-      })
-      reader.readAsDataURL(file)
-    }
   }
 
   // 保存精选商品
