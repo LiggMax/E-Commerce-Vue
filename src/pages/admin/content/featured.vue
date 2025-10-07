@@ -84,7 +84,7 @@
         >
           <!-- 商品图片 -->
           <template #item.image="{ item }">
-            <div class="my-2 rounded-lg overflow-hidden" style="width: 80px; height: 80px;">
+            <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 80px;">
               <v-img :alt="item.title" cover :src="item.images?.largeImage || ''" />
             </div>
           </template>
@@ -129,22 +129,30 @@
 
           <!-- 操作 -->
           <template #item.actions="{ item }">
-            <div class="d-flex ga-1">
-              <v-btn
-                color="primary"
-                icon="mdi-pencil"
-                size="small"
-                variant="text"
-                @click="openDialog('edit', item)"
-              />
-              <v-btn
-                color="error"
-                icon="mdi-delete"
-                size="small"
-                variant="text"
-                @click="deleteFeatured(item)"
-              />
-            </div>
+            <v-menu>
+              <template #activator="{ props }">
+                <v-btn
+                  color="primary"
+                  icon="mdi-dots-vertical"
+                  size="small"
+                  v-bind="props"
+                />
+              </template>
+              <v-list>
+                <v-list-item @click="openDialog('edit', item)">
+                  <template #prepend>
+                    <v-icon icon="mdi-pencil" />
+                  </template>
+                  <v-list-item-title>编辑</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="openDeleteDialog(item)">
+                  <template #prepend>
+                    <v-icon icon="mdi-delete" />
+                  </template>
+                  <v-list-item-title>删除</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </template>
         </v-data-table>
 
@@ -218,21 +226,22 @@
 
               <!-- 图片上传 -->
               <v-col cols="12">
+                <span class="text-caption text-medium-emphasis">封面上传</span>
                 <v-file-upload
                   v-model="editForm.imageFile"
                   clearable
                   density="compact"
                   show-size
-                  title="将文件拖放到此处"
+                  title="将图片文件拖放到此处"
                   variant="compact"
                 />
                 <!-- 文件要求提示 -->
                 <div class="text-caption text-medium-emphasis mt-1">
-                  <v-icon :class="[isFileError? 'text-error mr-1' : 'mr-1']" size="small">
+                  <v-icon :class="[imageFileError != ''? 'text-error mr-1' : 'mr-1']" size="small">
                     mdi-information
                   </v-icon>
-                  <span :class="[isFileError? 'text-error text-caption mt-1' : '']">
-                    {{ isFileError? imageFileError : '支持 JPG、PNG、GIF、WebP 格式，文件大小不超过 2MB' }}
+                  <span :class="[imageFileError != ''? 'text-error text-caption mt-1 ' : '']">
+                    {{ imageFileError != ''? imageFileError : '支持 JPG、PNG、GIF、WebP 格式，文件大小不超过 2MB' }}
                   </span>
                 </div>
               </v-col>
@@ -314,16 +323,50 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- 删除确认对话框 -->
+    <v-dialog v-model="deleteDialog" max-width="500px">
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2" color="warning">mdi-alert</v-icon>
+          确认删除
+        </v-card-title>
+        <v-card-text>
+          <p>确定要删除该商品 "{{ itemToDelete?.title }}" 吗？</p>
+          <p class="text-medium-emphasis">此操作无法撤销。</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            @click="deleteDialog = false"
+          >
+            取消
+          </v-btn>
+          <v-btn
+            color="error"
+            :loading="deleting"
+            @click="deleteFeatured(itemToDelete!)"
+          >
+            确认删除
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </AdminLayout>
 </template>
 
 <script lang="ts" setup>
   import { addFeatured, deleteFeaturedById, getFeatured, updateFeatured } from '@/http/admin/featured.ts'
+  import { useNotification } from '@/utils/notification'
 
   // 响应数据
   const imageFileError = ref('')
-  const isFileError = ref(false)
+  const deleteDialog = ref(false)
+  const deleting = ref(false)
+  const itemToDelete = ref<FeaturedItem>()
 
+  const { showSuccess } = useNotification()
   // 定义精选商品项目的接口
   interface FeaturedItem {
     id: string
@@ -383,7 +426,7 @@
     originalPrice: 0,
     currentPrice: 0,
     reviews: 0,
-    rating: 5,
+    rating: 0,
     createdAt: '',
   })
 
@@ -407,13 +450,11 @@
   function validateImageFile (file: File): boolean {
     if (!validateImageType(file)) {
       imageFileError.value = '只支持 JPG、PNG、GIF、WebP 格式的图片文件'
-      isFileError.value = true
       return false
     }
 
     if (!validateFileSize(file)) {
       imageFileError.value = '文件大小不能超过 2MB'
-      isFileError.value = true
       return false
     }
 
@@ -437,6 +478,7 @@
           largeImage: string
           smallImage: string
         }
+        description: string
         originalPrice: number
         currentPrice: number
         reviews: number
@@ -450,6 +492,7 @@
         currentPrice: item.currentPrice,
         reviews: item.reviews,
         rating: item.rating,
+        description: item.description,
         createdAt: item.createdAt,
       }))
     } catch (error) {
@@ -517,11 +560,12 @@
       Object.assign(editForm, {
         id: '',
         title: '',
+        description: '',
         images: {
           largeImage: '',
           smallImage: '',
         },
-        imageFile: null,
+        imageFile: undefined,
         originalPrice: 0,
         currentPrice: 0,
         reviews: 0,
@@ -567,6 +611,10 @@
       }
 
       if (dialogMode.value === 'add') {
+        if (!editForm.imageFile) {
+          imageFileError.value = '请选择有效的图片文件'
+          return
+        }
         await addFeatured(formData)
         // 添加成功后刷新数据
         await fetchFeaturedList()
@@ -588,17 +636,25 @@
     }
   }
 
+  // 打开删除确认框
+  function openDeleteDialog (item: FeaturedItem) {
+    itemToDelete.value = item
+    deleteDialog.value = true
+  }
+
   // 删除精选商品
   async function deleteFeatured (item: FeaturedItem) {
-    if (confirm('确定要删除这个精选商品吗？')) {
-      try {
-        await deleteFeaturedById(item.id)
+    try {
+      await deleteFeaturedById(item.id)
 
-        // 刷新数据
-        await fetchFeaturedList()
-      } catch (error) {
-        console.error('删除失败:', error)
-      }
+      featuredList.value = featuredList.value.filter(i => i.id !== itemToDelete.value!.id)
+
+      showSuccess(`${item.title}删除成功`)
+      deleteDialog.value = false
+      // 刷新数据
+      // await fetchFeaturedList()
+    } catch (error) {
+      console.error('删除失败:', error)
     }
   }
 

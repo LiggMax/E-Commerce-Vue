@@ -708,7 +708,11 @@
     try {
       await deleteCarouselById(itemToDelete.value.id)
 
-      // 删除表单中的数据
+      /*
+       * 删除表单中的数据
+       * 这里是直接删除页面表单中的数据没有重新发送请求刷新数据,确保了流程的删除元素和减少后端压力,
+       * 同时也会回导致分页组件中的总记录数不会变化
+       */
       carouselList.value = carouselList.value.filter(i => i.id !== itemToDelete.value!.id)
       deleteDialog.value = false
       showSuccess('轮播图删除成功')

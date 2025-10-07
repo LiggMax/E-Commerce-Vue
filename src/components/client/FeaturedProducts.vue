@@ -87,20 +87,6 @@
               </span>
             </div>
           </v-card-text>
-
-          <v-card-actions class="px-4 pb-4">
-            <v-btn
-              block
-              color="primary"
-              rounded
-              size="small"
-              variant="flat"
-              @click="addToCart(product)"
-            >
-              <v-icon icon="mdi-cart-plus" start />
-              加入购物车
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
