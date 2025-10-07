@@ -1,4 +1,4 @@
-import { FEATURED } from '@/http/admin/api.ts'
+import { FEATURED, UPLOAD_IMAGE } from '@/http/admin/api.ts'
 import request from '@/http/request.ts'
 
 /**
@@ -38,4 +38,15 @@ export async function getFeatured (pageNumber: number, pageSize: number) {
  */
 export async function deleteFeaturedById (id: string) {
   return await request.delete(`${FEATURED}/${id}`)
+}
+
+/**
+ * 上传图片
+ */
+export async function uploadFeaturedImage (data: FormData) {
+  return await request.post(UPLOAD_IMAGE, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 }

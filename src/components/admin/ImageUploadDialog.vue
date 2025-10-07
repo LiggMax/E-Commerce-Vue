@@ -8,13 +8,16 @@
 
       <v-card-text>
         <!-- 多文件上传组件 -->
-        <v-file-upload
+        <v-file-input
           v-model="uploadFiles"
           accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
           clearable
+          density="compact"
+          label="选择图片文件"
           multiple
+          prepend-icon="mdi-camera"
+          :rules="fileValidationRules"
           show-size
-          title="将图片文件拖放到此处，支持多张图片同时上传"
           variant="outlined"
           @update:model-value="handleUploadFilesChange"
         />
@@ -25,9 +28,15 @@
           支持 JPG、PNG、GIF、WebP 格式，每张图片不超过 2MB，可同时上传多张图片
         </div>
 
-        <!-- 上传文件列表 -->
+        <!-- 警告提示 -->
+        <div v-if="!itemId" class="text-caption text-warning mt-2">
+          <v-icon class="mr-1" size="small">mdi-alert</v-icon>
+          请先保存商品信息，然后才能上传图片
+        </div>
+
+        <!-- 文件预览区域 -->
         <div v-if="uploadFiles.length > 0" class="mt-4">
-          <h4 class="text-subtitle-1 mb-3">待上传文件列表</h4>
+          <h4 class="text-subtitle-1 mb-3">文件预览</h4>
           <v-list density="compact">
             <v-list-item
               v-for="(file, index) in uploadFiles"
@@ -35,35 +44,78 @@
               class="px-0"
             >
               <template #prepend>
-                <v-icon color="primary">mdi-image</v-icon>
+                <v-img
+                  class="rounded-lg mx-3"
+                  cover
+                  height="60"
+                  :src="getFilePreview(file)"
+                  width="100"
+                />
               </template>
               <v-list-item-title>{{ file.name }}</v-list-item-title>
-              <v-list-item-subtitle>{{ formatFileSize(file.size) }}</v-list-item-subtitle>
-              <template #append>
-                <v-btn
-                  color="error"
-                  icon="mdi-close"
-                  size="small"
-                  variant="text"
-                  @click="removeUploadFile(index)"
+              <v-list-item-subtitle>
+                {{ formatFileSize(file.size) }}
+              </v-list-item-subtitle>
+
+              <!-- 上传进度条 -->
+              <div v-if="uploading && fileProgress[index] !== undefined" class="mt-2">
+                <div class="d-flex align-center justify-space-between mb-1">
+                  <span class="text-caption">上传进度</span>
+                  <span class="text-caption">{{ Math.round(fileProgress[index] || 0) }}%</span>
+                </div>
+                <v-progress-linear
+                  color="primary"
+                  height="6"
+                  :model-value="fileProgress[index] || 0"
+                  rounded
                 />
+              </div>
+
+              <!-- 状态文字 -->
+              <div v-else-if="fileProgress[index] === 100" class="text-caption text-success mt-1">
+                上传完成
+              </div>
+              <div v-else-if="fileErrors[index]" class="text-caption text-error mt-1">
+                上传失败
+              </div>
+              <div v-else class="text-caption text-medium-emphasis mt-1">
+                等待上传
+              </div>
+
+              <!-- 状态指示 -->
+              <template #append>
+                <div class="d-flex align-center">
+                  <v-progress-circular
+                    v-if="uploading && fileProgress[index] !== undefined && fileProgress[index] < 100"
+                    color="primary"
+                    :model-value="fileProgress[index]"
+                    size="24"
+                    width="3"
+                  />
+                  <v-icon
+                    v-else-if="fileProgress[index] === 100"
+                    color="success"
+                    icon="mdi-check"
+                    size="24"
+                  />
+                  <v-icon
+                    v-else-if="fileErrors[index]"
+                    color="error"
+                    icon="mdi-alert"
+                    size="24"
+                  />
+                  <v-btn
+                    v-if="fileErrors[index]"
+                    color="primary"
+                    icon="mdi-refresh"
+                    size="small"
+                    variant="text"
+                    @click="retryUpload(index)"
+                  />
+                </div>
               </template>
             </v-list-item>
           </v-list>
-        </div>
-
-        <!-- 上传进度 -->
-        <div v-if="uploading" class="mt-4">
-          <div class="d-flex align-center justify-space-between mb-2">
-            <span class="text-subtitle-2">上传进度</span>
-            <span class="text-caption">{{ uploadProgress.current }}/{{ uploadProgress.total }}</span>
-          </div>
-          <v-progress-linear
-            color="primary"
-            height="8"
-            :model-value="(uploadProgress.current / uploadProgress.total) * 100"
-            rounded
-          />
         </div>
       </v-card-text>
 
@@ -77,7 +129,7 @@
         </v-btn>
         <v-btn
           color="primary"
-          :disabled="uploadFiles.length === 0"
+          :disabled="!canUpload"
           :loading="uploading"
           @click="handleUpload"
         >
@@ -89,6 +141,8 @@
 </template>
 
 <script lang="ts" setup>
+  import { UPLOAD_IMAGE } from '@/http/admin/api.ts'
+  import request from '@/http/request.ts'
   import { useNotification } from '@/utils/notification'
 
   // Props
@@ -118,7 +172,11 @@
     total: 0,
   })
 
-  const { showSuccess } = useNotification()
+  // 每个文件的上传进度和状态
+  const fileProgress = ref<(number | undefined)[]>([])
+  const fileErrors = ref<boolean[]>([])
+
+  const { showSuccess, showWarning } = useNotification()
 
   // 计算属性
   const dialog = computed({
@@ -126,43 +184,90 @@
     set: value => emit('update:modelValue', value),
   })
 
-  // 校验图片文件类型
-  function validateImageType (file: File): boolean {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-    return allowedTypes.includes(file.type)
-  }
+  const canUpload = computed(() => {
+    return uploadFiles.value.length > 0 && !!props.itemId
+  })
 
-  // 校验文件大小
-  function validateFileSize (file: File): boolean {
-    const maxSize = 2 * 1024 * 1024 // 2MB
-    return file.size <= maxSize
-  }
+  // 文件校验规则
+  const fileValidationRules = [
+    (files: File[] | null) => {
+      if (!files || files.length === 0) return true
 
-  // 文件上传校验
-  function validateImageFile (file: File): boolean {
-    if (!validateImageType(file)) {
-      showSuccess('只支持 JPG、PNG、GIF、WebP 格式的图片文件')
-      return false
-    }
+      // 检查每个文件
+      for (const file of files) {
+        // 检查文件类型
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+          return '只支持 JPG、PNG、GIF、WebP 格式的图片文件'
+        }
 
-    if (!validateFileSize(file)) {
-      showSuccess('文件大小不能超过 2MB')
-      return false
-    }
+        // 检查文件大小 (2MB)
+        const maxSize = 2 * 1024 * 1024
+        if (file.size > maxSize) {
+          return '文件大小不能超过 2MB'
+        }
+      }
 
-    return true
+      return true
+    },
+  ]
+
+  // 获取文件预览URL
+  function getFilePreview (file: File): string {
+    return URL.createObjectURL(file)
   }
 
   // 处理上传文件变化
-  function handleUploadFilesChange (files: File[]) {
-    // 过滤有效的图片文件
-    const validFiles = files.filter(file => validateImageFile(file))
-    uploadFiles.value = validFiles
+  function handleUploadFilesChange (files: File | File[] | null) {
+    if (!files) {
+      uploadFiles.value = []
+      fileProgress.value = []
+      fileErrors.value = []
+      return
+    }
+
+    // 直接使用传入的文件，因为v-file-input已经通过rules进行了校验
+    uploadFiles.value = Array.isArray(files) ? files : [files]
+
+    // 初始化进度和错误状态数组
+    fileProgress.value = Array.from({ length: uploadFiles.value.length }, () => undefined)
+    fileErrors.value = Array.from({ length: uploadFiles.value.length }, () => false)
   }
 
-  // 移除上传文件
-  function removeUploadFile (index: number) {
-    uploadFiles.value.splice(index, 1)
+  // 重试上传单个文件
+  async function retryUpload (index: number) {
+    if (!props.itemId || !uploadFiles.value[index]) return
+
+    const file = uploadFiles.value[index]
+
+    // 重置该文件的状态
+    fileErrors.value[index] = false
+    fileProgress.value[index] = 0
+
+    try {
+      const formData = new FormData()
+      formData.append('imageFile', file)
+      formData.append('featuredId', props.itemId)
+
+      await request.post(UPLOAD_IMAGE, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent: any) => {
+          if (progressEvent.total) {
+            fileProgress.value[index] = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          }
+        },
+      })
+
+      fileProgress.value[index] = 100
+      showSuccess(`文件 ${file.name} 重新上传成功`)
+    } catch (error) {
+      console.error(`文件 ${file.name} 重试上传失败:`, error)
+      fileErrors.value[index] = true
+      fileProgress.value[index] = 0
+      showWarning(`文件 ${file.name} 重新上传失败`)
+    }
   }
 
   // 格式化文件大小
@@ -181,43 +286,64 @@
     uploading.value = false
     uploadProgress.current = 0
     uploadProgress.total = 0
+    fileProgress.value = []
+    fileErrors.value = []
   }
 
   // 上传图片
   async function handleUpload () {
-    if (uploadFiles.value.length === 0) return
+    if (uploadFiles.value.length === 0 || !props.itemId) return
 
     uploading.value = true
     uploadProgress.total = uploadFiles.value.length
     uploadProgress.current = 0
 
+    // 重置所有文件的进度和错误状态
+    fileProgress.value = Array.from({ length: uploadFiles.value.length }, () => 0)
+    fileErrors.value = Array.from({ length: uploadFiles.value.length }, () => false)
+
     try {
-      // 并发上传所有图片
-      const uploadPromises = uploadFiles.value.map(async file => {
+      // 并发上传所有图片，每个文件独立处理进度
+      const uploadPromises = uploadFiles.value.map(async (file, index) => {
         const formData = new FormData()
         formData.append('imageFile', file)
-        if (props.itemId) {
-          formData.append('featuredId', props.itemId)
+        formData.append('featuredId', props.itemId)
+
+        try {
+          // 使用 Axios 直接上传，监听进度
+          await request.post(UPLOAD_IMAGE, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent: any) => {
+              if (progressEvent.total) {
+                fileProgress.value[index] = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+              }
+            },
+          })
+
+          // 上传完成，设置进度为100%
+          fileProgress.value[index] = 100
+          uploadProgress.current++
+        } catch (error) {
+          console.error(`文件 ${file.name} 上传失败:`, error)
+          fileErrors.value[index] = true
+          fileProgress.value[index] = 0
+          throw error
         }
-
-        // 这里需要调用实际的上传API
-        // await uploadFeaturedImage(formData)
-
-        // 模拟上传延迟
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        uploadProgress.current++
       })
 
       await Promise.all(uploadPromises)
 
       showSuccess(`成功上传 ${uploadFiles.value.length} 张图片`)
-      closeDialog()
+      // closeDialog()
 
       // 触发上传成功事件
       emit('upload-success')
     } catch (error) {
       console.error('上传失败:', error)
-      showSuccess('上传失败，请重试')
+      const errorMessage = error instanceof Error ? error.message : '上传失败，请重试'
+      showWarning(errorMessage)
     } finally {
       uploading.value = false
     }
@@ -230,6 +356,8 @@
       uploading.value = false
       uploadProgress.current = 0
       uploadProgress.total = 0
+      fileProgress.value = []
+      fileErrors.value = []
     }
   })
 </script>

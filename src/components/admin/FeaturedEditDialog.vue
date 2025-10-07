@@ -39,6 +39,7 @@
               <span class="text-caption text-medium-emphasis">封面上传</span>
               <v-file-upload
                 v-model="formData.imageFile"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                 clearable
                 density="compact"
                 show-size
