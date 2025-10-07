@@ -145,6 +145,13 @@
                   </template>
                   <v-list-item-title>编辑</v-list-item-title>
                 </v-list-item>
+                <!--上传图片-->
+                <v-list-item @click="openUploadDialog(item)">
+                  <template #prepend>
+                    <v-icon icon="mdi-upload" />
+                  </template>
+                  <v-list-item-title>图片</v-list-item-title>
+                </v-list-item>
                 <v-list-item @click="openDeleteDialog(item)">
                   <template #prepend>
                     <v-icon icon="mdi-delete" />
@@ -189,182 +196,45 @@
     </v-card>
 
     <!-- 添加/编辑对话框 -->
-    <v-dialog v-model="dialog" max-width="600px" persistent>
-      <v-card>
-        <v-card-title class="d-flex align-center">
-          <v-icon class="mr-2">
-            {{ dialogMode === 'add' ? 'mdi-plus' : 'mdi-pencil' }}
-          </v-icon>
-          {{ dialogMode === 'add' ? '添加精选商品' : '编辑精选商品' }}
-        </v-card-title>
-
-        <v-card-text>
-          <v-form ref="form" v-model="valid">
-            <v-row>
-              <!-- 商品名称 -->
-              <v-col cols="12">
-                <v-text-field
-                  v-model="editForm.title"
-                  label="商品名称"
-                  prepend-inner-icon="mdi-tag"
-                  :rules="[v => !!v || '请输入商品名称']"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <v-textarea
-                  v-model="editForm.description"
-                  label="商品描述"
-                  prepend-inner-icon="mdi-text"
-                  rows="3"
-                  :rules="[v => !!v || '请输入描述信息',
-                           v => (v && v.length <= 200 || '商品描述不能超过200个字符')]"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <!-- 图片上传 -->
-              <v-col cols="12">
-                <span class="text-caption text-medium-emphasis">封面上传</span>
-                <v-file-upload
-                  v-model="editForm.imageFile"
-                  clearable
-                  density="compact"
-                  show-size
-                  title="将图片文件拖放到此处"
-                  variant="compact"
-                />
-                <!-- 文件要求提示 -->
-                <div class="text-caption text-medium-emphasis mt-1">
-                  <v-icon :class="[imageFileError != ''? 'text-error mr-1' : 'mr-1']" size="small">
-                    mdi-information
-                  </v-icon>
-                  <span :class="[imageFileError != ''? 'text-error text-caption mt-1 ' : '']">
-                    {{ imageFileError != ''? imageFileError : '支持 JPG、PNG、GIF、WebP 格式，文件大小不超过 2MB' }}
-                  </span>
-                </div>
-              </v-col>
-
-              <!-- 价格信息 -->
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model.number="editForm.originalPrice"
-                  label="原价"
-                  prepend-inner-icon="mdi-currency-usd"
-                  :rules="[v => v > 0 || '原价必须大于0']"
-                  type="number"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model.number="editForm.currentPrice"
-                  label="现价"
-                  prepend-inner-icon="mdi-currency-usd"
-                  :rules="[
-                    v => v > 0 || '现价必须大于0',
-                    v => v <= editForm.originalPrice || '现价不能高于原价'
-                  ]"
-                  type="number"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <!-- 评分和评论数 -->
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model.number="editForm.rating"
-                  label="商品评分"
-                  max="5"
-                  min="0"
-                  prepend-inner-icon="mdi-star"
-                  :rules="[
-                    v => v >= 0 && v <= 10 || '评分范围为0-10'
-                  ]"
-                  step="0.1"
-                  type="number"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model.number="editForm.reviews"
-                  label="评论数"
-                  min="0"
-                  prepend-inner-icon="mdi-comment"
-                  :rules="[v => v >= 0 || '评论数不能为负']"
-                  type="number"
-                  variant="outlined"
-                />
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-card-text>
-
-        <v-card-actions class="px-6 pb-4">
-          <v-spacer />
-          <v-btn
-            variant="text"
-            @click="closeDialog"
-          >
-            取消
-          </v-btn>
-          <v-btn
-            color="primary"
-            :disabled="!valid"
-            :loading="saving"
-            @click="saveFeatured"
-          >
-            {{ dialogMode === 'add' ? '添加' : '保存' }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <FeaturedEditDialog
+      v-model="dialog"
+      :item="editItem"
+      :mode="dialogMode"
+      @save-success="handleSaveSuccess"
+    />
 
     <!-- 删除确认对话框 -->
-    <v-dialog v-model="deleteDialog" max-width="500px">
-      <v-card>
-        <v-card-title class="d-flex align-center">
-          <v-icon class="mr-2" color="warning">mdi-alert</v-icon>
-          确认删除
-        </v-card-title>
-        <v-card-text>
-          <p>确定要删除该商品 "{{ itemToDelete?.title }}" 吗？</p>
-          <p class="text-medium-emphasis">此操作无法撤销。</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            variant="text"
-            @click="deleteDialog = false"
-          >
-            取消
-          </v-btn>
-          <v-btn
-            color="error"
-            :loading="deleting"
-            @click="deleteFeatured(itemToDelete!)"
-          >
-            确认删除
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DeleteConfirmDialog
+      v-model="deleteDialog"
+      :item-title="itemToDelete?.title || ''"
+      item-type="商品"
+      @confirm="handleDeleteConfirm"
+    />
+
+    <!-- 图片上传对话框 -->
+    <ImageUploadDialog
+      v-model="uploadDialog"
+      :item-id="itemToUpload?.id"
+      :item-title="itemToUpload?.title || ''"
+      @upload-success="handleUploadSuccess"
+    />
   </AdminLayout>
 </template>
 
 <script lang="ts" setup>
-  import { addFeatured, deleteFeaturedById, getFeatured, updateFeatured } from '@/http/admin/featured.ts'
+  import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog.vue'
+  import FeaturedEditDialog from '@/components/admin/FeaturedEditDialog.vue'
+  import ImageUploadDialog from '@/components/admin/ImageUploadDialog.vue'
+  import { deleteFeaturedById, getFeatured } from '@/http/admin/featured.ts'
   import { useNotification } from '@/utils/notification'
 
   // 响应数据
-  const imageFileError = ref('')
   const deleteDialog = ref(false)
-  const deleting = ref(false)
   const itemToDelete = ref<FeaturedItem>()
+
+  // 图片上传相关
+  const uploadDialog = ref(false)
+  const itemToUpload = ref<FeaturedItem>()
 
   const { showSuccess } = useNotification()
   // 定义精选商品项目的接口
@@ -387,11 +257,9 @@
   // 响应式数据
   const dialog = ref(false)
   const loading = ref(false)
-  const saving = ref(false)
-  const valid = ref(false)
   const search = ref('')
   const dialogMode = ref<'add' | 'edit'>('add')
-  const form = ref()
+  const editItem = ref<FeaturedItem>()
   const route = useRoute()
   const router = useRouter()
 
@@ -413,53 +281,8 @@
     { title: '操作', key: 'actions', sortable: false, width: 120 },
   ]
 
-  // 编辑表单数据
-  const editForm = reactive<FeaturedItem>({
-    id: '',
-    title: '',
-    description: '',
-    images: {
-      largeImage: '',
-      smallImage: '',
-    },
-    imageFile: undefined,
-    originalPrice: 0,
-    currentPrice: 0,
-    reviews: 0,
-    rating: 0,
-    createdAt: '',
-  })
-
   // 精选商品数据
   const featuredList = ref<FeaturedItem[]>([])
-
-  // 校验图片文件类型
-  function validateImageType (file: File): boolean {
-    imageFileError.value = ''
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
-    return allowedTypes.includes(file.type)
-  }
-
-  // 校验文件大小
-  function validateFileSize (file: File): boolean {
-    const maxSize = 2 * 1024 * 1024
-    return file.size <= maxSize
-  }
-
-  // 文件上传校验
-  function validateImageFile (file: File): boolean {
-    if (!validateImageType(file)) {
-      imageFileError.value = '只支持 JPG、PNG、GIF、WebP 格式的图片文件'
-      return false
-    }
-
-    if (!validateFileSize(file)) {
-      imageFileError.value = '文件大小不能超过 2MB'
-      return false
-    }
-
-    return true
-  }
 
   // 获取精选商品数据
   async function fetchFeaturedList () {
@@ -552,88 +375,13 @@
   // 打开对话框
   function openDialog (mode: 'add' | 'edit', item?: FeaturedItem) {
     dialogMode.value = mode
-
-    if (mode === 'edit' && item) {
-      Object.assign(editForm, { ...item, imageFile: null })
-    } else {
-      // 重置表单
-      Object.assign(editForm, {
-        id: '',
-        title: '',
-        description: '',
-        images: {
-          largeImage: '',
-          smallImage: '',
-        },
-        imageFile: undefined,
-        originalPrice: 0,
-        currentPrice: 0,
-        reviews: 0,
-        rating: 5,
-        createdAt: '',
-      })
-    }
-
+    editItem.value = item
     dialog.value = true
   }
 
-  // 关闭对话框
-  function closeDialog () {
-    dialog.value = false
-    form.value?.reset()
-  }
-
-  // 保存精选商品
-  async function saveFeatured () {
-    if (!valid.value) return
-
-    // 校验文件
-    if (editForm.imageFile && !validateImageFile(editForm.imageFile)) {
-      return
-    }
-
-    saving.value = true
-
-    try {
-      const formData = new FormData()
-
-      // 添加表单数据
-      formData.append('title', editForm.title)
-      formData.append('description', editForm.description)
-      formData.append('originalPrice', editForm.originalPrice.toString())
-      formData.append('currentPrice', editForm.currentPrice.toString())
-      formData.append('reviews', editForm.reviews.toString())
-      formData.append('rating', editForm.rating.toString())
-
-      // 添加图片文件
-      if (editForm.imageFile) {
-        formData.append('imageFile', editForm.imageFile)
-      }
-
-      if (dialogMode.value === 'add') {
-        if (!editForm.imageFile) {
-          imageFileError.value = '请选择有效的图片文件'
-          return
-        }
-        await addFeatured(formData)
-        // 添加成功后刷新数据
-        await fetchFeaturedList()
-        closeDialog()
-      } else {
-        // 编辑模式
-        if (editForm.id) {
-          formData.append('id', editForm.id)
-          await updateFeatured(formData)
-          // 编辑成功后刷新列表
-          await fetchFeaturedList()
-          closeDialog()
-        }
-      }
-    } catch (error) {
-      console.error('保存失败:', error)
-    } finally {
-      saving.value = false
-    }
+  // 处理保存成功
+  async function handleSaveSuccess () {
+    await fetchFeaturedList()
   }
 
   // 打开删除确认框
@@ -642,20 +390,30 @@
     deleteDialog.value = true
   }
 
-  // 删除精选商品
-  async function deleteFeatured (item: FeaturedItem) {
+  // 处理删除确认
+  async function handleDeleteConfirm () {
+    if (!itemToDelete.value) return
+
     try {
-      await deleteFeaturedById(item.id)
-
+      await deleteFeaturedById(itemToDelete.value.id)
       featuredList.value = featuredList.value.filter(i => i.id !== itemToDelete.value!.id)
-
-      showSuccess(`${item.title}删除成功`)
+      showSuccess(`${itemToDelete.value.title}删除成功`)
       deleteDialog.value = false
-      // 刷新数据
-      // await fetchFeaturedList()
     } catch (error) {
       console.error('删除失败:', error)
     }
+  }
+
+  // 打开图片上传对话框
+  function openUploadDialog (item: FeaturedItem) {
+    itemToUpload.value = item
+    uploadDialog.value = true
+  }
+
+  // 处理上传成功
+  async function handleUploadSuccess () {
+    // 刷新数据
+    await fetchFeaturedList()
   }
 
   onMounted(() => {

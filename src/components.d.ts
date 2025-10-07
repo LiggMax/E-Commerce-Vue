@@ -9,10 +9,13 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AdminLayout: typeof import('./components/admin/AdminLayout.vue')['default']
+    DeleteConfirmDialog: typeof import('./components/admin/DeleteConfirmDialog.vue')['default']
     ECommerceFooter: typeof import('./components/client/ECommerceFooter.vue')['default']
     ECommerceHeader: typeof import('./components/client/ECommerceHeader.vue')['default']
+    FeaturedEditDialog: typeof import('./components/admin/FeaturedEditDialog.vue')['default']
     FeaturedProducts: typeof import('./components/client/FeaturedProducts.vue')['default']
     HeroSection: typeof import('./components/client/HeroSection.vue')['default']
+    ImageUploadDialog: typeof import('./components/admin/ImageUploadDialog.vue')['default']
     Notification: typeof import('./components/common/Notification.vue')['default']
     ProductCategories: typeof import('./components/client/ProductCategories.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
