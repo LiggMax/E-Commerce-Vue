@@ -142,10 +142,12 @@
 
 <script lang="ts" setup>
   import { useDisplay, useTheme } from 'vuetify'
-
+  import { cleanToken } from '@/http/admin/login.ts'
+  import { userTokenStore } from '@/stores/token.ts'
   // 主题管理
   const theme = useTheme()
   const isDark = computed(() => theme.current.value.dark)
+  const { removeToken } = userTokenStore()
 
   function toggleTheme () {
     theme.change(theme.current.value.dark ? 'light' : 'dark')
@@ -258,9 +260,11 @@
   // 退出登录
   function handleLogout () {
     // 清除登录状态
-    localStorage.removeItem('remember_user')
+    removeToken()
     // 跳转到登录页面
     router.push('/admin/login')
+    // 调用接口清除Token
+    cleanToken()
   }
 
   // 监听屏幕尺寸变化

@@ -22,3 +22,8 @@ export const UPDATE_CAROUSEL_STATUS = `${CAROUSEL}/status`
  * 更新轮播图排序
  */
 export const UPDATE_CAROUSEL_SORT = `${CAROUSEL}/sort`
+
+/**
+ * 清理Token
+ */
+export const CLEAR_TOKEN = '/api/admin/user/remove_token'

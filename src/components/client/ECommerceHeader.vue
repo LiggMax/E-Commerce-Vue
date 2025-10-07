@@ -174,6 +174,7 @@
 <script setup lang="ts">
   import { useDisplay } from 'vuetify'
   import { useThemeToggle } from '@/composables/useTheme.ts'
+  import router from '@/router'
 
   const display = useDisplay()
   const searchQuery = ref('')
@@ -196,7 +197,7 @@
     { title: '订单历史', icon: 'mdi-package-variant', action: () => console.log('订单') },
     { title: '收藏夹', icon: 'mdi-heart', action: () => console.log('收藏') },
     { title: '设置', icon: 'mdi-cog', action: () => console.log('设置') },
-    { title: '退出登录', icon: 'mdi-logout', action: () => console.log('退出') },
+    { title: '退出登录', icon: 'mdi-logout', action: () => logout() },
   ]
   function closeSearchDialog () {
     searchDialog.value = false
@@ -209,6 +210,13 @@
     setTimeout(() => {
       closeSearchDialog()
     }, 1000)
+  }
+
+  /**
+   * 登出
+   */
+  function logout () {
+    console.log('登出')
   }
 
   watch(() => display.mdAndUp.value, isMdAndUp => {

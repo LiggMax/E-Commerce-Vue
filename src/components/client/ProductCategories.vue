@@ -7,7 +7,6 @@
           <!-- 衣橱捡漏 -->
           <v-card
             class="h-100 category-card"
-            color="orange-lighten-5"
             elevation="2"
             rounded="xl"
             @click="navigateToCategory('wardrobe')"
@@ -41,7 +40,6 @@
           <!-- 手机数码 -->
           <v-card
             class="h-100 category-card"
-            color="blue-lighten-5"
             elevation="2"
             rounded="xl"
             @click="navigateToCategory('digital')"
@@ -76,7 +74,6 @@
           <!-- Anime -->
           <v-card
             class="h-100 category-card"
-            color="green-lighten-5"
             elevation="2"
             rounded="xl"
             @click="navigateToCategory('anime')"
@@ -110,7 +107,6 @@
           <!-- 省钱卡券 -->
           <v-card
             class="h-100 category-card"
-            color="pink-lighten-5"
             elevation="2"
             rounded="xl"
             @click="navigateToCategory('coupons')"
