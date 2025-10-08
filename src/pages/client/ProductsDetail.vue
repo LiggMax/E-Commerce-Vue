@@ -1,5 +1,4 @@
 <template>
-  <ECommerceHeader />
   <v-container v-if="productDetail != null" class="py-8" max-width="1700">
     <v-row>
       <!-- 左侧：图片画廊 -->
@@ -160,7 +159,6 @@
       </v-col>
     </v-row>
   </v-container>
-  <ECommerceFooter />
 </template>
 
 <script setup lang="ts">

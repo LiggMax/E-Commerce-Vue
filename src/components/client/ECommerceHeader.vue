@@ -66,6 +66,7 @@
               placeholder="搜索产品..."
               rounded
               variant="outlined"
+              @keyup.enter="handleSearch"
             >
               <template #append-inner>
                 <v-btn

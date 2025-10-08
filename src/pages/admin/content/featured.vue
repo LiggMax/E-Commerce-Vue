@@ -1,6 +1,5 @@
 <template>
-  <AdminLayout>
-    <!-- 页面标题和操作 -->
+  <!-- 页面标题和操作 -->
     <div class="d-flex align-center justify-space-between mb-6">
       <div>
         <h1 class="text-h4 font-weight-bold mb-2">精选商品管理</h1>
@@ -218,7 +217,6 @@
       :item-title="itemToUpload?.title || ''"
       @upload-success="handleUploadSuccess"
     />
-  </AdminLayout>
 </template>
 
 <script lang="ts" setup>

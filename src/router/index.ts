@@ -11,9 +11,23 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 // eslint-disable-next-line import/no-duplicates
 import { routes } from 'vue-router/auto-routes'
 
+// 手动为管理后台路由添加布局
+const routesWithLayouts = routes.map(route => {
+  if (route.path.startsWith('/admin') && route.path !== '/admin/login') {
+    return {
+      ...route,
+      meta: {
+        ...route.meta,
+        layout: 'admin',
+      },
+    }
+  }
+  return route
+})
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
+  routes: setupLayouts(routesWithLayouts),
   // 让页面滚动到顶部
   scrollBehavior () {
     return { top: 0 }

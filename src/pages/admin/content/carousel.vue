@@ -1,6 +1,5 @@
 <template>
-  <AdminLayout>
-    <!-- 页面标题和操作 -->
+  <!-- 页面标题和操作 -->
     <div class="d-flex align-center justify-space-between mb-6">
       <div>
         <h1 class="text-h4 font-weight-bold mb-2">轮播图管理</h1>
@@ -404,7 +403,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </AdminLayout>
 </template>
 
 <script lang="ts" setup>

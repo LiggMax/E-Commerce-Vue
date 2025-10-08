@@ -1,6 +1,5 @@
 <template>
-  <AdminLayout>
-    <!-- 页面标题 -->
+  <!-- 页面标题 -->
     <div class="d-flex align-center justify-space-between mb-6">
       <div>
         <h1 class="text-h4 font-weight-bold mb-2">仪表盘</h1>
@@ -169,7 +168,6 @@
         </v-card>
       </v-col>
     </v-row>
-  </AdminLayout>
 </template>
 
 <script lang="ts" setup>

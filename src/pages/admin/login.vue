@@ -117,9 +117,14 @@
 <script lang="ts" setup>
   import { login } from '@/http/admin/login.ts'
   import { userTokenStore } from '@/stores/token.ts'
+  import { useThemeToggle } from '@/composables/useTheme.ts'
 
   // 路由实例
   const router = useRouter()
+
+  // 初始化主题
+  const { loadTheme } = useThemeToggle()
+  loadTheme()
 
   const { setToken } = userTokenStore()
 
