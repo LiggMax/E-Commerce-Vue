@@ -27,9 +27,9 @@
           <!-- Logo -->
           <v-col cols="2">
             <v-btn
-              class=""
-              to="/"
+              class="logo-btn"
               variant="text"
+              @click="router.push('/')"
             >
               <v-icon
                 class="mr-2"
@@ -60,22 +60,24 @@
           <v-col cols="4">
             <v-text-field
               v-model="searchQuery"
-              class="mx-4"
+              class="mx-4 "
               density="compact"
               hide-details
               placeholder="搜索产品..."
-              prepend-inner-icon="mdi-magnify"
               rounded
               variant="outlined"
             >
               <template #append-inner>
                 <v-btn
+                  class="search-btn"
                   color="primary"
-                  icon="mdi-magnify"
                   size="small"
                   variant="flat"
                   @click="handleSearch"
-                />
+                >
+                  <v-icon class="mr-1" icon="mdi-magnify" size="16" />
+                  搜索
+                </v-btn>
               </template>
             </v-text-field>
           </v-col>
@@ -229,7 +231,26 @@
 </script>
 
 <style scoped>
+/* 椭圆形搜索按钮样式 */
+.search-btn {
+  border-radius: 20px !important;
+  padding: 8px 16px !important;
+  min-width: 80px !important;
+  height: 36px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.search-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 修正按钮在搜索框内的位置  */
 :deep(.v-field--appended) {
-  padding-inline-end: 0 !important;
+  padding-inline-end: 3px !important;
 }
 </style>
