@@ -187,13 +187,13 @@
   const totalPages = ref(0)
   const currentPage = ref(1)
   const loading = ref(false)
-  const sortBy = ref('default')
+  const sortBy = ref(1)
 
   const sortOptions = [
-    { label: '综合排序', value: 'default' },
-    { label: '价格从低到高', value: 'price_asc' },
-    { label: '价格从高到低', value: 'price_desc' },
-    { label: '销量优先', value: 'sales' },
+    { label: '综合排序', value: 1 },
+    { label: '价格从低到高', value: 2 },
+    { label: '价格从高到低', value: 3 },
+    { label: '销量优先', value: 4 },
   ]
 
   /**
@@ -204,7 +204,10 @@
 
     loading.value = true
     try {
-      const result: SearchResponse = await searchServer(keyword.value, currentPage.value)
+      const result: SearchResponse = await searchServer(keyword.value,
+                                                        currentPage.value,
+                                                        sortBy.value,
+      )
 
       productList.value = result.data.list
       total.value = result.data.total
