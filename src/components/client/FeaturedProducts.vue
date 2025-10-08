@@ -123,7 +123,7 @@
 
   async function getFeaturedProducts () {
     try {
-      const data = await getFeaturedServer()
+      const data = await getFeaturedServer(1)
       featuredProducts.value = data.data
     } finally {}
   }
