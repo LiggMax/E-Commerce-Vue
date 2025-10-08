@@ -19,3 +19,8 @@ export const PRODUCT_DETAIL = '/api/client/featured/detail'
  * 搜索
  */
 export const SEARCH = '/api/client/search'
+
+/**
+ * 订阅
+ */
+export const SUBSCRIBE = '/api/email'

@@ -114,7 +114,7 @@
               readonly
               size="small"
             />
-            <span class="text-caption ml-2">({{ product.reviews }})</span>
+            <span v-if="product.reviews > 0" class="text-caption ml-2">({{ product.reviews }})</span>
           </v-card-subtitle>
 
           <v-card-text class="px-4 py-2">

@@ -99,10 +99,10 @@
       <v-row class="mt-8">
         <v-col cols="12">
           <v-divider class="mb-6" />
-          <div class="text-center mb-6">
+          <div class="text-center mb-6 ">
             <h3 class="text-h6 font-weight-bold mb-2">订阅我们的邮件</h3>
             <p class="text-body-2 mb-4">获取最新优惠信息和新品精选</p>
-            <div class="d-flex justify-center">
+            <div class="d-flex justify-center align-center">
               <v-text-field
                 v-model="email"
                 class="mr-2"
@@ -163,6 +163,9 @@
 
 <script setup lang="ts">
 
+  import { subscribeServer } from '@/http/client/subscribe.ts'
+  import useNotification from '@/utils/notification'
+
   const email = ref('')
   const showBackToTop = ref(false)
 
@@ -212,9 +215,16 @@
   }
 
   function subscribe () {
+    if (!email.value) {
+      useNotification.showWarning('内容不能为空')
+      return
+    }
     if (email.value) {
       console.log('订阅邮箱:', email.value)
-      // 这里可以添加实际的订阅逻辑
+      const formData = new FormData()
+      formData.append('email', email.value)
+      subscribeServer(formData)
+      useNotification.showSuccess('订阅成功')
       email.value = ''
     }
   }
