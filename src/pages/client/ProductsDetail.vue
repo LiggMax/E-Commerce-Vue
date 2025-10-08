@@ -1,16 +1,29 @@
 <template>
-  <ECommerceHeader />
-  <v-container v-if="productDetail != null" class="py-8" max-width="1400">
+  <v-container v-if="productDetail != null" class="py-8" max-width="1700">
     <v-row>
       <!-- 左侧：图片画廊 -->
-      <v-col cols="12" md="6">
-        <v-card elevation="2" rounded="lg">
-          <v-img aspect-ratio="4/3" cover :src="images[activeIndex]" />
+      <v-col cols="12" md="7">
+        <v-card
+          class="d-flex flex-column"
+          elevation="0"
+          lg="7"
+          rounded="lg"
+          style="height: 600px;"
+        >
+          <div class="flex-grow-1 d-flex align-center justify-center" style="min-height: 0;">
+            <v-img
+              aspect-ratio="16/9"
+              class="w-100 h-100 rounded-lg"
+              cover
+              :src="activeImage"
+              style="max-height: 100%; object-fit: cover;"
+            />
+          </div>
           <v-divider />
           <v-sheet class="pa-3">
             <v-slide-group show-arrows>
               <v-slide-group-item
-                v-for="(img, idx) in images"
+                v-for="(img, idx) in allImages"
                 :key="idx"
               >
                 <v-card
@@ -30,77 +43,85 @@
       </v-col>
 
       <!-- 右侧：商品信息与操作 -->
-      <v-col cols="12" md="6">
-        <v-card class="pa-6" elevation="2" rounded="lg">
-          <div class="text-h5 font-weight-bold mb-2">{{ productDetail.title }}</div>
-          <div class="d-flex align-center mb-2">
-            <v-rating
-              color="amber"
-              half-increments
-              :model-value="productDetail.rating / 2"
-              readonly
-              size="small"
-            />
-            <span class="text-caption ml-2">{{ productDetail.rating }} 分 · {{ productDetail.reviews }} 条评价 · 销量 {{ product.sales }}</span>
-          </div>
-
-          <v-sheet class="pa-4 mb-4 bg-grey-lighten-4 rounded-lg">
-            <div class="d-flex align-end ga-3">
-              <div class="text-h4 font-weight-bold text-primary">¥{{ productDetail.currentPrice }}</div>
-              <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ productDetail.originalPrice }}</div>
-              <v-chip color="error" size="small" variant="flat">直降 {{ productDetail.discount }}%</v-chip>
+      <v-col cols="12" md="5">
+        <v-card
+          class="pa-6"
+          elevation="0"
+          lg="5"
+          rounded="lg"
+          style="height: 600px;"
+        >
+          <div class="h-100 overflow-y-auto">
+            <div class="text-h5 font-weight-bold mb-2">{{ productDetail.title }}</div>
+            <div class="d-flex align-center mb-2">
+              <v-rating
+                color="amber"
+                half-increments
+                :model-value="productDetail.rating / 2"
+                readonly
+                size="small"
+              />
+              <span class="text-caption ml-2">{{ productDetail.rating }} 分 · {{ productDetail.reviews }} 条评价 · 销量 {{ product.sales }}</span>
             </div>
-            <div class="mt-2 text-body-2 text-medium-emphasis">{{ product.delivery }}</div>
-          </v-sheet>
 
-          <div class="mb-3">
-            <div class="text-body-2 text-medium-emphasis mb-2">规格</div>
-            <div class="d-flex flex-wrap ga-2">
-              <v-chip v-for="sp in product.specs" :key="sp" variant="outlined">{{ sp }}</v-chip>
+            <v-sheet class="pa-4 mb-4 bg-grey-lighten-4 rounded-lg">
+              <div class="d-flex align-end ga-3">
+                <div class="text-h4 font-weight-bold text-primary">¥{{ productDetail.currentPrice }}</div>
+                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ productDetail.originalPrice }}</div>
+                <v-chip color="error" size="small" variant="flat">直降 ¥{{ productDetail.originalPrice - productDetail.currentPrice }}</v-chip>
+              </div>
+              <div class="mt-2 text-body-2 text-medium-emphasis">{{ product.delivery }}</div>
+            </v-sheet>
+
+            <div class="mb-3">
+              <div class="text-body-2 text-medium-emphasis mb-2">规格</div>
+              <div class="d-flex flex-wrap ga-2">
+                <v-chip v-for="sp in product.specs" :key="sp" variant="outlined">{{ sp }}</v-chip>
+              </div>
             </div>
-          </div>
 
-          <div class="mb-6 d-flex align-center ga-4">
-            <div class="text-body-2 text-medium-emphasis">数量</div>
-            <v-btn density="comfortable" icon="mdi-minus" variant="outlined" @click="quantity = Math.max(1, quantity - 1)" />
-            <v-text-field
-              v-model.number="quantity"
-              density="compact"
-              hide-details
-              style="max-width: 80px"
-              type="number"
-            />
-            <v-btn density="comfortable" icon="mdi-plus" variant="outlined" @click="quantity++" />
-          </div>
+            <div class="mb-6 d-flex align-center ga-4">
+              <div class="text-body-2 text-medium-emphasis">数量</div>
+              <v-btn density="comfortable" icon="mdi-minus" variant="outlined" @click="quantity = Math.max(1, quantity - 1)" />
+              <v-text-field
+                v-model.number="quantity"
+                density="compact"
+                hide-details
+                style="max-width: 80px"
+                type="number"
+              />
+              <v-btn density="comfortable" icon="mdi-plus" variant="outlined" @click="quantity++" />
+            </div>
 
-          <div class="d-flex ga-4">
-            <v-btn color="primary" rounded="lg" size="large" @click="addToCart">
-              <v-icon icon="mdi-cart-plus" start /> 加入购物车
-            </v-btn>
-            <v-btn
-              color="error"
-              rounded="lg"
-              size="large"
-              variant="flat"
-              @click="buyNow"
-            >
-              立即购买
-            </v-btn>
-            <v-btn icon="mdi-heart-outline" variant="outlined" />
-          </div>
+            <div class="d-flex ga-4">
+              <v-btn color="primary" rounded="lg" size="large" @click="addToCart">
+                <v-icon icon="mdi-cart-plus" start /> 加入购物车
+              </v-btn>
+              <v-btn
+                color="error"
+                rounded="lg"
+                size="large"
+                variant="flat"
+                @click="buyNow"
+              >
+                立即购买
+              </v-btn>
+              <v-btn icon="mdi-heart-outline" variant="outlined" />
+            </div>
 
-          <v-divider class="my-6" />
+            <v-divider class="my-6" />
 
-          <div class="d-flex flex-wrap ga-3">
-            <v-chip
-              v-for="srv in product.services"
-              :key="srv"
-              color="success"
-              size="small"
-              variant="tonal"
-            >
-              <v-icon icon="mdi-check-decagram" start /> {{ srv }}
-            </v-chip>
+            <div class="d-flex flex-wrap ga-3">
+              <v-chip
+                v-for="srv in product.services"
+                :key="srv"
+                color="success"
+                size="small"
+                variant="tonal"
+              >
+                <v-icon icon="mdi-check-decagram" start /> {{ srv }}
+              </v-chip>
+            </div>
           </div>
         </v-card>
       </v-col>
@@ -138,7 +159,6 @@
       </v-col>
     </v-row>
   </v-container>
-  <ECommerceFooter />
 </template>
 
 <script setup lang="ts">
@@ -148,25 +168,45 @@
   const route = useRoute()
 
   // 数据模型
+  interface DetailImage {
+    id: number
+    sort: number
+    url: string
+  }
+
   interface Product {
     id: string
     title: string
+    images: {
+      largeImage: string
+      smallImage: string
+    }
     originalPrice: number
     currentPrice: number
     reviews: number
     rating: number
     discount: number
-    delivery: string
+    createdAt: string
     description: string
+    detailImages: DetailImage[]
   }
+
   const productDetail = ref<Product>()
-  const images = [
-    'https://via.placeholder.com/800x600/EEEEEE/222222?text=主图1',
-    'https://via.placeholder.com/800x600/DDDDDD/222222?text=主图2',
-    'https://via.placeholder.com/800x600/CCCCCC/222222?text=主图3',
-    'https://via.placeholder.com/800x600/BBBBBB/222222?text=主图4',
-  ]
   const activeIndex = ref(0)
+
+  // 计算所有图片数组，第一张是largeImage，后面是detailImages中的所有url
+  const allImages = computed(() => {
+    if (!productDetail.value) return []
+    return [
+      productDetail.value.images.largeImage,
+      ...productDetail.value.detailImages.map(img => img.url),
+    ]
+  })
+
+  // 计算当前显示的图片
+  const activeImage = computed(() => {
+    return allImages.value[activeIndex.value] || ''
+  })
 
   function selectImage (idx: number) {
     activeIndex.value = idx
@@ -202,6 +242,8 @@
     if (productId != null) {
       const res = await getFeaturedDetailServer(productId.toString())
       productDetail.value = res.data
+      // 重置图片索引
+      activeIndex.value = 0
     }
   }
 

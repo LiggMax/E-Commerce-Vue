@@ -56,7 +56,7 @@
           </v-list>
         </v-col>
 
-        <!-- Customer Service -->
+        <!-- 顾客服务 -->
         <v-col cols="6" md="2">
           <h3 class="text-h6 font-weight-bold mb-4">客户服务</h3>
           <v-list bg-color="transparent" density="compact">
@@ -71,7 +71,7 @@
           </v-list>
         </v-col>
 
-        <!-- Contact Info -->
+        <!-- 联系信息 -->
         <v-col cols="6" md="3">
           <h3 class="text-h6 font-weight-bold mb-4">联系我们</h3>
           <div class="contact-info">
@@ -95,7 +95,7 @@
         </v-col>
       </v-row>
 
-      <!-- Newsletter Subscription -->
+      <!-- 订阅 -->
       <v-row class="mt-8">
         <v-col cols="12">
           <v-divider class="mb-6" />
@@ -123,13 +123,13 @@
         </v-col>
       </v-row>
 
-      <!-- Bottom Bar -->
+      <!-- 底部栏 -->
       <v-row class="mt-6">
         <v-col cols="12">
           <v-divider class="mb-4" />
           <div class="d-flex flex-column flex-md-row justify-space-between align-center">
             <div class="text-body-2  mb-4 mb-md-0 ">
-              © 2024 ShopVue. 版权所有 |
+              © {{ new Date().getFullYear() }} ShopVue. 版权所有 |
               <a class="text-decoration-none text-primary" href="/privacy">隐私政策</a> |
               <a class="text-decoration-none text-primary" href="/terms">服务条款</a>
             </div>
@@ -147,11 +147,24 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <!-- 返回顶部按钮 -->
+    <v-fab
+      v-show="showBackToTop"
+      class="back-to-top"
+      color="primary"
+      icon="mdi-chevron-up"
+      location="bottom end"
+      size="small"
+      @click="scrollToTop"
+    />
   </v-footer>
 </template>
 
 <script setup lang="ts">
+
   const email = ref('')
+  const showBackToTop = ref(false)
 
   const socialMedia = [
     { name: 'WeChat', icon: 'mdi-wechat', url: '#' },
@@ -191,6 +204,13 @@
     'mdi-cellphone',
   ]
 
+  function scrollToTop () {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
   function subscribe () {
     if (email.value) {
       console.log('订阅邮箱:', email.value)
@@ -198,7 +218,29 @@
       email.value = ''
     }
   }
+
+  function handleScroll () {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+    showBackToTop.value = scrollTop > 100
+  }
+
+  onMounted(() => {
+    window.addEventListener('scroll', handleScroll)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+  })
 </script>
 
 <style scoped>
+/* 返回顶部按钮样式 */
+.back-to-top {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
 </style>

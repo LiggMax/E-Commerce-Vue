@@ -1,6 +1,4 @@
 <template>
-  <!-- 头部标题导航 -->
-  <ECommerceHeader />
   <v-container class="py-1" max-width="1700">
     <v-row align="stretch" no-gutters>
       <!-- 轮播图 -->
@@ -25,8 +23,6 @@
     <!-- 热门精选 -->
     <FeaturedProducts class="my-8 pa-2" />
   </v-container>
-  <!-- 页脚 -->
-  <ECommerceFooter />
 </template>
 
 <script lang="ts" setup>

@@ -1,7 +1,8 @@
 <template>
   <v-app>
-    <!-- 侧边导航栏 -->
+    <!-- 侧边导航栏 - 登录页面不显示 -->
     <v-navigation-drawer
+      v-if="!isLoginPage"
       v-model="drawer"
       color="surface"
       :permanent="!mobile"
@@ -86,8 +87,8 @@
       </template>
     </v-navigation-drawer>
 
-    <!-- 顶部应用栏 -->
-    <v-app-bar color="surface" elevation="1">
+    <!-- 顶部应用栏 - 登录页面不显示 -->
+    <v-app-bar v-if="!isLoginPage" color="surface" elevation="1">
       <!-- 移动端菜单按钮 -->
       <v-app-bar-nav-icon
         v-if="mobile"
@@ -133,8 +134,8 @@
 
     <!-- 主要内容区域 -->
     <v-main>
-      <v-container class="pa-4" fluid>
-        <slot />
+      <v-container class="py-2">
+        <router-view />
       </v-container>
     </v-main>
   </v-app>
@@ -144,6 +145,7 @@
   import { useDisplay, useTheme } from 'vuetify'
   import { cleanToken } from '@/http/admin/login.ts'
   import { userTokenStore } from '@/stores/token.ts'
+
   // 主题管理
   const theme = useTheme()
   const isDark = computed(() => theme.current.value.dark)
@@ -160,6 +162,11 @@
   // 路由相关
   const router = useRouter()
   const route = useRoute()
+
+  // 检查是否为登录页面
+  const isLoginPage = computed(() => {
+    return route.path === '/admin/login'
+  })
 
   // 菜单项配置（支持二级菜单）
   const menuItems = [

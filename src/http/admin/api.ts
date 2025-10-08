@@ -24,6 +24,11 @@ export const UPDATE_CAROUSEL_STATUS = `${CAROUSEL}/status`
 export const UPDATE_CAROUSEL_SORT = `${CAROUSEL}/sort`
 
 /**
+ * 图片接口
+ */
+export const UPLOAD_IMAGE = '/api/admin/featured/image'
+
+/**
  * 清理Token
  */
 export const CLEAR_TOKEN = '/api/admin/user/remove_token'

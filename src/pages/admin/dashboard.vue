@@ -1,175 +1,173 @@
 <template>
-  <AdminLayout>
-    <!-- 页面标题 -->
-    <div class="d-flex align-center justify-space-between mb-6">
-      <div>
-        <h1 class="text-h4 font-weight-bold mb-2">仪表盘</h1>
-        <p class="text-subtitle-1 text-medium-emphasis">
-          欢迎回来，这是您的管理概览
-        </p>
-      </div>
-      <v-chip color="success" variant="tonal">
-        <v-icon start>mdi-check-circle</v-icon>
-        系统正常
-      </v-chip>
+  <!-- 页面标题 -->
+  <div class="d-flex align-center justify-space-between mb-6">
+    <div>
+      <h1 class="text-h4 font-weight-bold mb-2">仪表盘</h1>
+      <p class="text-subtitle-1 text-medium-emphasis">
+        欢迎回来，这是您的管理概览
+      </p>
     </div>
+    <v-chip color="success" variant="tonal">
+      <v-icon start>mdi-check-circle</v-icon>
+      系统正常
+    </v-chip>
+  </div>
 
-    <!-- 统计卡片 -->
-    <v-row class="mb-6">
-      <v-col
-        v-for="stat in statsCards"
-        :key="stat.title"
-        cols="12"
-        md="3"
-        sm="6"
-      >
-        <v-card class="stat-card" height="120">
-          <v-card-text class="d-flex align-center">
-            <div class="flex-grow-1">
-              <div class="text-subtitle-2 text-medium-emphasis mb-1">
-                {{ stat.title }}
-              </div>
-              <div class="text-h4 font-weight-bold mb-1">
-                {{ stat.value }}
-              </div>
-              <div class="d-flex align-center">
-                <v-icon
-                  class="mr-1"
-                  :color="stat.trend === 'up' ? 'success' : 'error'"
-                  size="small"
-                >
-                  {{ stat.trend === 'up' ? 'mdi-trending-up' : 'mdi-trending-down' }}
-                </v-icon>
-                <span
-                  class="text-caption"
-                  :class="stat.trend === 'up' ? 'text-success' : 'text-error'"
-                >
-                  {{ stat.change }}
-                </span>
-              </div>
+  <!-- 统计卡片 -->
+  <v-row class="mb-6">
+    <v-col
+      v-for="stat in statsCards"
+      :key="stat.title"
+      cols="12"
+      md="3"
+      sm="6"
+    >
+      <v-card class="stat-card" height="120">
+        <v-card-text class="d-flex align-center">
+          <div class="flex-grow-1">
+            <div class="text-subtitle-2 text-medium-emphasis mb-1">
+              {{ stat.title }}
             </div>
-            <v-avatar
-              :color="stat.color"
-              size="48"
-              variant="tonal"
-            >
-              <v-icon :icon="stat.icon" />
-            </v-avatar>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- 主要内容区域 -->
-    <v-row>
-      <!-- 左侧内容 -->
-      <v-col cols="12" md="8">
-        <!-- 最近活动 -->
-        <v-card class="mb-4">
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-clock-outline</v-icon>
-            最近活动
-          </v-card-title>
-          <v-card-text>
-            <v-timeline align="start" density="compact">
-              <v-timeline-item
-                v-for="activity in recentActivities"
-                :key="activity.id"
-                :dot-color="activity.color"
+            <div class="text-h4 font-weight-bold mb-1">
+              {{ stat.value }}
+            </div>
+            <div class="d-flex align-center">
+              <v-icon
+                class="mr-1"
+                :color="stat.trend === 'up' ? 'success' : 'error'"
                 size="small"
               >
-                <template #icon>
-                  <v-icon :icon="activity.icon" size="small" />
-                </template>
-                <div class="d-flex justify-space-between align-start">
-                  <div>
-                    <div class="text-body-2 font-weight-medium">
-                      {{ activity.title }}
-                    </div>
-                    <div class="text-caption text-medium-emphasis">
-                      {{ activity.description }}
-                    </div>
+                {{ stat.trend === 'up' ? 'mdi-trending-up' : 'mdi-trending-down' }}
+              </v-icon>
+              <span
+                class="text-caption"
+                :class="stat.trend === 'up' ? 'text-success' : 'text-error'"
+              >
+                {{ stat.change }}
+              </span>
+            </div>
+          </div>
+          <v-avatar
+            :color="stat.color"
+            size="48"
+            variant="tonal"
+          >
+            <v-icon :icon="stat.icon" />
+          </v-avatar>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
+
+  <!-- 主要内容区域 -->
+  <v-row>
+    <!-- 左侧内容 -->
+    <v-col cols="12" md="8">
+      <!-- 最近活动 -->
+      <v-card class="mb-4">
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2">mdi-clock-outline</v-icon>
+          最近活动
+        </v-card-title>
+        <v-card-text>
+          <v-timeline align="start" density="compact">
+            <v-timeline-item
+              v-for="activity in recentActivities"
+              :key="activity.id"
+              :dot-color="activity.color"
+              size="small"
+            >
+              <template #icon>
+                <v-icon :icon="activity.icon" size="small" />
+              </template>
+              <div class="d-flex justify-space-between align-start">
+                <div>
+                  <div class="text-body-2 font-weight-medium">
+                    {{ activity.title }}
                   </div>
                   <div class="text-caption text-medium-emphasis">
-                    {{ activity.time }}
+                    {{ activity.description }}
                   </div>
                 </div>
-              </v-timeline-item>
-            </v-timeline>
-          </v-card-text>
-        </v-card>
-      </v-col>
+                <div class="text-caption text-medium-emphasis">
+                  {{ activity.time }}
+                </div>
+              </div>
+            </v-timeline-item>
+          </v-timeline>
+        </v-card-text>
+      </v-card>
+    </v-col>
 
-      <!-- 右侧内容 -->
-      <v-col cols="12" md="4">
-        <!-- 快速操作 -->
-        <v-card class="mb-4">
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
-            快速操作
-          </v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="action in quickActions"
-                :key="action.title"
-                :prepend-icon="action.icon"
-                :subtitle="action.subtitle"
-                :title="action.title"
-                @click="handleQuickAction(action.action)"
-              />
-            </v-list>
-          </v-card-text>
-        </v-card>
+    <!-- 右侧内容 -->
+    <v-col cols="12" md="4">
+      <!-- 快速操作 -->
+      <v-card class="mb-4">
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
+          快速操作
+        </v-card-title>
+        <v-card-text>
+          <v-list>
+            <v-list-item
+              v-for="action in quickActions"
+              :key="action.title"
+              :prepend-icon="action.icon"
+              :subtitle="action.subtitle"
+              :title="action.title"
+              @click="handleQuickAction(action.action)"
+            />
+          </v-list>
+        </v-card-text>
+      </v-card>
 
-        <!-- 系统状态 -->
-        <v-card>
-          <v-card-title class="d-flex align-center">
-            <v-icon class="mr-2">mdi-server</v-icon>
-            系统状态
-          </v-card-title>
-          <v-card-text>
-            <div class="mb-3">
-              <div class="d-flex justify-space-between mb-1">
-                <span class="text-body-2">CPU使用率</span>
-                <span class="text-body-2">45%</span>
-              </div>
-              <v-progress-linear
-                color="primary"
-                height="6"
-                model-value="45"
-                rounded
-              />
+      <!-- 系统状态 -->
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2">mdi-server</v-icon>
+          系统状态
+        </v-card-title>
+        <v-card-text>
+          <div class="mb-3">
+            <div class="d-flex justify-space-between mb-1">
+              <span class="text-body-2">CPU使用率</span>
+              <span class="text-body-2">45%</span>
             </div>
-            <div class="mb-3">
-              <div class="d-flex justify-space-between mb-1">
-                <span class="text-body-2">内存使用</span>
-                <span class="text-body-2">68%</span>
-              </div>
-              <v-progress-linear
-                color="warning"
-                height="6"
-                model-value="68"
-                rounded
-              />
+            <v-progress-linear
+              color="primary"
+              height="6"
+              model-value="45"
+              rounded
+            />
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-space-between mb-1">
+              <span class="text-body-2">内存使用</span>
+              <span class="text-body-2">68%</span>
             </div>
-            <div>
-              <div class="d-flex justify-space-between mb-1">
-                <span class="text-body-2">存储空间</span>
-                <span class="text-body-2">82%</span>
-              </div>
-              <v-progress-linear
-                color="error"
-                height="6"
-                model-value="82"
-                rounded
-              />
+            <v-progress-linear
+              color="warning"
+              height="6"
+              model-value="68"
+              rounded
+            />
+          </div>
+          <div>
+            <div class="d-flex justify-space-between mb-1">
+              <span class="text-body-2">存储空间</span>
+              <span class="text-body-2">82%</span>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </AdminLayout>
+            <v-progress-linear
+              color="error"
+              height="6"
+              model-value="82"
+              rounded
+            />
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts" setup>
