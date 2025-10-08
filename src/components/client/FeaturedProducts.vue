@@ -76,24 +76,41 @@
       </v-col>
     </v-row>
 
-    <v-row class="mt-8">
+    <!-- 加载状态指示器 -->
+    <v-row v-if="loading" class="mt-4">
       <v-col class="text-center" cols="12">
-        <v-btn
-          append-icon="mdi-arrow-right"
+        <v-progress-circular
           color="primary"
-          rounded
-          size="large"
-          to="/products"
-          variant="outlined"
+          indeterminate
+          size="32"
+        />
+        <p class="text-body-2 text-medium-emphasis mt-2">正在加载更多商品...</p>
+      </v-col>
+    </v-row>
+
+    <!-- 没有更多数据提示 -->
+    <v-row v-else-if="!hasMore && featuredProducts.length > 0" class="mt-4">
+      <!--水平布局-->
+      <v-col class="text-center d-flex justify-center align-center" cols="12">
+        <span class="text-sm-h6 mr-2">
+          --------------------------------------------------------
+        </span>
+        <img
+          alt="Arrow Down"
+          height="20px"
+          :src="mad"
         >
-          查看更多商品
-        </v-btn>
+        <p class="text-body-2 text-medium-emphasis mr-2 mx-3 ml-2">这是我的底线</p>
+        <span class="text-sm-h6">
+          --------------------------------------------------------
+        </span>
       </v-col>
     </v-row>
   </div>
 </template>
 
 <script setup lang="ts">
+  import mad from '@/assets/mad.svg'
   import { getFeaturedServer } from '@/http/client/featured.ts'
   import router from '@/router'
 
@@ -112,6 +129,11 @@
   }
 
   const featuredProducts = ref<CarouselItem[]>([])
+  const currentPage = ref(1)
+  const totalPages = ref(0)
+  const totalItems = ref(0)
+  const loading = ref(false)
+  const hasMore = ref(true)
 
   function viewDetail (productId: string) {
     console.log('查看详情:', productId)
@@ -121,15 +143,75 @@
     })
   }
 
-  async function getFeaturedProducts () {
+  async function getFeaturedProducts (page = 1, isLoadMore = false) {
+    if (loading.value) return
+
     try {
-      const data = await getFeaturedServer(1)
-      featuredProducts.value = data.data
-    } finally {}
+      loading.value = true
+      const result = await getFeaturedServer(page)
+
+      // 更新总数和总页数
+      totalPages.value = result.data.pages
+      totalItems.value = result.data.total
+
+      isLoadMore
+        // 加载更多时追加到现有数据
+        ? featuredProducts.value = [...featuredProducts.value, ...result.data.list]
+        // 首次加载时替换数据
+        : featuredProducts.value = result.data.list
+
+      // 使用总页数检查是否还有更多数据
+      hasMore.value = currentPage.value < totalPages.value
+    } catch (error) {
+      console.error('获取商品数据失败:', error)
+    } finally {
+      loading.value = false
+    }
   }
 
+  // 加载更多数据
+  async function loadMore () {
+    if (!hasMore.value || loading.value) return
+
+    currentPage.value += 1
+    await getFeaturedProducts(currentPage.value, true)
+  }
+
+  // 防抖函数
+  function debounce (func: Function, wait: number) {
+    let timeout: number | undefined
+    return function executedFunction (...args: any[]) {
+      const later = () => {
+        clearTimeout(timeout)
+        func(...args)
+      }
+      clearTimeout(timeout)
+      timeout = setTimeout(later, wait)
+    }
+  }
+
+  // 滚动监听
+  function handleScroll () {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+    const windowHeight = window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
+
+    // 当滚动到距离底部100px时触发加载
+    if (scrollTop + windowHeight >= documentHeight - 250) {
+      loadMore()
+    }
+  }
+
+  // 防抖的滚动处理函数
+  const debouncedHandleScroll = debounce(handleScroll, 100)
+
   onMounted(() => {
-    getFeaturedProducts()
+    getFeaturedProducts(1)
+    window.addEventListener('scroll', debouncedHandleScroll)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', debouncedHandleScroll)
   })
 </script>
 
