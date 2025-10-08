@@ -208,11 +208,12 @@
 
   function handleSearch () {
     if (!searchQuery.value.trim()) return
-    console.log('搜索:', searchQuery.value)
-    // 这里可以添加实际的搜索逻辑
-    setTimeout(() => {
-      closeSearchDialog()
-    }, 1000)
+    router.push({
+      path: '/client/Search',
+      query: {
+        keyword: searchQuery.value,
+      },
+    })
   }
 
   /**

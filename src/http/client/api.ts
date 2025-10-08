@@ -14,3 +14,8 @@ export const FEATURED = '/api/client/featured'
  * 精选商品详情
  */
 export const PRODUCT_DETAIL = '/api/client/featured/detail'
+
+/**
+ * 搜索
+ */
+export const SEARCH = '/api/client/search'
