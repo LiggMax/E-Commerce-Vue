@@ -18,43 +18,28 @@
       >
         <v-card
           class="product-card"
-          elevation="4"
+          elevation="0"
           hover
           rounded="lg"
           @click="viewDetail(product.id)"
         >
-          <div class="product-image-container">
-            <v-img
-              class="product-image"
-              cover
-              height="200"
-              :src="product.images.largeImage"
-            />
+          <v-img
+            class="rounded-lg"
+            cover
+            height="200"
+            :src="product.images.largeImage"
+          />
 
-            <!-- Discount Badge -->
-            <v-chip
-              v-if="product.discount"
-              class="discount-badge"
-              color="error"
-              label
-              size="small"
-            >
-              -{{ product.discount }}%
-            </v-chip>
-
-            <!-- Quick View Overlay -->
-            <div class="quick-view-overlay">
-              <v-btn
-                color="primary"
-                rounded
-                size="small"
-                @click.stop="viewDetail(product.id)"
-              >
-                <v-icon icon="mdi-eye" start />
-                快速预览
-              </v-btn>
-            </div>
-          </div>
+          <!-- Discount Badge -->
+          <v-chip
+            v-if="product.discount"
+            class="discount-badge"
+            color="error"
+            label
+            size="small"
+          >
+            -{{ product.discount }}%
+          </v-chip>
 
           <v-card-title class="pa-4 pb-0">
             <h3 class="text-subtitle-1 font-weight-bold text-truncate">
@@ -112,8 +97,6 @@
   import { getFeaturedServer } from '@/http/client/featured.ts'
   import router from '@/router'
 
-  const favoriteProducts = ref<number[]>([])
-
   interface CarouselItem {
     id: string
     title: string
@@ -130,14 +113,11 @@
 
   const featuredProducts = ref<CarouselItem[]>([])
 
-  function addToCart (product: any) {
-    console.log('添加到购物车:', product.name)
-  }
-
   function viewDetail (productId: string) {
     console.log('查看详情:', productId)
-    router.push({ path: `/client/ProductsDetail`,
-                  query: { productId: productId },
+    router.push({
+      path: `/client/ProductsDetail`,
+      query: { productId: productId },
     })
   }
 
@@ -157,20 +137,7 @@
 
 .product-card:hover {
   transform: translateY(-4px);
-}
-
-/* 图片容器 */
-.product-image-container {
-  position: relative;
-  overflow: hidden;
-}
-
-.product-image {
-  transition: transform 0.3s ease;
-}
-
-.product-card:hover .product-image {
-  transform: scale(1.05);
+  transition: all 0.3s ease-in-out;
 }
 
 /* 折扣徽章 */
@@ -179,25 +146,6 @@
   top: 8px;
   left: 8px;
   z-index: 2;
-}
-
-/* 快速预览覆盖层 */
-.quick-view-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.product-card:hover .quick-view-overlay {
-  opacity: 1;
 }
 
 </style>
