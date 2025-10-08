@@ -5,12 +5,12 @@
       <!-- 左侧：图片画廊 -->
       <v-col cols="12" md="6">
         <v-card elevation="2" rounded="lg">
-          <v-img aspect-ratio="4/3" cover :src="images[activeIndex]" />
+          <v-img aspect-ratio="4/3" cover :src="activeImage" />
           <v-divider />
           <v-sheet class="pa-3">
             <v-slide-group show-arrows>
               <v-slide-group-item
-                v-for="(img, idx) in images"
+                v-for="(img, idx) in allImages"
                 :key="idx"
               >
                 <v-card
@@ -148,25 +148,45 @@
   const route = useRoute()
 
   // 数据模型
+  interface DetailImage {
+    id: number
+    sort: number
+    url: string
+  }
+
   interface Product {
     id: string
     title: string
+    images: {
+      largeImage: string
+      smallImage: string
+    }
     originalPrice: number
     currentPrice: number
     reviews: number
     rating: number
     discount: number
-    delivery: string
+    createdAt: string
     description: string
+    detailImages: DetailImage[]
   }
+
   const productDetail = ref<Product>()
-  const images = [
-    'https://via.placeholder.com/800x600/EEEEEE/222222?text=主图1',
-    'https://via.placeholder.com/800x600/DDDDDD/222222?text=主图2',
-    'https://via.placeholder.com/800x600/CCCCCC/222222?text=主图3',
-    'https://via.placeholder.com/800x600/BBBBBB/222222?text=主图4',
-  ]
   const activeIndex = ref(0)
+
+  // 计算所有图片数组，第一张是largeImage，后面是detailImages中的所有url
+  const allImages = computed(() => {
+    if (!productDetail.value) return []
+    return [
+      productDetail.value.images.largeImage,
+      ...productDetail.value.detailImages.map(img => img.url),
+    ]
+  })
+
+  // 计算当前显示的图片
+  const activeImage = computed(() => {
+    return allImages.value[activeIndex.value] || ''
+  })
 
   function selectImage (idx: number) {
     activeIndex.value = idx
@@ -202,6 +222,8 @@
     if (productId != null) {
       const res = await getFeaturedDetailServer(productId.toString())
       productDetail.value = res.data
+      // 重置图片索引
+      activeIndex.value = 0
     }
   }
 
