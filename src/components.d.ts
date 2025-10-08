@@ -8,7 +8,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AdminLayout: typeof import('./components/admin/AdminLayout.vue')['default']
     DeleteConfirmDialog: typeof import('./components/admin/DeleteConfirmDialog.vue')['default']
     ECommerceFooter: typeof import('./components/client/ECommerceFooter.vue')['default']
     ECommerceHeader: typeof import('./components/client/ECommerceHeader.vue')['default']

@@ -134,7 +134,7 @@
 
     <!-- 主要内容区域 -->
     <v-main>
-      <v-container :class="isLoginPage ? '' : 'pa-4'" fluid>
+      <v-container class="py-2">
         <router-view />
       </v-container>
     </v-main>
@@ -145,7 +145,7 @@
   import { useDisplay, useTheme } from 'vuetify'
   import { cleanToken } from '@/http/admin/login.ts'
   import { userTokenStore } from '@/stores/token.ts'
-  
+
   // 主题管理
   const theme = useTheme()
   const isDark = computed(() => theme.current.value.dark)
@@ -162,7 +162,7 @@
   // 路由相关
   const router = useRouter()
   const route = useRoute()
-  
+
   // 检查是否为登录页面
   const isLoginPage = computed(() => {
     return route.path === '/admin/login'

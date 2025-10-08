@@ -11,7 +11,7 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 // eslint-disable-next-line import/no-duplicates
 import { routes } from 'vue-router/auto-routes'
 
-// 手动为管理后台路由添加布局
+// 为管理后台路由添加布局
 const routesWithLayouts = routes.map(route => {
   if (route.path.startsWith('/admin') && route.path !== '/admin/login') {
     return {

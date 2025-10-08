@@ -1,222 +1,222 @@
 <template>
   <!-- 页面标题和操作 -->
-    <div class="d-flex align-center justify-space-between mb-6">
-      <div>
-        <h1 class="text-h4 font-weight-bold mb-2">精选商品管理</h1>
-        <p class="text-subtitle-1 text-medium-emphasis">
-          管理精选商品信息
-        </p>
-      </div>
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-plus"
-        @click="openDialog('add')"
-      >
-        添加商品
-      </v-btn>
+  <div class="d-flex align-center justify-space-between mb-6">
+    <div>
+      <h1 class="text-h4 font-weight-bold mb-2">精选商品管理</h1>
+      <p class="text-subtitle-1 text-medium-emphasis">
+        管理精选商品信息
+      </p>
     </div>
+    <v-btn
+      color="primary"
+      prepend-icon="mdi-plus"
+      @click="openDialog('add')"
+    >
+      添加商品
+    </v-btn>
+  </div>
 
-    <!-- 统计卡片 -->
-    <v-row class="mb-3">
-      <v-col cols="12" md="3" sm="3">
-        <v-card class="text-center pa-4">
-          <v-icon class="mb-2" color="primary" size="48">mdi-star</v-icon>
-          <div class="text-h4 font-weight-bold">{{ pagination.totalItems }}</div>
-          <div class="text-subtitle-2 text-medium-emphasis">精选商品总数</div>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="3" sm="3">
-        <v-card class="text-center pa-4">
-          <v-icon class="mb-2" color="success" size="48">mdi-currency-usd</v-icon>
-          <div class="text-h4 font-weight-bold">{{ averagePrice }}</div>
-          <div class="text-subtitle-2 text-medium-emphasis">平均价格</div>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="3" sm="3">
-        <v-card class="text-center pa-4">
-          <v-icon class="mb-2" color="warning" size="48">mdi-star-outline</v-icon>
-          <div class="text-h4 font-weight-bold">{{ averageRating.toFixed(1) }}</div>
-          <div class="text-subtitle-2 text-medium-emphasis">平均评分</div>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="3" sm="3">
-        <v-card class="text-center pa-4">
-          <v-icon class="mb-2" color="info" size="48">mdi-comment</v-icon>
-          <div class="text-h4 font-weight-bold">{{ totalReviews }}</div>
-          <div class="text-subtitle-2 text-medium-emphasis">总评论数</div>
-        </v-card>
-      </v-col>
-    </v-row>
+  <!-- 统计卡片 -->
+  <v-row class="mb-3">
+    <v-col cols="12" md="3" sm="3">
+      <v-card class="text-center pa-4">
+        <v-icon class="mb-2" color="primary" size="48">mdi-star</v-icon>
+        <div class="text-h4 font-weight-bold">{{ pagination.totalItems }}</div>
+        <div class="text-subtitle-2 text-medium-emphasis">精选商品总数</div>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="3" sm="3">
+      <v-card class="text-center pa-4">
+        <v-icon class="mb-2" color="success" size="48">mdi-currency-usd</v-icon>
+        <div class="text-h4 font-weight-bold">{{ averagePrice }}</div>
+        <div class="text-subtitle-2 text-medium-emphasis">平均价格</div>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="3" sm="3">
+      <v-card class="text-center pa-4">
+        <v-icon class="mb-2" color="warning" size="48">mdi-star-outline</v-icon>
+        <div class="text-h4 font-weight-bold">{{ averageRating.toFixed(1) }}</div>
+        <div class="text-subtitle-2 text-medium-emphasis">平均评分</div>
+      </v-card>
+    </v-col>
+    <v-col cols="12" md="3" sm="3">
+      <v-card class="text-center pa-4">
+        <v-icon class="mb-2" color="info" size="48">mdi-comment</v-icon>
+        <div class="text-h4 font-weight-bold">{{ totalReviews }}</div>
+        <div class="text-subtitle-2 text-medium-emphasis">总评论数</div>
+      </v-card>
+    </v-col>
+  </v-row>
 
-    <!-- 精选商品列表 -->
-    <v-card>
-      <v-card-title class="d-flex align-center justify-space-between">
-        <div class="d-flex align-center">
-          <v-icon class="mr-2">mdi-star</v-icon>
-          精选商品列表
-        </div>
-
-        <!-- 搜索 -->
-        <div class="d-flex align-center ga-2">
-          <v-text-field
-            v-model="search"
-            density="compact"
-            hide-details
-            placeholder="搜索商品..."
-            prepend-inner-icon="mdi-magnify"
-            style="width: 300px;"
-            variant="outlined"
-          />
-        </div>
-      </v-card-title>
-
-      <v-card-text class="overflow-y-auto" style="max-height: 600px;">
-        <!-- 数据表格 -->
-        <v-data-table
-          class="elevation-0"
-          :headers="headers"
-          hide-default-footer
-          :items="filteredFeaturedList"
-          :items-per-page="-1"
-          :loading="loading"
-          :search="search"
-        >
-          <!-- 商品图片 -->
-          <template #item.image="{ item }">
-            <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 80px;">
-              <v-img :alt="item.title" cover :src="item.images?.largeImage || ''" />
-            </div>
-          </template>
-
-          <template #item.title="{ item }">
-            <div class="my-2 rounded-lg overflow-hidden">
-              <div class="text-sm-h6 font-weight-bold">{{ item.title }}</div>
-            </div>
-          </template>
-
-          <!-- 价格信息 -->
-          <template #item.price="{ item }">
-            <div>
-              <div class="text-success font-weight-bold">¥{{ item.currentPrice }}</div>
-              <div
-                v-if="item.originalPrice !== item.currentPrice"
-                class="text-decoration-line-through text-medium-emphasis"
-              >
-                ¥{{ item.originalPrice }}
-              </div>
-            </div>
-          </template>
-
-          <!-- 评分 -->
-          <template #item.rating="{ item }">
-            <div class="d-flex align-center">
-              <v-rating
-                v-model="item.rating"
-                color="warning"
-                density="compact"
-                readonly
-                size="small"
-              />
-              <span class="ml-2 text-body-2">({{ item.reviews }})</span>
-            </div>
-          </template>
-
-          <!-- 创建时间-->
-          <template #item.createdAt="{item}">
-            <div>{{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '' }}</div>
-          </template>
-
-          <!-- 操作 -->
-          <template #item.actions="{ item }">
-            <v-menu>
-              <template #activator="{ props }">
-                <v-btn
-                  color="primary"
-                  icon="mdi-dots-vertical"
-                  size="small"
-                  v-bind="props"
-                />
-              </template>
-              <v-list>
-                <v-list-item @click="openDialog('edit', item)">
-                  <template #prepend>
-                    <v-icon icon="mdi-pencil" />
-                  </template>
-                  <v-list-item-title>编辑</v-list-item-title>
-                </v-list-item>
-                <!--上传图片-->
-                <v-list-item @click="openUploadDialog(item)">
-                  <template #prepend>
-                    <v-icon icon="mdi-upload" />
-                  </template>
-                  <v-list-item-title>图片</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="openDeleteDialog(item)">
-                  <template #prepend>
-                    <v-icon icon="mdi-delete" />
-                  </template>
-                  <v-list-item-title>删除</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-          </template>
-        </v-data-table>
-
-      </v-card-text>
-      <!-- 分页控件 -->
-      <div class="my-3 d-flex align-center justify-space-between mt-4 px-4">
-        <div class="text-body-2 text-medium-emphasis">
-          共 {{ pagination.totalItems }} 条记录，第 {{ pagination.page }}/{{ pagination.totalPages }} 页
-        </div>
-
-        <v-pagination
-          v-model="pagination.page"
-          density="compact"
-          :length="pagination.totalPages"
-          :total-visible="5"
-          @update:model-value="handlePageChange"
-        />
-
-        <div class="d-flex align-center">
-          <span class="mr-2">每页</span>
-          <v-select
-            v-model="pagination.pageSize"
-            class="pagination-select"
-            density="compact"
-            hide-details
-            :items="[10, 20, 50, 100]"
-            style="width: 100px;"
-            variant="outlined"
-            @update:model-value="handlePageSizeChange"
-          />
-          <span class="ml-2">条</span>
-        </div>
+  <!-- 精选商品列表 -->
+  <v-card>
+    <v-card-title class="d-flex align-center justify-space-between">
+      <div class="d-flex align-center">
+        <v-icon class="mr-2">mdi-star</v-icon>
+        精选商品列表
       </div>
-    </v-card>
 
-    <!-- 添加/编辑对话框 -->
-    <FeaturedEditDialog
-      v-model="dialog"
-      :item="editItem"
-      :mode="dialogMode"
-      @save-success="handleSaveSuccess"
-    />
+      <!-- 搜索 -->
+      <div class="d-flex align-center ga-2">
+        <v-text-field
+          v-model="search"
+          density="compact"
+          hide-details
+          placeholder="搜索商品..."
+          prepend-inner-icon="mdi-magnify"
+          style="width: 300px;"
+          variant="outlined"
+        />
+      </div>
+    </v-card-title>
 
-    <!-- 删除确认对话框 -->
-    <DeleteConfirmDialog
-      v-model="deleteDialog"
-      :item-title="itemToDelete?.title || ''"
-      item-type="商品"
-      @confirm="handleDeleteConfirm"
-    />
+    <v-card-text class="overflow-y-auto" style="max-height: 600px;">
+      <!-- 数据表格 -->
+      <v-data-table
+        class="elevation-0"
+        :headers="headers"
+        hide-default-footer
+        :items="filteredFeaturedList"
+        :items-per-page="-1"
+        :loading="loading"
+        :search="search"
+      >
+        <!-- 商品图片 -->
+        <template #item.image="{ item }">
+          <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 80px;">
+            <v-img :alt="item.title" cover :src="item.images?.largeImage || ''" />
+          </div>
+        </template>
 
-    <!-- 图片上传对话框 -->
-    <ImageUploadDialog
-      v-model="uploadDialog"
-      :item-id="itemToUpload?.id"
-      :item-title="itemToUpload?.title || ''"
-      @upload-success="handleUploadSuccess"
-    />
+        <template #item.title="{ item }">
+          <div class="my-2 rounded-lg overflow-hidden">
+            <div class="text-sm-h6 font-weight-bold">{{ item.title }}</div>
+          </div>
+        </template>
+
+        <!-- 价格信息 -->
+        <template #item.price="{ item }">
+          <div>
+            <div class="text-success font-weight-bold">¥{{ item.currentPrice }}</div>
+            <div
+              v-if="item.originalPrice !== item.currentPrice"
+              class="text-decoration-line-through text-medium-emphasis"
+            >
+              ¥{{ item.originalPrice }}
+            </div>
+          </div>
+        </template>
+
+        <!-- 评分 -->
+        <template #item.rating="{ item }">
+          <div class="d-flex align-center">
+            <v-rating
+              v-model="item.rating"
+              color="warning"
+              density="compact"
+              readonly
+              size="small"
+            />
+            <span class="ml-2 text-body-2">({{ item.reviews }})</span>
+          </div>
+        </template>
+
+        <!-- 创建时间-->
+        <template #item.createdAt="{item}">
+          <div>{{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '' }}</div>
+        </template>
+
+        <!-- 操作 -->
+        <template #item.actions="{ item }">
+          <v-menu>
+            <template #activator="{ props }">
+              <v-btn
+                color="primary"
+                icon="mdi-dots-vertical"
+                size="small"
+                v-bind="props"
+              />
+            </template>
+            <v-list>
+              <v-list-item @click="openDialog('edit', item)">
+                <template #prepend>
+                  <v-icon icon="mdi-pencil" />
+                </template>
+                <v-list-item-title>编辑</v-list-item-title>
+              </v-list-item>
+              <!--上传图片-->
+              <v-list-item @click="openUploadDialog(item)">
+                <template #prepend>
+                  <v-icon icon="mdi-upload" />
+                </template>
+                <v-list-item-title>图片</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="openDeleteDialog(item)">
+                <template #prepend>
+                  <v-icon icon="mdi-delete" />
+                </template>
+                <v-list-item-title>删除</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </template>
+      </v-data-table>
+
+    </v-card-text>
+    <!-- 分页控件 -->
+    <div class="my-3 d-flex align-center justify-space-between mt-4 px-4">
+      <div class="text-body-2 text-medium-emphasis">
+        共 {{ pagination.totalItems }} 条记录，第 {{ pagination.page }}/{{ pagination.totalPages }} 页
+      </div>
+
+      <v-pagination
+        v-model="pagination.page"
+        density="compact"
+        :length="pagination.totalPages"
+        :total-visible="5"
+        @update:model-value="handlePageChange"
+      />
+
+      <div class="d-flex align-center">
+        <span class="mr-2">每页</span>
+        <v-select
+          v-model="pagination.pageSize"
+          class="pagination-select"
+          density="compact"
+          hide-details
+          :items="[10, 20, 50, 100]"
+          style="width: 100px;"
+          variant="outlined"
+          @update:model-value="handlePageSizeChange"
+        />
+        <span class="ml-2">条</span>
+      </div>
+    </div>
+  </v-card>
+
+  <!-- 添加/编辑对话框 -->
+  <FeaturedEditDialog
+    v-model="dialog"
+    :item="editItem"
+    :mode="dialogMode"
+    @save-success="handleSaveSuccess"
+  />
+
+  <!-- 删除确认对话框 -->
+  <DeleteConfirmDialog
+    v-model="deleteDialog"
+    :item-title="itemToDelete?.title || ''"
+    item-type="商品"
+    @confirm="handleDeleteConfirm"
+  />
+
+  <!-- 图片上传对话框 -->
+  <ImageUploadDialog
+    v-model="uploadDialog"
+    :item-id="itemToUpload?.id"
+    :item-title="itemToUpload?.title || ''"
+    @upload-success="handleUploadSuccess"
+  />
 </template>
 
 <script lang="ts" setup>
