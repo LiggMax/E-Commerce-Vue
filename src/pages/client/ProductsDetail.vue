@@ -66,9 +66,12 @@
 
             <v-sheet class=" mb-4 rounded-lg">
               <div class="d-flex align-end ga-3">
-                <div class="text-h4 font-weight-bold text-primary">¥{{ productDetail.currentPrice }}</div>
-                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ productDetail.originalPrice }}</div>
-                <v-chip color="error" size="small" variant="flat">直降 ¥{{ productDetail.originalPrice - productDetail.currentPrice }}</v-chip>
+                <div class="text-h4 font-weight-bold text-primary">¥{{ finalCurrentPrice.toFixed(2) }}</div>
+                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ finalOriginalPrice.toFixed(2) }}</div>
+                <v-chip color="error" size="small" variant="flat">直降 ¥{{ (finalOriginalPrice - finalCurrentPrice).toFixed(2) }}</v-chip>
+              </div>
+              <div v-if="selectedSpecsPrice > 0" class="mt-2 text-caption text-medium-emphasis">
+                基础价格 ¥{{ productDetail.currentPrice.toFixed(2) }} + 规格价格 ¥{{ selectedSpecsPrice.toFixed(2) }}
               </div>
             </v-sheet>
 
@@ -85,6 +88,9 @@
                     @click="selectSpec(spec.id, specValue.id)"
                   >
                     {{ specValue.value }}
+                    <span v-if="specValue.price > 0" class="ml-1 text-caption">
+                      +¥{{ specValue.price.toFixed(2) }}
+                    </span>
                   </v-chip>
                 </div>
               </div>
@@ -175,6 +181,7 @@
     id: number
     value: string
     sort: number
+    price: number
     createTime: string
     updateTime: string
   }
@@ -252,12 +259,42 @@
     return texts.join(', ')
   })
 
+  // 计算选中规格的总价格
+  const selectedSpecsPrice = computed(() => {
+    if (!productDetail.value?.specs) return 0
+    let totalPrice = 0
+    for (const spec of productDetail.value.specs) {
+      const selectedValueId = selectedSpecs.value[spec.id]
+      if (selectedValueId) {
+        const specValue = spec.specValues.find(v => v.id === selectedValueId)
+        if (specValue && specValue.price) {
+          totalPrice += specValue.price
+        }
+      }
+    }
+    return totalPrice
+  })
+
+  // 计算最终显示的当前价格（基础价格 + 规格价格）
+  const finalCurrentPrice = computed(() => {
+    if (!productDetail.value) return 0
+    return productDetail.value.currentPrice + selectedSpecsPrice.value
+  })
+
+  // 计算最终显示的原价（基础原价 + 规格价格）
+  const finalOriginalPrice = computed(() => {
+    if (!productDetail.value) return 0
+    return productDetail.value.originalPrice + selectedSpecsPrice.value
+  })
+
   function addToCart () {
     if (!validateSpecs()) return
     console.log('加入购物车', {
       product: productDetail.value,
       quantity: quantity.value,
       selectedSpecs: selectedSpecsText.value,
+      finalPrice: finalCurrentPrice.value,
+      totalPrice: finalCurrentPrice.value * quantity.value,
     })
   }
 
@@ -267,6 +304,8 @@
       product: productDetail.value,
       quantity: quantity.value,
       selectedSpecs: selectedSpecsText.value,
+      finalPrice: finalCurrentPrice.value,
+      totalPrice: finalCurrentPrice.value * quantity.value,
     })
   }
 
