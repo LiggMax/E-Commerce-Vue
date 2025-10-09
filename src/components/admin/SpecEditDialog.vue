@@ -374,7 +374,7 @@
       // await saveSpecs(props.productId, specs.value)
 
       // 触发保存成功事件
-      emit('save-success', JSON.parse(JSON.stringify(specs.value)))
+      emit('save-success', structuredClone(specs.value))
       closeDialog()
     } catch (error) {
       console.error('保存规格失败:', error)
@@ -388,18 +388,10 @@
   watch(dialog, newValue => {
     if (newValue) {
       // 深拷贝初始规格数据
-      specs.value = JSON.parse(JSON.stringify(props.initialSpecs || []))
+      specs.value = structuredClone(props.initialSpecs || [])
     }
   })
 </script>
 
 <style scoped>
-/* 自定义样式 */
-:deep(.v-expansion-panel-title) {
-  padding: 12px 16px;
-}
-
-:deep(.v-expansion-panel-text__wrapper) {
-  padding: 16px;
-}
 </style>
