@@ -52,8 +52,8 @@
           style="height: 600px;"
         >
           <div class="h-100 overflow-y-auto">
-            <div class="text-h5 font-weight-bold mb-2">{{ productDetail.title }}</div>
-            <div class="d-flex align-center mb-2">
+            <div class="text-h5 font-weight-bold">{{ productDetail.title }}</div>
+            <div class="d-flex align-center ">
               <v-rating
                 color="amber"
                 half-increments
@@ -61,22 +61,32 @@
                 readonly
                 size="small"
               />
-              <span class="text-caption ml-2">{{ productDetail.rating }} 分 · {{ productDetail.reviews }} 条评价 · 销量 {{ product.sales }}</span>
+              <span class="text-caption ml-2">{{ productDetail.rating }} 分 · {{ productDetail.reviews }} 条评价</span>
             </div>
 
-            <v-sheet class="pa-4 mb-4 bg-grey-lighten-4 rounded-lg">
+            <v-sheet class=" mb-4 rounded-lg">
               <div class="d-flex align-end ga-3">
                 <div class="text-h4 font-weight-bold text-primary">¥{{ productDetail.currentPrice }}</div>
                 <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ productDetail.originalPrice }}</div>
                 <v-chip color="error" size="small" variant="flat">直降 ¥{{ productDetail.originalPrice - productDetail.currentPrice }}</v-chip>
               </div>
-              <div class="mt-2 text-body-2 text-medium-emphasis">{{ product.delivery }}</div>
             </v-sheet>
 
-            <div class="mb-3">
-              <div class="text-body-2 text-medium-emphasis mb-2">规格</div>
-              <div class="d-flex flex-wrap ga-2">
-                <v-chip v-for="sp in product.specs" :key="sp" variant="outlined">{{ sp }}</v-chip>
+            <!-- 规格选择 -->
+            <div v-if="productDetail.specs && productDetail.specs.length > 0" class="mb-4">
+              <div v-for="spec in productDetail.specs" :key="spec.id" class="mb-3">
+                <div class="text-body-2 text-medium-emphasis mb-2">{{ spec.name }}</div>
+                <div class="d-flex flex-wrap ga-2">
+                  <v-chip
+                    v-for="specValue in spec.specValues"
+                    :key="specValue.id"
+                    :color="selectedSpecs[spec.id] === specValue.id ? 'primary' : ''"
+                    :variant="selectedSpecs[spec.id] === specValue.id ? 'flat' : 'outlined'"
+                    @click="selectSpec(spec.id, specValue.id)"
+                  >
+                    {{ specValue.value }}
+                  </v-chip>
+                </div>
               </div>
             </div>
 
@@ -108,20 +118,7 @@
               </v-btn>
               <v-btn icon="mdi-heart-outline" variant="outlined" />
             </div>
-
             <v-divider class="my-6" />
-
-            <div class="d-flex flex-wrap ga-3">
-              <v-chip
-                v-for="srv in product.services"
-                :key="srv"
-                color="success"
-                size="small"
-                variant="tonal"
-              >
-                <v-icon icon="mdi-check-decagram" start /> {{ srv }}
-              </v-chip>
-            </div>
           </div>
         </v-card>
       </v-col>
@@ -174,6 +171,23 @@
     url: string
   }
 
+  interface SpecValue {
+    id: number
+    value: string
+    sort: number
+    createTime: string
+    updateTime: string
+  }
+
+  interface Spec {
+    id: number
+    name: string
+    sort: number
+    createTime: string
+    updateTime: string
+    specValues: SpecValue[]
+  }
+
   interface Product {
     id: string
     title: string
@@ -187,12 +201,17 @@
     rating: number
     discount: number
     createdAt: string
-    description: string
+    description: string | null
     detailImages: DetailImage[]
+    specs: Spec[]
   }
 
   const productDetail = ref<Product>()
   const activeIndex = ref(0)
+  const quantity = ref(1)
+
+  // 选中的规格，key为规格id，value为规格值id
+  const selectedSpecs = ref<Record<number, number>>({})
 
   // 计算所有图片数组，第一张是largeImage，后面是detailImages中的所有url
   const allImages = computed(() => {
@@ -212,30 +231,66 @@
     activeIndex.value = idx
   }
 
-  const product = {
-    title: '超清 4K 显示器 27 寸 IPS 144Hz',
-    price: 1999,
-    originalPrice: 2599,
-    rating: 4.5,
-    reviews: 328,
-    sales: 1520,
-    delivery: '顺丰包邮 · 48 小时内发货',
-    services: ['7 天无理由', '一年质保', '正规发票'],
-    specs: ['27 寸', '4K', '144Hz', 'Type‑C 90W 供电'],
+  // 选择规格
+  function selectSpec (specId: number, specValueId: number) {
+    selectedSpecs.value[specId] = specValueId
   }
 
-  const quantity = ref(1)
+  // 获取已选择的规格文本
+  const selectedSpecsText = computed(() => {
+    if (!productDetail.value?.specs) return ''
+    const texts: string[] = []
+    for (const spec of productDetail.value.specs) {
+      const selectedValueId = selectedSpecs.value[spec.id]
+      if (selectedValueId) {
+        const specValue = spec.specValues.find(v => v.id === selectedValueId)
+        if (specValue) {
+          texts.push(`${spec.name}: ${specValue.value}`)
+        }
+      }
+    }
+    return texts.join(', ')
+  })
 
   function addToCart () {
-    console.log('加入购物车', { product, quantity: quantity.value })
+    if (!validateSpecs()) return
+    console.log('加入购物车', {
+      product: productDetail.value,
+      quantity: quantity.value,
+      selectedSpecs: selectedSpecsText.value,
+    })
   }
 
   function buyNow () {
-    console.log('立即购买', { product, quantity: quantity.value })
+    if (!validateSpecs()) return
+    console.log('立即购买', {
+      product: productDetail.value,
+      quantity: quantity.value,
+      selectedSpecs: selectedSpecsText.value,
+    })
+  }
+
+  // 验证是否所有规格都已选择
+  function validateSpecs () {
+    if (!productDetail.value?.specs || productDetail.value.specs.length === 0) {
+      return true
+    }
+
+    const unselectedSpecs = productDetail.value.specs.filter(
+      spec => !selectedSpecs.value[spec.id],
+    )
+
+    if (unselectedSpecs.length > 0) {
+      const specNames = unselectedSpecs.map(s => s.name).join('、')
+      alert(`请选择${specNames}`)
+      return false
+    }
+
+    return true
   }
 
   /**
-   * 商品商品数据
+   * 获取商品数据
    */
   async function getProduct () {
     const productId = route.query.productId
@@ -244,6 +299,16 @@
       productDetail.value = res.data
       // 重置图片索引
       activeIndex.value = 0
+      // 重置选中的规格
+      selectedSpecs.value = {}
+      // 如果有规格，默认选中每个规格的第一个值
+      if (res.data.specs && res.data.specs.length > 0) {
+        for (const spec of res.data.specs) {
+          if (spec.specValues && spec.specValues.length > 0) {
+            selectedSpecs.value[spec.id] = spec.specValues[0].id
+          }
+        }
+      }
     }
   }
 

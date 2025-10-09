@@ -1,5 +1,3 @@
-import request from '@/http/request.ts'
-
 /**
  * 获取轮播图数据
  */
