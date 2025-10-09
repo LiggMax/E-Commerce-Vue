@@ -240,6 +240,8 @@
 
 <script lang="ts" setup>
   // 定义规格值接口
+  import { addSpecification } from '@/http/admin/spec.ts'
+  import notification from '@/utils/notification.ts'
   interface SpecValue {
     id?: number
     value: string
@@ -370,11 +372,21 @@
     saving.value = true
 
     try {
-      // 这里可以调用API保存规格数据
-      // await saveSpecs(props.productId, specs.value)
-
-      // 触发保存成功事件
-      emit('save-success', structuredClone(specs.value))
+      // 构建数据
+      const specsData = {
+        productId: props.productId,
+        specs: JSON.parse(JSON.stringify(specs.value)).map((specs: any) => ({
+          name: specs.name,
+          sort: specs.sort,
+          specValues: specs.specValues.map((value: any) => ({
+            value: value.value,
+            sort: value.sort,
+            price: value.price,
+          })),
+        })),
+      }
+      await addSpecification(specsData)
+      notification.showSuccess('保存规格成功')
       closeDialog()
     } catch (error) {
       console.error('保存规格失败:', error)
@@ -388,7 +400,7 @@
   watch(dialog, newValue => {
     if (newValue) {
       // 深拷贝初始规格数据
-      specs.value = structuredClone(props.initialSpecs || [])
+      specs.value = JSON.parse(JSON.stringify(props.initialSpecs || []))
     }
   })
 </script>

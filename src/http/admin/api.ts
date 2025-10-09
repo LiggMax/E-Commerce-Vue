@@ -32,3 +32,8 @@ export const UPLOAD_IMAGE = '/api/admin/featured/image'
  * 清理Token
  */
 export const CLEAR_TOKEN = '/api/admin/user/remove_token'
+
+/**
+ * 规格
+ */
+export const SPECIFICATION = '/api/admin/spec'

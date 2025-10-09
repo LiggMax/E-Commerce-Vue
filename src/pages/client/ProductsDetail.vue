@@ -131,7 +131,7 @@
     <v-row class="mt-8">
       <v-col cols="12">
         <v-card elevation="2" rounded="lg">
-          <v-tabs bg-color="white" color="primary" grow>
+          <v-tabs color="primary" grow>
             <v-tab value="detail">详情</v-tab>
             <v-tab value="spec">参数</v-tab>
             <v-tab value="review">评价</v-tab>
