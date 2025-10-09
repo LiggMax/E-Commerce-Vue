@@ -19,5 +19,6 @@ declare module 'vue' {
     ProductCategories: typeof import('./components/client/ProductCategories.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SpecEditDialog: typeof import('./components/admin/SpecEditDialog.vue')['default']
   }
 }

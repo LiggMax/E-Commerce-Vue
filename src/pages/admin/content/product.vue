@@ -2,7 +2,7 @@
   <!-- 页面标题和操作 -->
   <div class="d-flex align-center justify-space-between mb-6">
     <div>
-      <h1 class="text-h4 font-weight-bold mb-2">精选商品管理</h1>
+      <h1 class="text-h4 font-weight-bold mb-2">商品管理</h1>
       <p class="text-subtitle-1 text-medium-emphasis">
         管理精选商品信息
       </p>
@@ -15,39 +15,6 @@
       添加商品
     </v-btn>
   </div>
-
-  <!-- 统计卡片 -->
-  <v-row class="mb-3">
-    <v-col cols="12" md="3" sm="3">
-      <v-card class="text-center pa-4">
-        <v-icon class="mb-2" color="primary" size="48">mdi-star</v-icon>
-        <div class="text-h4 font-weight-bold">{{ pagination.totalItems }}</div>
-        <div class="text-subtitle-2 text-medium-emphasis">精选商品总数</div>
-      </v-card>
-    </v-col>
-    <v-col cols="12" md="3" sm="3">
-      <v-card class="text-center pa-4">
-        <v-icon class="mb-2" color="success" size="48">mdi-currency-usd</v-icon>
-        <div class="text-h4 font-weight-bold">{{ averagePrice }}</div>
-        <div class="text-subtitle-2 text-medium-emphasis">平均价格</div>
-      </v-card>
-    </v-col>
-    <v-col cols="12" md="3" sm="3">
-      <v-card class="text-center pa-4">
-        <v-icon class="mb-2" color="warning" size="48">mdi-star-outline</v-icon>
-        <div class="text-h4 font-weight-bold">{{ averageRating.toFixed(1) }}</div>
-        <div class="text-subtitle-2 text-medium-emphasis">平均评分</div>
-      </v-card>
-    </v-col>
-    <v-col cols="12" md="3" sm="3">
-      <v-card class="text-center pa-4">
-        <v-icon class="mb-2" color="info" size="48">mdi-comment</v-icon>
-        <div class="text-h4 font-weight-bold">{{ totalReviews }}</div>
-        <div class="text-subtitle-2 text-medium-emphasis">总评论数</div>
-      </v-card>
-    </v-col>
-  </v-row>
-
   <!-- 精选商品列表 -->
   <v-card>
     <v-card-title class="d-flex align-center justify-space-between">
@@ -144,6 +111,13 @@
                 </template>
                 <v-list-item-title>编辑</v-list-item-title>
               </v-list-item>
+              <!--规格-->
+              <v-list-item @click="openPendingDialog(item)">
+                <template #prepend>
+                  <v-icon icon="mdi-clipboard-list" />
+                </template>
+                <v-list-item-title>规格</v-list-item-title>
+              </v-list-item>
               <!--上传图片-->
               <v-list-item @click="openUploadDialog(item)">
                 <template #prepend>
@@ -217,12 +191,22 @@
     :item-title="itemToUpload?.title || ''"
     @upload-success="handleUploadSuccess"
   />
+
+  <!-- 规格编辑对话框 -->
+  <SpecEditDialog
+    v-model="specDialog"
+    :initial-specs="itemToEditSpec?.specs || []"
+    :product-id="itemToEditSpec?.id || ''"
+    :product-title="itemToEditSpec?.title || ''"
+    @save-success="handleSpecSaveSuccess"
+  />
 </template>
 
 <script lang="ts" setup>
   import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog.vue'
   import FeaturedEditDialog from '@/components/admin/FeaturedEditDialog.vue'
   import ImageUploadDialog from '@/components/admin/ImageUploadDialog.vue'
+  import SpecEditDialog from '@/components/admin/SpecEditDialog.vue'
   import { deleteFeaturedById, getFeatured } from '@/http/admin/featured.ts'
   import { useNotification } from '@/utils/notification'
 
@@ -234,7 +218,32 @@
   const uploadDialog = ref(false)
   const itemToUpload = ref<FeaturedItem>()
 
+  // 规格编辑相关
+  const specDialog = ref(false)
+  const itemToEditSpec = ref<FeaturedItem>()
+
   const { showSuccess } = useNotification()
+
+  // 定义规格值接口
+  interface SpecValue {
+    id?: number
+    value: string
+    price: number
+    sort: number
+    createTime?: string
+    updateTime?: string
+  }
+
+  // 定义规格接口
+  interface Spec {
+    id?: number
+    name: string
+    sort: number
+    createTime?: string
+    updateTime?: string
+    specValues: SpecValue[]
+  }
+
   // 定义精选商品项目的接口
   interface FeaturedItem {
     id: string
@@ -250,6 +259,7 @@
     reviews: number
     rating: number
     createdAt: string
+    specs?: Spec[]
   }
 
   // 响应式数据
@@ -305,6 +315,7 @@
         reviews: number
         rating: number
         createdAt?: string
+        specs?: Spec[]
       }) => ({
         id: item.id,
         title: item.title,
@@ -315,6 +326,7 @@
         rating: item.rating,
         description: item.description,
         createdAt: item.createdAt,
+        specs: item.specs || [],
       }))
     } catch (error) {
       console.error('获取精选商品数据失败:', error)
@@ -349,23 +361,6 @@
     })
   }
 
-  // 计算属性
-  const averagePrice = computed(() => {
-    if (featuredList.value.length === 0) return '¥0'
-    const total = featuredList.value.reduce((sum, item) => sum + item.currentPrice, 0)
-    return `¥${Math.round(total / featuredList.value.length)}`
-  })
-
-  const averageRating = computed(() => {
-    if (featuredList.value.length === 0) return 0
-    const total = featuredList.value.reduce((sum, item) => sum + item.rating, 0)
-    return total / featuredList.value.length
-  })
-
-  const totalReviews = computed(() =>
-    featuredList.value.reduce((sum, item) => sum + item.reviews, 0),
-  )
-
   const filteredFeaturedList = computed(() => {
     return featuredList.value
   })
@@ -382,6 +377,33 @@
     await fetchFeaturedList()
   }
 
+  // 打开规格编辑对话框
+  function openPendingDialog (item: FeaturedItem) {
+    itemToEditSpec.value = item
+    specDialog.value = true
+  }
+
+  // 处理规格保存成功
+  async function handleSpecSaveSuccess (specs: Spec[]) {
+    if (!itemToEditSpec.value) return
+
+    try {
+      // 这里可以调用API保存规格数据
+      // await updateProductSpecs(itemToEditSpec.value.id, specs)
+
+      // 更新本地数据
+      const index = featuredList.value.findIndex(i => i.id === itemToEditSpec.value!.id)
+      if (index !== -1) {
+        featuredList.value[index].specs = specs
+      }
+
+      showSuccess('规格保存成功')
+      // 刷新数据
+      await fetchFeaturedList()
+    } catch (error) {
+      console.error('保存规格失败:', error)
+    }
+  }
   // 打开删除确认框
   function openDeleteDialog (item: FeaturedItem) {
     itemToDelete.value = item

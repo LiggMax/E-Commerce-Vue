@@ -194,7 +194,7 @@
           to: '/admin/content/carousel',
         },
         {
-          title: '精选商品',
+          title: '商品管理',
           icon: 'mdi-star',
           value: 'featured',
           to: '/admin/content/featured',

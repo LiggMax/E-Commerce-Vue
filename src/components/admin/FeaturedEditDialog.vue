@@ -5,7 +5,7 @@
         <v-icon class="mr-2">
           {{ mode === 'add' ? 'mdi-plus' : 'mdi-pencil' }}
         </v-icon>
-        {{ mode === 'add' ? '添加精选商品' : '编辑精选商品' }}
+        {{ mode === 'add' ? '添加商品' : '编辑商品' }}
       </v-card-title>
 
       <v-card-text>
@@ -15,7 +15,7 @@
             <v-col cols="12">
               <v-text-field
                 v-model="formData.title"
-                label="商品名称"
+                label="标题"
                 prepend-inner-icon="mdi-tag"
                 :rules="[v => !!v || '请输入商品名称']"
                 variant="outlined"

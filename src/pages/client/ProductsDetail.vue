@@ -88,9 +88,6 @@
                     @click="selectSpec(spec.id, specValue.id)"
                   >
                     {{ specValue.value }}
-                    <span v-if="specValue.price > 0" class="ml-1 text-caption">
-                      +¥{{ specValue.price.toFixed(2) }}
-                    </span>
                   </v-chip>
                 </div>
               </div>
