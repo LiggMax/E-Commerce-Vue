@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" max-width="450px" persistent>
     <v-card class="auth-card">
       <!-- Header -->
-      <v-card-title class="text-center pa-6">
+      <v-card-title class="text-center py-2">
         <div class="auth-header">
           <v-icon
             class="mb-4"
@@ -26,7 +26,7 @@
           <!-- Username Field -->
           <v-text-field
             v-model="authForm.username"
-            class="mb-3"
+            class="mb-2"
             color="primary"
             :error-messages="errors.username"
             label="用户名"
@@ -40,7 +40,7 @@
           <v-text-field
             v-if="!isLogin"
             v-model="authForm.email"
-            class="mb-3"
+            class="mb-2"
             color="primary"
             :error-messages="errors.email"
             label="邮箱"
@@ -54,7 +54,7 @@
           <v-text-field
             v-model="authForm.password"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            class="mb-3"
+            class="mb-2"
             color="primary"
             :error-messages="errors.password"
             label="密码"
@@ -71,7 +71,7 @@
             v-if="!isLogin"
             v-model="authForm.confirmPassword"
             :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            class="mb-3"
+            class="mb-2"
             color="primary"
             :error-messages="errors.confirmPassword"
             label="确认密码"
@@ -83,11 +83,32 @@
             @input="clearError('confirmPassword')"
           />
 
+          <div v-if="!isLogin">
+            <div class="d-flex align-cent mb-2">
+              <v-text-field
+                v-model="authForm.captcha"
+                class="flex-grow-1 mr-2"
+                color="primary"
+                :error-messages="errors.captcha"
+                label="验证码"
+                prepend-inner-icon="mdi-shield-check"
+                :rules="captchaRules"
+                variant="outlined"
+                @input="clearError('captcha')"
+              />
+              <v-img
+                v-if="!isLogin"
+                class="mb-5 rounded-lg"
+                :src="'data:image/png;base64,'+ captcha?.captcha"
+                @click="getCaptcha"
+              />
+            </div>
+          </div>
+
           <!-- Remember Me (仅登录时显示) -->
           <v-checkbox
             v-if="isLogin"
             v-model="authForm.remember"
-            class="mb-4"
             color="primary"
             hide-details
             label="记住我"
@@ -152,7 +173,10 @@
 </template>
 
 <script setup lang="ts">
+  import { getCaptchaService } from '@/http/client/captcha.ts'
+  import { registerService } from '@/http/client/user.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
+  import { useNotification } from '@/utils/notification.ts'
 
   // Props
   interface Props {
@@ -169,6 +193,7 @@
   const emit = defineEmits<Emits>()
 
   const { setToken } = userTokenStore()
+  const { showSuccess } = useNotification()
 
   // 响应式数据
   const form = ref()
@@ -185,6 +210,7 @@
     email: '',
     password: '',
     confirmPassword: '',
+    captcha: '',
     remember: false,
   })
 
@@ -193,14 +219,24 @@
     username: '',
     email: '',
     password: '',
+    captcha: '',
     confirmPassword: '',
   })
+
+  interface Captcha {
+    uuid: string
+    captcha: string
+  }
+
+  // 验证码
+  const captcha = ref<Captcha>()
 
   // 表单验证规则
   const usernameRules = [
     (v: string) => !!v || '请输入用户名',
-    (v: string) => (v && v.length >= 3) || '用户名至少需要3个字符',
+    (v: string) => (v && v.length >= 6) || '用户名至少需要个6字符',
     (v: string) => (v && v.length < 30) || '用户名不能超过30个字符',
+    (v: string) => v !== '123456' || '账号过于简单',
   ]
 
   const emailRules = [
@@ -212,11 +248,17 @@
     (v: string) => !!v || '请输入密码',
     (v: string) => (v && v.length >= 6) || '密码至少需要6个字符',
     (v: string) => (v && v.length < 30) || '密码不能超过30个字符',
+    (v: string) => v !== '123456' || '密码于简单',
   ]
 
   const confirmPasswordRules = [
     (v: string) => !!v || '请确认密码',
     (v: string) => v === authForm.password || '两次输入的密码不一致',
+  ]
+
+  const captchaRules = [
+    (v: string) => !!v || '请输入验证码',
+    (v: string) => (v && v.length === 6) || '验证码为6位字符',
   ]
 
   // 计算属性
@@ -242,6 +284,14 @@
     resetForm()
   }
 
+  /**
+   * 获取验证码
+   */
+  async function getCaptcha () {
+    const res = await getCaptchaService()
+    captcha.value = res.data
+  }
+
   // 处理认证（登录或注册）
   async function handleAuth () {
     if (!valid.value) return
@@ -250,15 +300,21 @@
     errorMessage.value = ''
 
     try {
-      // 模拟认证请求
-      // 实际项目中这里需要调用真实的API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // 模拟认证成功，设置token
-      setToken('fake-client-token')
-
-      // 关闭对话框
-      closeDialog()
+      if (isLogin.value) {
+        // 登录
+        setToken('fake-client-token')
+      } else {
+        // 注册
+        await registerService({
+          account: authForm.username,
+          password: authForm.password,
+          email: authForm.email,
+          code: authForm.captcha,
+          uuid: captcha.value!.uuid,
+        })
+        showSuccess('注册成功')
+        switchAuthMode()
+      }
 
       // 重置表单
       resetForm()
@@ -281,6 +337,10 @@
       form.value.resetValidation()
     }
   }
+
+  onMounted(() => {
+    getCaptcha()
+  })
 
   // 监听对话框关闭，重置表单
   watch(dialog, newValue => {

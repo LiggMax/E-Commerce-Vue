@@ -22,3 +22,13 @@ export const SEARCH = '/api/client/search'
  * 订阅
  */
 export const SUBSCRIBE = '/api/email'
+
+/**
+ * 验证码
+ */
+export const CAPTCHA = '/api/client/captcha'
+
+/**
+ * 注册
+ */
+export const REGISTER = '/api/client/account/register'

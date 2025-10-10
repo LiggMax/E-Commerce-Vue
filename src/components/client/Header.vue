@@ -180,7 +180,7 @@
     />
   </v-navigation-drawer>
 
-  <AuthDialog v-model="authDialog" />
+  <AuthDialog v-if="authDialog" v-model="authDialog" />
 </template>
 
 <script setup lang="ts">
