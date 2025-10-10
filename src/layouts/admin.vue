@@ -144,7 +144,7 @@
 <script lang="ts" setup>
   import { useDisplay, useTheme } from 'vuetify'
   import { cleanToken } from '@/http/admin/login.ts'
-  import { userTokenStore } from '@/stores/token.ts'
+  import { userTokenStore } from '@/stores/admin/adminToken.ts'
 
   // 主题管理
   const theme = useTheme()

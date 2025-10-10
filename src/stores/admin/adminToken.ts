@@ -1,4 +1,4 @@
-export const userTokenStore = defineStore('token', () => {
+export const userTokenStore = defineStore('adminToken', () => {
   // 响应式变量
   const token = ref('')
   // 修改token的值

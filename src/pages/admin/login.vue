@@ -109,7 +109,7 @@
 <script lang="ts" setup>
   import { useThemeToggle } from '@/composables/useTheme.ts'
   import { login } from '@/http/admin/login.ts'
-  import { userTokenStore } from '@/stores/token.ts'
+  import { userTokenStore } from '@/stores/admin/adminToken.ts'
 
   // 路由实例
   const router = useRouter()

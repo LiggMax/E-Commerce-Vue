@@ -141,8 +141,6 @@
             <v-row>
               <v-col cols="12" md="8">
                 <p class="text-body-1 mb-4">{{ productDetail.description }}</p>
-                <v-img class="mb-4" cover height="320" src="https://via.placeholder.com/900x320/EEEEEE/222222?text=产品详情图" />
-                <v-img cover height="320" src="https://via.placeholder.com/900x320/DDDDDD/222222?text=更多展示" />
               </v-col>
               <v-col cols="12" md="4">
                 <v-list density="compact" subheader>

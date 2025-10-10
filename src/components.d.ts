@@ -8,11 +8,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AuthDialog: typeof import('./components/client/AuthDialog.vue')['default']
     DeleteConfirmDialog: typeof import('./components/admin/DeleteConfirmDialog.vue')['default']
-    ECommerceFooter: typeof import('./components/client/ECommerceFooter.vue')['default']
-    ECommerceHeader: typeof import('./components/client/ECommerceHeader.vue')['default']
     FeaturedEditDialog: typeof import('./components/admin/FeaturedEditDialog.vue')['default']
     FeaturedProducts: typeof import('./components/client/FeaturedProducts.vue')['default']
+    Footer: typeof import('./components/client/Footer.vue')['default']
+    Header: typeof import('./components/client/Header.vue')['default']
     HeroSection: typeof import('./components/client/HeroSection.vue')['default']
     ImageUploadDialog: typeof import('./components/admin/ImageUploadDialog.vue')['default']
     Notification: typeof import('./components/common/Notification.vue')['default']

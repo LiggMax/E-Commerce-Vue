@@ -1,11 +1,9 @@
 import axios from 'axios'
-import { storeToRefs } from 'pinia'
 import router from '@/router'
-import { userTokenStore } from '@/stores/token.ts'
+import { userTokenStore } from '@/stores/admin/adminToken.ts'
 import notification from '@/utils/notification'
 
-const store = userTokenStore()
-const { token } = storeToRefs(store)
+const { token, removeToken } = userTokenStore()
 const instance = axios.create({
   baseURL: '/',
   timeout: 30_000,
@@ -14,8 +12,8 @@ const instance = axios.create({
 // 请求拦截器
 instance.interceptors.request.use(
   config => {
-    if (token.value) {
-      config.headers.Authorization = token.value
+    if (token) {
+      config.headers.Authorization = token
     }
     return config
   },
@@ -39,7 +37,7 @@ instance.interceptors.response.use(
       switch (error.response.status) {
         case 401: {
           notification.showError('未授权，请重新登录')
-          store.removeToken()
+          removeToken()
           router.push('/admin/login')
           break
         }

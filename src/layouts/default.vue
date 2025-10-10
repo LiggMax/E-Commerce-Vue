@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <!-- 头部导航 - 只在非管理后台页面显示 -->
-    <ECommerceHeader v-if="!isAdminRoute" />
+    <Header v-if="!isAdminRoute" />
 
     <!-- Main Content -->
     <v-main>
@@ -9,7 +9,7 @@
     </v-main>
 
     <!-- 页脚 - 只在非管理后台页面显示 -->
-    <ECommerceFooter v-if="!isAdminRoute" />
+    <Footer v-if="!isAdminRoute" />
   </v-app>
 </template>
 

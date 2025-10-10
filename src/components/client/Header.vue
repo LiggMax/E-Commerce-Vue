@@ -98,7 +98,14 @@
               </v-tooltip>
             </v-btn>
 
-            <v-menu>
+            <v-btn
+              v-if="!token"
+              icon="mdi-account-circle"
+              variant="text"
+              @click="authDialog = true"
+            />
+
+            <v-menu v-else-if="token">
               <template #activator="{ props }">
                 <v-btn
                   icon="mdi-account-circle"
@@ -172,20 +179,26 @@
       variant="outlined"
     />
   </v-navigation-drawer>
+
+  <AuthDialog v-model="authDialog" />
 </template>
 
 <script setup lang="ts">
   import { useDisplay } from 'vuetify'
+  import AuthDialog from '@/components/client/AuthDialog.vue'
   import { useThemeToggle } from '@/composables/useTheme.ts'
   import router from '@/router'
+  import { userTokenStore } from '@/stores/client/clientToken.ts'
 
   const display = useDisplay()
   const searchQuery = ref('')
   const drawer = ref(false)
   const searchDialog = ref(false)
+  const authDialog = ref(false)
 
   // 主题切换功能
   const { isDark, toggleTheme } = useThemeToggle()
+  const { token } = userTokenStore()
 
   const navItems = [
     { title: '首页', to: '/', icon: 'mdi-home' },
@@ -202,6 +215,7 @@
     { title: '设置', icon: 'mdi-cog', action: () => console.log('设置') },
     { title: '退出登录', icon: 'mdi-logout', action: () => logout() },
   ]
+
   function closeSearchDialog () {
     searchDialog.value = false
   }
