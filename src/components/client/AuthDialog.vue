@@ -63,7 +63,7 @@
             :type="showPassword ? 'text' : 'password'"
             variant="outlined"
             @click:append-inner="showPassword = !showPassword"
-            @input="clearError('password')"
+            @input="handlePasswordInput"
           />
 
           <!-- Confirm Password Field (仅注册时显示) -->
@@ -83,8 +83,9 @@
             @input="clearError('confirmPassword')"
           />
 
-          <div v-if="!isLogin">
-            <div class="d-flex align-cent mb-2">
+          <!-- Captcha Field (仅注册时显示，且在输入密码后) -->
+          <div v-if="!isLogin && showCaptcha">
+            <div class="d-flex align-center mb-2">
               <v-text-field
                 v-model="authForm.captcha"
                 class="flex-grow-1 mr-2"
@@ -97,8 +98,8 @@
                 @input="clearError('captcha')"
               />
               <v-img
-                v-if="!isLogin"
-                class="mb-5 rounded-lg"
+                v-if="captcha"
+                class="rounded-lg mb-4"
                 :src="'data:image/png;base64,'+ captcha?.captcha"
                 @click="getCaptcha"
               />
@@ -112,17 +113,6 @@
             color="primary"
             hide-details
             label="记住我"
-          />
-
-          <!-- Error Message -->
-          <v-alert
-            v-if="errorMessage"
-            class="mb-4"
-            closable
-            :text="errorMessage"
-            type="error"
-            variant="tonal"
-            @click:close="errorMessage = ''"
           />
 
           <!-- Auth Button -->
@@ -174,7 +164,7 @@
 
 <script setup lang="ts">
   import { getCaptchaService } from '@/http/client/captcha.ts'
-  import { registerService } from '@/http/client/user.ts'
+  import { loginService, registerService } from '@/http/client/user.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
   import { useNotification } from '@/utils/notification.ts'
 
@@ -188,6 +178,7 @@
   // Emits
   interface Emits {
     (e: 'update:modelValue', value: boolean): void
+    (e: 'login-success'): void
   }
 
   const emit = defineEmits<Emits>()
@@ -201,8 +192,8 @@
   const loading = ref(false)
   const showPassword = ref(false)
   const showConfirmPassword = ref(false)
-  const errorMessage = ref('')
   const isLogin = ref(true) // true为登录模式，false为注册模式
+  const showCaptcha = ref(false)
 
   // 认证表单数据
   const authForm = reactive({
@@ -270,7 +261,6 @@
   // 清除特定字段错误
   function clearError (field: keyof typeof errors) {
     errors[field] = ''
-    errorMessage.value = ''
   }
 
   // 关闭对话框
@@ -284,12 +274,29 @@
     resetForm()
   }
 
+  // 处理密码输入事件
+  function handlePasswordInput () {
+    clearError('password')
+    // 在注册模式下且密码不为空时才显示验证码
+    if (!isLogin.value && authForm.password) {
+      showCaptcha.value = true
+      // 如果还没有获取过验证码，则获取验证码
+      if (!captcha.value) {
+        getCaptcha()
+      }
+    }
+  }
+
   /**
    * 获取验证码
    */
   async function getCaptcha () {
-    const res = await getCaptchaService()
-    captcha.value = res.data
+    try {
+      const res = await getCaptchaService()
+      captcha.value = res.data
+    } catch (error) {
+      console.error('获取验证码失败:', error)
+    }
   }
 
   // 处理认证（登录或注册）
@@ -297,12 +304,17 @@
     if (!valid.value) return
 
     loading.value = true
-    errorMessage.value = ''
 
     try {
       if (isLogin.value) {
         // 登录
-        setToken('fake-client-token')
+        const res = await loginService({
+          account: authForm.username,
+          password: authForm.password,
+        })
+        setToken(res.data)
+        showSuccess('登录成功')
+        closeDialog()
       } else {
         // 注册
         await registerService({
@@ -314,12 +326,11 @@
         })
         showSuccess('注册成功')
         switchAuthMode()
+        emit('login-success')// 发射登录成功事件
       }
 
       // 重置表单
       resetForm()
-    } catch (error: any) {
-      errorMessage.value = error.message || (isLogin.value ? '登录失败，请稍后重试' : '注册失败，请稍后重试')
     } finally {
       loading.value = false
     }
@@ -331,16 +342,13 @@
     authForm.email = ''
     authForm.password = ''
     authForm.confirmPassword = ''
+    authForm.captcha = ''
     authForm.remember = false
-    errorMessage.value = ''
+    showCaptcha.value = false
     if (form.value) {
       form.value.resetValidation()
     }
   }
-
-  onMounted(() => {
-    getCaptcha()
-  })
 
   // 监听对话框关闭，重置表单
   watch(dialog, newValue => {

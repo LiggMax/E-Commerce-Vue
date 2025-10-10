@@ -26,7 +26,8 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   response => {
     if (response.data && response.data.code !== undefined && response.data.code != 200) {
-      return notification.showError(response.data.message)
+      notification.showError(response.data.message)
+      return Promise.reject(response.data.message)
     }
     return response.data
   },

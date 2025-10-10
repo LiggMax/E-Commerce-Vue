@@ -180,7 +180,11 @@
     />
   </v-navigation-drawer>
 
-  <AuthDialog v-if="authDialog" v-model="authDialog" />
+  <AuthDialog
+    v-if="authDialog"
+    v-model="authDialog"
+    @login-success="handleLoginSuccess"
+  />
 </template>
 
 <script setup lang="ts">
@@ -230,6 +234,10 @@
     })
   }
 
+  /**
+   * 处理登录成功事件
+   */
+  function handleLoginSuccess () {}
   /**
    * 登出
    */
