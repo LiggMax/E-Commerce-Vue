@@ -19,8 +19,8 @@
   <v-card>
     <v-card-title class="d-flex align-center justify-space-between">
       <div class="d-flex align-center">
-        <v-icon class="mr-2">mdi-star</v-icon>
-        精选商品列表
+        <v-icon class="mr-2">mdi-truck-cargo-container</v-icon>
+        商品列表
       </div>
 
       <!-- 搜索 -->
@@ -48,6 +48,49 @@
         :loading="loading"
         :search="search"
       >
+
+        <template #header.image="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-image</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
+
+        <template #header.title="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-format-title</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
+
+        <template #header.price="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-currency-cny</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
+
+        <template #header.rating="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-star</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
+
+        <template #header.createdAt="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-calendar</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
+
+        <template #header.actions="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-cog</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
+
         <!-- 商品图片 -->
         <template #item.image="{ item }">
           <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 80px;">
@@ -121,7 +164,7 @@
               <!--上传图片-->
               <v-list-item @click="openUploadDialog(item)">
                 <template #prepend>
-                  <v-icon icon="mdi-upload" />
+                  <v-icon icon="mdi-image-plus" />
                 </template>
                 <v-list-item-title>图片</v-list-item-title>
               </v-list-item>
@@ -281,7 +324,7 @@
 
   // 表格头部配置
   const headers = [
-    { title: '图片', key: 'image', sortable: false, width: 100 },
+    { title: '图片', key: 'image', icon: 'mdi-image-plus', sortable: false, width: 100 },
     { title: '商品名称', key: 'title', sortable: true, minWidth: 150 },
     { title: '价格', key: 'price', sortable: true, minWidth: 100 },
     { title: '评分', key: 'rating', sortable: true, width: 200 },

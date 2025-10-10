@@ -134,7 +134,7 @@
 
     <!-- 主要内容区域 -->
     <v-main>
-      <v-container class="py-2">
+      <v-container>
         <router-view />
       </v-container>
     </v-main>
@@ -195,9 +195,9 @@
         },
         {
           title: '商品管理',
-          icon: 'mdi-star',
+          icon: 'mdi-truck-cargo-container',
           value: 'featured',
-          to: '/admin/content/featured',
+          to: '/admin/content/product',
         },
       ],
     },
