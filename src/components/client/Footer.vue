@@ -12,18 +12,16 @@
           <p class="text-body-2 mb-4">
             专业的在线购物平台，为您提供优质商品和贴心服务。我们致力于为每一位顾客创造完美的购物体验。
           </p>
-          <div class="d-flex gap-2">
-            <v-btn
-              v-for="social in socialMedia"
-              :key="social.name"
-              color="primary"
-              :href="social.url"
-              :icon="social.icon"
-              size="small"
-              target="_blank"
-              variant="text"
-            />
-          </div>
+          <v-btn
+            v-for="social in socialMedia"
+            :key="social.name"
+            color="primary"
+            :href="social.url"
+            :icon="social.icon"
+            size="large"
+            target="_blank"
+            variant="text"
+          />
         </v-col>
 
         <!-- Quick Links -->
@@ -33,7 +31,7 @@
             <v-list-item
               v-for="link in quickLinks"
               :key="link.text"
-              class="px-0 text-body-2 text-white"
+              class="px-2 text-body-2 text-white rounded-lg"
               :to="link.to"
             >
               {{ link.text }}
@@ -48,7 +46,7 @@
             <v-list-item
               v-for="category in footerCategories"
               :key="category.text"
-              class="px-0 text-body-2 text-white"
+              class="px-2 text-body-2 text-white rounded-lg"
               :to="category.to"
             >
               {{ category.text }}
@@ -63,7 +61,7 @@
             <v-list-item
               v-for="service in customerServices"
               :key="service.text"
-              class="px-0 text-body-2 text-white"
+              class="px-2 text-body-2 text-white rounded-lg"
               :to="service.to"
             >
               {{ service.text }}
@@ -174,6 +172,7 @@
     { name: 'Weibo', icon: 'mdi-sina-weibo', url: '#' },
     { name: 'QQ', icon: 'mdi-qqchat', url: '#' },
     { name: 'Douyin', icon: 'mdi-music-note', url: '#' },
+    { name: 'GitHub', icon: 'mdi-github', url: '#' },
   ]
 
   const quickLinks = [
