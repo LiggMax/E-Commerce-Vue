@@ -238,6 +238,7 @@
    * 处理登录成功事件
    */
   function handleLoginSuccess () {}
+
   /**
    * 登出
    */

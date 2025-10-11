@@ -3,7 +3,7 @@
     <v-card class="auth-card">
       <!-- Header -->
       <v-card-title class="text-center py-2">
-        <div class="auth-header">
+        <div class="align-center">
           <v-icon
             class="mb-4"
             color="primary"
@@ -54,6 +54,7 @@
           <v-text-field
             v-model="authForm.password"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            autocomplete="current-password"
             class="mb-2"
             color="primary"
             :error-messages="errors.password"
@@ -71,6 +72,7 @@
             v-if="!isLogin"
             v-model="authForm.confirmPassword"
             :append-inner-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            autocomplete="new-password"
             class="mb-2"
             color="primary"
             :error-messages="errors.confirmPassword"
@@ -97,12 +99,31 @@
                 variant="outlined"
                 @input="clearError('captcha')"
               />
-              <v-img
-                v-if="captcha"
-                class="rounded-lg mb-4"
-                :src="'data:image/png;base64,'+ captcha?.captcha"
-                @click="getCaptcha"
-              />
+              <div class="d-flex align-center justify-center mb-5" style="min-width: 150px;min-height: 60px">
+                <v-img
+                  v-if="captcha && !captchaLoading"
+                  class="rounded-lg cursor-pointer"
+                  :src="'data:image/png;base64,' + captcha?.captcha"
+                  @click="debouncedGetCaptcha"
+                >
+                  <v-tooltip
+                    activator="parent"
+                    location="top"
+                  >
+                    点击刷新验证码
+                  </v-tooltip>
+                </v-img>
+                <div
+                  v-else
+                  class="captcha-loading"
+                >
+                  <v-progress-circular
+                    color="primary"
+                    indeterminate
+                    size="40"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -194,6 +215,7 @@
   const showConfirmPassword = ref(false)
   const isLogin = ref(true) // true为登录模式，false为注册模式
   const showCaptcha = ref(false)
+  const captchaLoading = ref(false)
 
   // 认证表单数据
   const authForm = reactive({
@@ -274,6 +296,20 @@
     resetForm()
   }
 
+  // 创建防抖函数
+  const debouncedGetCaptcha = debounce(getCaptcha, 500)
+
+  // 防抖函数实现
+  function debounce (func: Function, wait: number) {
+    let timeout: number | undefined
+    return function (...args: any[]) {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        func(...args)
+      }, wait) as unknown as number
+    }
+  }
+
   // 处理密码输入事件
   function handlePasswordInput () {
     clearError('password')
@@ -282,7 +318,7 @@
       showCaptcha.value = true
       // 如果还没有获取过验证码，则获取验证码
       if (!captcha.value) {
-        getCaptcha()
+        debouncedGetCaptcha()
       }
     }
   }
@@ -291,11 +327,14 @@
    * 获取验证码
    */
   async function getCaptcha () {
+    captchaLoading.value = true
     try {
       const res = await getCaptchaService()
-      captcha.value = res.data
-    } catch (error) {
-      console.error('获取验证码失败:', error)
+      if (res.data) {
+        captcha.value = res.data
+      }
+    } finally {
+      captchaLoading.value = false
     }
   }
 
@@ -363,7 +402,4 @@
 </script>
 
 <style scoped>
-.auth-header {
-  text-align: center;
-}
 </style>
