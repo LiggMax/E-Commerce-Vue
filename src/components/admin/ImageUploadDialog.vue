@@ -141,8 +141,8 @@
 </template>
 
 <script lang="ts" setup>
+  import request from '@/http/admin/adminRequest.ts'
   import { UPLOAD_IMAGE } from '@/http/admin/api.ts'
-  import request from '@/http/request.ts'
   import { useNotification } from '@/utils/notification'
 
   // Props

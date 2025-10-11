@@ -1,5 +1,5 @@
+import request from '@/http/admin/adminRequest.ts'
 import { CAROUSEL, UPDATE_CAROUSEL_SORT, UPDATE_CAROUSEL_STATUS } from '@/http/admin/api.ts'
-import request from '@/http/request.ts'
 
 /**
  * 添加轮播图

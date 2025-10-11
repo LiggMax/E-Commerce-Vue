@@ -1,5 +1,5 @@
 import { GET_CAROUSEL } from '@/http/client/api.ts'
-import request from '@/http/request.ts'
+import request from '@/http/client/clientRequest.ts'
 
 /**
  * 获取轮播图

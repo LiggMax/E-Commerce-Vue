@@ -1,5 +1,5 @@
+import request from '@/http/admin/adminRequest.ts'
 import { SPECIFICATION } from '@/http/admin/api.ts'
-import request from '@/http/request.ts'
 
 /**
  * 添加商品规格

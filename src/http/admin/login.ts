@@ -1,6 +1,6 @@
 import qs from 'qs'
+import request from '@/http/admin/adminRequest.ts'
 import { CLEAR_TOKEN, LOGIN } from '@/http/admin/api.ts'
-import request from '@/http/request.ts'
 /**
  * 登录
  */

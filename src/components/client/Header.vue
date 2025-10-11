@@ -108,7 +108,16 @@
 
             <v-menu v-else>
               <template #activator="{ props }">
+                <v-avatar
+                  v-if="userInfo?.avatar"
+                  size="40"
+                  v-bind="props"
+                  class="cursor-pointer"
+                >
+                  <v-img :src="userInfo.avatar" />
+                </v-avatar>
                 <v-btn
+                  v-else
                   icon="mdi-account-circle"
                   size="large"
                   variant="text"
@@ -116,6 +125,20 @@
                 />
               </template>
               <v-list>
+                <!-- 用户信息显示 -->
+                <v-list-item v-if="userInfo">
+                  <template #prepend>
+                    <v-avatar size="40">
+                      <v-img v-if="userInfo.avatar" :src="userInfo.avatar" />
+                      <v-icon v-else icon="mdi-account-circle" />
+                    </v-avatar>
+                  </template>
+                  <v-list-item-title>{{ userInfo.nickName || userInfo.account }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ userInfo.email }}</v-list-item-subtitle>
+                </v-list-item>
+                <v-divider />
+                
+                <!-- 用户菜单项 -->
                 <v-list-item
                   v-for="item in userMenuItems"
                   :key="item.title"
@@ -193,6 +216,7 @@
   import { useDisplay } from 'vuetify'
   import AuthDialog from '@/components/client/AuthDialog.vue'
   import { useThemeToggle } from '@/composables/useTheme.ts'
+  import { getUserInfoService } from '@/http/client/user.ts'
   import router from '@/router'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
 
@@ -208,6 +232,18 @@
 
   // 计算属性：检查用户是否已登录
   const isLoggedIn = computed(() => !!tokenStore.token)
+
+  interface UserInfo {
+    nickName: string
+    account: string
+    email: string
+    avatar: string
+    role: string
+    createTime: string
+    lastLoginTime: string
+  }
+
+  const userInfo = ref<UserInfo>()
 
   const navItems = [
     { title: '首页', to: '/', icon: 'mdi-home' },
@@ -242,11 +278,20 @@
   /**
    * 处理登录成功事件
    */
-  function handleLoginSuccess () {
+  async function handleLoginSuccess () {
     // 关闭认证对话框
     authDialog.value = false
-    // token 会自动从 store 中获取并触发界面更新
+    // 获取用户信息
+    await getUserInfo()
     console.log('登录成功，用户状态已更新')
+  }
+
+  /**
+   * 获取用户信息
+   */
+  async function getUserInfo () {
+    const res = await getUserInfoService()
+    userInfo.value = res.data
   }
 
   /**
@@ -257,6 +302,17 @@
     authDialog.value = false
     console.log('用户已登出')
   }
+
+  // 监听登录状态变化，自动获取用户信息
+  watch(isLoggedIn, async (newValue) => {
+    if (newValue && !userInfo.value) {
+      // 用户已登录但还没有用户信息，获取用户信息
+      await getUserInfo()
+    } else if (!newValue) {
+      // 用户登出，清空用户信息
+      userInfo.value = undefined
+    }
+  }, { immediate: true })
 
   watch(() => display.mdAndUp.value, isMdAndUp => {
     if (isMdAndUp) {
@@ -289,5 +345,16 @@
 /* 修正按钮在搜索框内的位置  */
 :deep(.v-field--appended) {
   padding-inline-end: 3px !important;
+}
+
+/* 用户头像样式 */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
 }
 </style>

@@ -37,3 +37,8 @@ export const REGISTER = '/api/client/account/register'
  * 登录
  */
 export const LOGIN = '/api/client/account/login'
+
+/**
+ * 获取用户信息
+ */
+export const GET_USER_INFO = '/api/client/user/info'

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import router from '@/router'
 import { userTokenStore } from '@/stores/admin/adminToken.ts'
-import notification from '@/utils/notification'
+import notification from '@/utils/notification.ts'
 
 const tokenStore = userTokenStore()
 const instance = axios.create({
@@ -39,7 +39,7 @@ instance.interceptors.response.use(
         case 401: {
           notification.showError('未授权，请重新登录')
           tokenStore.removeToken()
-          router.push('/admin/login')
+          // router.push('/admin/login')
           break
         }
         case 403: {
