@@ -87,8 +87,8 @@
           <v-col class="text-right">
             <!-- Theme Toggle -->
             <v-btn
-              class="mr-2"
               :icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+              size="large"
               variant="text"
               @click="toggleTheme"
             >
@@ -99,16 +99,18 @@
             </v-btn>
 
             <v-btn
-              v-if="!token"
+              v-if="!isLoggedIn"
               icon="mdi-account-circle"
+              size="large"
               variant="text"
               @click="authDialog = true"
             />
 
-            <v-menu v-else-if="token">
+            <v-menu v-else>
               <template #activator="{ props }">
                 <v-btn
                   icon="mdi-account-circle"
+                  size="large"
                   variant="text"
                   v-bind="props"
                 />
@@ -129,7 +131,7 @@
     </v-container>
   </v-app-bar>
 
-  <!-- Mobile Navigation Drawer -->
+  <!-- 移动导航抽滑器 -->
   <v-navigation-drawer v-model="drawer" location="left" temporary>
     <v-list>
       <v-list-item
@@ -202,7 +204,10 @@
 
   // 主题切换功能
   const { isDark, toggleTheme } = useThemeToggle()
-  const { token } = userTokenStore()
+  const tokenStore = userTokenStore()
+
+  // 计算属性：检查用户是否已登录
+  const isLoggedIn = computed(() => !!tokenStore.token)
 
   const navItems = [
     { title: '首页', to: '/', icon: 'mdi-home' },
@@ -237,13 +242,20 @@
   /**
    * 处理登录成功事件
    */
-  function handleLoginSuccess () {}
+  function handleLoginSuccess () {
+    // 关闭认证对话框
+    authDialog.value = false
+    // token 会自动从 store 中获取并触发界面更新
+    console.log('登录成功，用户状态已更新')
+  }
 
   /**
    * 登出
    */
   function logout () {
-    console.log('登出')
+    tokenStore.removeToken()
+    authDialog.value = false
+    console.log('用户已登出')
   }
 
   watch(() => display.mdAndUp.value, isMdAndUp => {

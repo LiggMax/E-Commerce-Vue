@@ -3,7 +3,7 @@ import router from '@/router'
 import { userTokenStore } from '@/stores/admin/adminToken.ts'
 import notification from '@/utils/notification'
 
-const { token, removeToken } = userTokenStore()
+const tokenStore = userTokenStore()
 const instance = axios.create({
   baseURL: '/',
   timeout: 30_000,
@@ -12,8 +12,8 @@ const instance = axios.create({
 // 请求拦截器
 instance.interceptors.request.use(
   config => {
-    if (token) {
-      config.headers.Authorization = token
+    if (tokenStore.token) {
+      config.headers.Authorization = tokenStore.token
     }
     return config
   },
@@ -38,7 +38,7 @@ instance.interceptors.response.use(
       switch (error.response.status) {
         case 401: {
           notification.showError('未授权，请重新登录')
-          removeToken()
+          tokenStore.removeToken()
           router.push('/admin/login')
           break
         }

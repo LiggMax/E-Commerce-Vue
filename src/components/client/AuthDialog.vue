@@ -205,7 +205,7 @@
 
   const emit = defineEmits<Emits>()
 
-  const { setToken } = userTokenStore()
+  const tokenStore = userTokenStore()
   const { showSuccess } = useNotification()
 
   // 响应式数据
@@ -357,9 +357,10 @@
           account: authForm.username,
           password: authForm.password,
         })
-        setToken(res.data)
+        tokenStore.setToken(res.data)
         showSuccess('登录成功')
         closeDialog()
+        emit('login-success') // 发送登录成功事件
       } else {
         // 注册
         await registerService({
@@ -371,7 +372,6 @@
         })
         showSuccess('注册成功')
         switchAuthMode()
-        emit('login-success')// 发射登录成功事件
       }
 
       // 重置表单
