@@ -1,6 +1,5 @@
 import axios from 'axios'
-import router from '@/router'
-import { userTokenStore } from '@/stores/admin/adminToken.ts'
+import { userTokenStore } from '@/stores/client/clientToken.ts'
 import notification from '@/utils/notification.ts'
 
 const tokenStore = userTokenStore()

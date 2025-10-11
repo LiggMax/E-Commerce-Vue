@@ -1,5 +1,5 @@
-import request from '@/http/admin/adminRequest.ts'
 import { GET_USER_INFO, LOGIN, REGISTER } from '@/http/client/api.ts'
+import request from '@/http/client/clientRequest.ts'
 
 /**
  * 注册

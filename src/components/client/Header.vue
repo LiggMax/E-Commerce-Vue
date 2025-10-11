@@ -110,9 +110,9 @@
               <template #activator="{ props }">
                 <v-avatar
                   v-if="userInfo?.avatar"
-                  size="40"
                   v-bind="props"
                   class="cursor-pointer"
+                  size="40"
                 >
                   <v-img :src="userInfo.avatar" />
                 </v-avatar>
@@ -137,7 +137,7 @@
                   <v-list-item-subtitle>{{ userInfo.email }}</v-list-item-subtitle>
                 </v-list-item>
                 <v-divider />
-                
+
                 <!-- 用户菜单项 -->
                 <v-list-item
                   v-for="item in userMenuItems"
@@ -156,13 +156,24 @@
 
   <!-- 移动导航抽滑器 -->
   <v-navigation-drawer v-model="drawer" location="left" temporary>
-    <v-list>
+    <v-list v-if="!isLoggedIn" class="cursor-pointer">
       <v-list-item
         prepend-icon="mdi-account-circle"
         subtitle="游客"
-        title="欢迎回来"
+        title="点击的登陆"
+        @click="authDialog = true"
       />
     </v-list>
+    <div v-if="userInfo" class="pa-3 d-flex align-center">
+      <v-avatar size="40">
+        <v-img v-if="userInfo.avatar" :src="userInfo.avatar" />
+        <v-icon v-else icon="mdi-account-circle" />
+      </v-avatar>
+      <div class="ml-2">
+        <v-list-item-title>{{ userInfo.nickName || userInfo.account }}</v-list-item-title>
+        <v-list-item-subtitle>{{ userInfo.email }}</v-list-item-subtitle>
+      </div>
+    </div>
 
     <v-divider />
 
@@ -254,7 +265,7 @@
   ]
 
   const userMenuItems = [
-    { title: '我的账户', icon: 'mdi-account', action: () => console.log('账户') },
+    { title: '个人中心', icon: 'mdi-account', action: () => gotoPersonalCenter() },
     { title: '订单历史', icon: 'mdi-package-variant', action: () => console.log('订单') },
     { title: '收藏夹', icon: 'mdi-heart', action: () => console.log('收藏') },
     { title: '设置', icon: 'mdi-cog', action: () => console.log('设置') },
@@ -273,6 +284,13 @@
         keyword: searchQuery.value,
       },
     })
+  }
+
+  /**
+   * goto 个人中心
+   */
+  function gotoPersonalCenter () {
+    router.push('/client/UserCenter')
   }
 
   /**
@@ -304,7 +322,7 @@
   }
 
   // 监听登录状态变化，自动获取用户信息
-  watch(isLoggedIn, async (newValue) => {
+  watch(isLoggedIn, async newValue => {
     if (newValue && !userInfo.value) {
       // 用户已登录但还没有用户信息，获取用户信息
       await getUserInfo()
