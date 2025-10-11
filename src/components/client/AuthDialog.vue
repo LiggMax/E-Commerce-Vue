@@ -199,6 +199,7 @@
   // Emits
   interface Emits {
     (e: 'update:modelValue', value: boolean): void
+
     (e: 'login-success'): void
   }
 
@@ -329,9 +330,14 @@
   async function getCaptcha () {
     captchaLoading.value = true
     try {
-      const res = await getCaptchaService()
-      if (res.data) {
-        captcha.value = res.data
+      if (captcha.value?.uuid) {
+        const res = await getCaptchaService(captcha.value?.uuid.toString())
+        return captcha.value = res.data
+      } else {
+        const res = await getCaptchaService()
+        if (res.data) {
+          return captcha.value = res.data
+        }
       }
     } finally {
       captchaLoading.value = false

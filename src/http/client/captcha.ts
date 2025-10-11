@@ -4,6 +4,6 @@ import request from '@/http/request.ts'
 /**
  * 获取验证码
  */
-export async function getCaptchaService () {
-  return await request.get(CAPTCHA)
+export async function getCaptchaService (lastTimeUid?: string) {
+  return await request.get(CAPTCHA, { lastTimeUid })
 }
