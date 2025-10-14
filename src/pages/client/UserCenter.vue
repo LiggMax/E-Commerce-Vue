@@ -146,7 +146,7 @@
 
   // 计算属性：当前菜单项
   const currentMenuItem = computed(() =>
-    menuItems.find(item => item.key === activeTab),
+    menuItems.find(item => item.key === activeTab.value),
   )
 
   // 获取用户信息

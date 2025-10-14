@@ -197,7 +197,7 @@
     const documentHeight = document.documentElement.scrollHeight
 
     // 当滚动到距离底部100px时触发加载
-    if (scrollTop + windowHeight >= documentHeight - 250) {
+    if (scrollTop + windowHeight >= documentHeight - 350) {
       loadMore()
     }
   }
