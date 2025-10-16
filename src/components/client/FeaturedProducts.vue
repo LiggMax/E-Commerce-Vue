@@ -111,7 +111,7 @@
 
 <script setup lang="ts">
   import mad from '@/assets/mad.svg'
-  import { getFeaturedServer } from '@/http/client/featured.ts'
+  import { getFeaturedServer } from '@/http/client/product.ts'
   import router from '@/router'
 
   interface CarouselItem {

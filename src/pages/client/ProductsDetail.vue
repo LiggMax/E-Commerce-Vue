@@ -66,8 +66,8 @@
 
             <v-sheet class=" mb-4 rounded-lg">
               <div class="d-flex align-end ga-3">
-                <div class="text-h4 font-weight-bold text-primary">¥{{ finalCurrentPrice.toFixed(2) }}</div>
-                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ finalOriginalPrice.toFixed(2) }}</div>
+                <div class="text-h4 font-weight-bold text-primary">¥{{ (finalCurrentPrice * quantity).toFixed(2) }}</div>
+                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ (finalOriginalPrice * quantity).toFixed(2) }}</div>
                 <v-chip color="error" size="small" variant="flat">直降 ¥{{ (finalOriginalPrice - finalCurrentPrice).toFixed(2) }}</v-chip>
               </div>
               <div v-if="selectedSpecsPrice > 0" class="mt-2 text-caption text-medium-emphasis">
@@ -160,10 +160,15 @@
 </template>
 
 <script setup lang="ts">
+  import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
-  import { getFeaturedDetailServer } from '@/http/client/featured.ts'
+  import { getFeaturedDetailServer } from '@/http/client/product.ts'
+  import router from '@/router'
+  import { useAppStore } from '@/stores/client/app.ts'
+  import { userTokenStore } from '@/stores/client/clientToken.ts'
 
   const route = useRoute()
+  const appStore = useAppStore()
 
   // 数据模型
   interface DetailImage {
@@ -293,14 +298,36 @@
     })
   }
 
-  function buyNow () {
+  async function buyNow () {
+    // 登录校验：未登录则打开登录弹窗
+    const tokenStore = userTokenStore()
+    if (!tokenStore.token) {
+      appStore.openAuthDialog()
+      return
+    }
     if (!validateSpecs()) return
-    console.log('立即购买', {
-      product: productDetail.value,
+    // 构建参数
+    const params = {
+      productId: productDetail.value!.id,
       quantity: quantity.value,
-      selectedSpecs: selectedSpecsText.value,
+      spec: productDetail.value!.specs.map(spec => {
+        return {
+          id: spec.id,
+          specValue: spec.specValues.find(v => v.id === selectedSpecs.value[spec.id]),
+        }
+      }),
+      product: productDetail.value,
+      specText: selectedSpecsText.value,
       finalPrice: finalCurrentPrice.value,
-      totalPrice: finalCurrentPrice.value * quantity.value,
+    }
+
+    // 使用 js-base64 进行 UTF-8 的 URL-safe Base64 编码
+    const encodedData = Base64.encodeURL(JSON.stringify(params))
+    await router.push({
+      path: '/client/OrderSubmit',
+      query: {
+        data: encodedData,
+      },
     })
   }
 

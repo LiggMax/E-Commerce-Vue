@@ -4,14 +4,14 @@
 export const GET_CAROUSEL = '/api/client/carousel'
 
 /**
- * 精选商品
+ * 商品
  */
-export const FEATURED = '/api/client/featured'
+export const FEATURED = '/api/client/product'
 
 /**
- * 精选商品详情
+ * 商品详情
  */
-export const PRODUCT_DETAIL = '/api/client/featured/detail'
+export const PRODUCT_DETAIL = `${FEATURED}/detail`
 
 /**
  * 搜索
@@ -42,3 +42,8 @@ export const LOGIN = '/api/client/account/login'
  * 获取用户信息
  */
 export const GET_USER_INFO = '/api/client/user/info'
+
+/**
+ * 订单
+ */
+export const ORDER = '/api/client/order'

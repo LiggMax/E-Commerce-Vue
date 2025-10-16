@@ -160,7 +160,7 @@
       <v-list-item
         prepend-icon="mdi-account-circle"
         subtitle="游客"
-        title="点击的登陆"
+        title="登录"
         @click="authDialog = true"
       />
     </v-list>
@@ -229,13 +229,18 @@
   import { useThemeToggle } from '@/composables/useTheme.ts'
   import { getUserInfoService } from '@/http/client/user.ts'
   import router from '@/router'
+  import { useAppStore } from '@/stores/client/app.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
 
   const display = useDisplay()
   const searchQuery = ref('')
   const drawer = ref(false)
   const searchDialog = ref(false)
-  const authDialog = ref(false)
+  const appStore = useAppStore()
+  const authDialog = computed({
+    get: () => appStore.authDialog,
+    set: (v: boolean) => appStore.setAuthDialog(v),
+  })
 
   // 主题切换功能
   const { isDark, toggleTheme } = useThemeToggle()
