@@ -257,6 +257,7 @@
 
 <script setup lang="ts">
   import { useNotification } from '@/utils/notification.ts'
+  import area from '@/assets/area.json'
 
   const { showSuccess, showError } = useNotification()
 
@@ -296,7 +297,7 @@
   })
 
   // 地区数据
-  const provinces = ref<string[]>(['北京市', '上海市', '广东省', '江苏省', '浙江省'])
+  const provinces = ref<string[]>(Object.values<any>(area).map((p: any) => p.n))
   const cities = ref<string[]>([])
   const districts = ref<string[]>([])
 
@@ -391,31 +392,34 @@
     formData.district = ''
     districts.value = []
 
-    // 模拟城市数据
-    const cityMap: Record<string, string[]> = {
-      北京市: ['东城区', '西城区', '朝阳区', '海淀区'],
-      上海市: ['黄浦区', '徐汇区', '长宁区', '静安区'],
-      广东省: ['广州市', '深圳市', '珠海市', '汕头市'],
-      江苏省: ['南京市', '苏州市', '无锡市', '常州市'],
-      浙江省: ['杭州市', '宁波市', '温州市', '嘉兴市'],
+    // 筛选城市
+    const provinceEntry = Object.values<any>(area).find((p: any) => p.n === province)
+    if (!provinceEntry || !provinceEntry.c) {
+      cities.value = []
+      return
     }
-    cities.value = cityMap[province] || []
+    cities.value = Object.values<any>(provinceEntry.c).map((c: any) => c.n)
   }
 
   // 处理城市变化
   function handleCityChange (city: string) {
     formData.district = ''
 
-    // 模拟区县数据
-    const districtMap: Record<string, string[]> = {
-      广州市: ['天河区', '越秀区', '海珠区', '荔湾区'],
-      深圳市: ['罗湖区', '福田区', '南山区', '宝安区'],
-      南京市: ['玄武区', '秦淮区', '建邺区', '鼓楼区'],
-      杭州市: ['上城区', '下城区', '江干区', '拱墅区'],
+    // 筛选区县
+    const provinceEntry = Object.values<any>(area).find((p: any) => p.n === formData.province)
+    if (!provinceEntry || !provinceEntry.c) {
+      districts.value = []
+      return
     }
-    districts.value = districtMap[city] || []
+    const cityEntry = Object.values<any>(provinceEntry.c).find((c: any) => c.n === city)
+    if (!cityEntry || !cityEntry.c) {
+      districts.value = []
+      return
+    }
+    districts.value = Object.values<any>(cityEntry.c).map((d: any) => d.n)
   }
 
+  // 不再需要远程获取地区信息，已使用本地 area.json
   // 保存地址
   // async function saveAddress () {
   //   if (!valid.value) return

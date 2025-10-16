@@ -47,3 +47,8 @@ export const GET_USER_INFO = '/api/client/user/info'
  * 订单
  */
 export const ORDER = '/api/client/order'
+
+/**
+ * 地区
+ */
+export const REGION = '/api/area'
