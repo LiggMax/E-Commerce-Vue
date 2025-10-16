@@ -263,10 +263,10 @@
 
   const navItems = [
     { title: '首页', to: '/', icon: 'mdi-home' },
-    { title: '分类', to: '/categories', icon: 'mdi-view-grid' },
-    { title: '热销', to: '/bestsellers', icon: 'mdi-fire' },
-    { title: '新品', to: '/new-arrivals', icon: 'mdi-new-box' },
-    { title: '优惠', to: '/deals', icon: 'mdi-tag' },
+    { title: '分类', to: '', icon: 'mdi-view-grid' },
+    { title: '热销', to: '', icon: 'mdi-fire' },
+    { title: '新品', to: '', icon: 'mdi-new-box' },
+    { title: '优惠', to: '', icon: 'mdi-tag' },
   ]
 
   const userMenuItems = [
