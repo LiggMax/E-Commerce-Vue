@@ -306,10 +306,6 @@
     (v: string) => (v && v.length >= 5) || '详细地址至少5个字符',
   ]
 
-  const postalCodeRules = [
-    (v: string) => !v || /^\d{6}$/.test(v) || '邮政编码格式不正确',
-  ]
-
   // 打开地址对话框
   function openAddressDialog (address?: Address) {
     editingAddress.value = address
