@@ -209,23 +209,6 @@
                   variant="outlined"
                 />
               </v-col>
-
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-model="formData.postalCode"
-                  label="邮政编码"
-                  :rules="postalCodeRules"
-                  variant="outlined"
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-checkbox
-                  v-model="formData.isDefault"
-                  color="primary"
-                  label="设为默认地址"
-                />
-              </v-col>
             </v-row>
           </v-card-text>
 
@@ -245,6 +228,7 @@
               :loading="saving"
               type="submit"
               variant="flat"
+              @click.prevent="saveAddress"
             >
               保存
             </v-btn>
@@ -256,8 +240,9 @@
 </template>
 
 <script setup lang="ts">
-  import { useNotification } from '@/utils/notification.ts'
   import area from '@/assets/area.json'
+  import { addAddressService } from '@/http/client/user.ts'
+  import { useNotification } from '@/utils/notification.ts'
 
   const { showSuccess, showError } = useNotification()
 
@@ -324,20 +309,6 @@
   const postalCodeRules = [
     (v: string) => !v || /^\d{6}$/.test(v) || '邮政编码格式不正确',
   ]
-
-  // 获取地址列表
-  // async function fetchAddresses () {
-  //   loading.value = true
-  //   try {
-  //     const res = await getAddressesService()
-  //     addresses.value = res.data || []
-  //   } catch (error) {
-  //     console.error('获取地址列表失败:', error)
-  //     showError('获取地址列表失败')
-  //   } finally {
-  //     loading.value = false
-  //   }
-  // }
 
   // 打开地址对话框
   function openAddressDialog (address?: Address) {
@@ -419,32 +390,39 @@
     districts.value = Object.values<any>(cityEntry.c).map((d: any) => d.n)
   }
 
-  // 不再需要远程获取地区信息，已使用本地 area.json
   // 保存地址
-  // async function saveAddress () {
-  //   if (!valid.value) return
-  //
-  //   saving.value = true
-  //   try {
-  //     if (editingAddress.value) {
-  //       // 更新地址
-  //       await updateAddressService(editingAddress.value.id, formData)
-  //       showSuccess('地址更新成功')
-  //     } else {
-  //       // 新增地址
-  //       await addAddressService(formData)
-  //       showSuccess('地址添加成功')
-  //     }
-  //
-  //     closeAddressDialog()
-  //     fetchAddresses()
-  //   } catch (error) {
-  //     console.error('保存地址失败:', error)
-  //     showError('保存地址失败')
-  //   } finally {
-  //     saving.value = false
-  //   }
-  // }
+  async function saveAddress () {
+    if (!valid.value) return
+
+    saving.value = true
+    try {
+      // 构建请求数据
+      const requestData = {
+        receiverName: formData.recipientName,
+        receiverPhone: formData.phone,
+        province: formData.province,
+        city: formData.city,
+        district: formData.district,
+        detailAddress: formData.detailAddress,
+      }
+      if (editingAddress.value) {
+        // 更新地址
+        // await updateAddressService(editingAddress.value.id, formData)
+        showSuccess('地址更新成功')
+      } else {
+        // 新增地址
+        await addAddressService(requestData)
+        showSuccess('地址添加成功')
+      }
+
+      closeAddressDialog()
+    } catch (error) {
+      console.error('保存地址失败:', error)
+      showError('保存地址失败')
+    } finally {
+      saving.value = false
+    }
+  }
 
   // 设为默认地址
   // async function setDefault (addressId: string) {

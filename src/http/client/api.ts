@@ -49,6 +49,6 @@ export const GET_USER_INFO = '/api/client/user/info'
 export const ORDER = '/api/client/order'
 
 /**
- * 地区
+ * 收货地址
  */
-export const REGION = '/api/area'
+export const ADDRESS = '/api/client/user/address'
