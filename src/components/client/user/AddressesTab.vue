@@ -48,7 +48,7 @@
           lg="4"
           md="6"
         >
-          <v-card class="address-card" elevation="1">
+          <v-card class="opacity-hover" elevation="1">
             <!-- 默认地址标识 -->
             <v-chip
               v-if="address.isDefault"
@@ -122,7 +122,7 @@
                 color="error"
                 size="small"
                 variant="text"
-                @click=""
+                @click="confirmDeleteAddress(address)"
               >
                 删除
               </v-btn>
@@ -131,6 +131,41 @@
         </v-col>
       </v-row>
     </div>
+
+    <!-- 删除确认对话框 -->
+    <v-dialog v-model="deleteDialog" max-width="450px" persistent>
+      <v-card>
+        <v-card-title>
+          确认删除
+        </v-card-title>
+        <v-card-text>
+          您确定要删除{
+          {{ addressToDelete?.province }}
+          {{ addressToDelete?.city }}
+          {{ addressToDelete?.district }}
+          }地址吗？此操作无法撤销。
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="deleteDialog = false"
+          >
+            取消
+          </v-btn>
+          <v-btn
+            color="error"
+            :loading="deleting"
+            variant="flat"
+            @click="deleteAddress(addressToDelete!.id)"
+          >
+            确认删除
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- 地址编辑对话框 -->
     <v-dialog v-model="addressDialog" max-width="600px" persistent>
@@ -241,7 +276,13 @@
 
 <script setup lang="ts">
   import area from '@/assets/area.json'
-  import { addAddressService, getAddressService } from '@/http/client/user.ts'
+  import {
+    addAddressService,
+    deleteAddressService,
+    getAddressService,
+    setDefaultAddressService,
+    updateAddressService,
+  } from '@/http/client/user.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   const { showSuccess, showError } = useNotification()
@@ -250,9 +291,12 @@
   const loading = ref(false)
   const saving = ref(false)
   const addressDialog = ref(false)
+  const deleteDialog = ref(false)
+  const deleting = ref(false)
   const valid = ref(false)
   const addressForm = ref()
   const editingAddress = ref<any>(null)
+  const addressToDelete = ref<Address | null>(null)
 
   // 地址数据
   interface Address {
@@ -321,7 +365,7 @@
         postalCode: address.postalCode || '',
         isDefault: address.isDefault,
       })
-      
+
       // 编辑模式下需要初始化城市和区县选项
       nextTick(() => {
         // 先加载城市选项
@@ -329,7 +373,7 @@
         if (provinceEntry && provinceEntry.c) {
           cities.value = Object.values<any>(provinceEntry.c).map((c: any) => c.n)
         }
-        
+
         // 再加载区县选项
         if (address.city) {
           const cityEntry = Object.values<any>(provinceEntry.c).find((c: any) => c.n === address.city)
@@ -404,7 +448,7 @@
   /**
    * 获取收货地址
    */
-  async function getAddresses () {
+  async function fetchAddresses () {
     getAddressService().then(response => {
       addresses.value = response.data.map((item: any) => ({
         id: item.id,
@@ -436,13 +480,18 @@
         detailAddress: formData.detailAddress,
       }
       if (editingAddress.value) {
+        const updateData = {
+          id: editingAddress.value.id,
+          ...requestData,
+        }
         // 更新地址
-        // await updateAddressService(editingAddress.value.id, formData)
+        await updateAddressService(updateData)
         showSuccess('地址更新成功')
       } else {
         // 新增地址
         await addAddressService(requestData)
         showSuccess('地址添加成功')
+        await fetchAddresses()
       }
 
       closeAddressDialog()
@@ -455,32 +504,40 @@
   }
 
   // 设为默认地址
-  // async function setDefault (addressId: string) {
-  //   try {
-  //     await setDefaultAddressService(addressId)
-  //     showSuccess('已设为默认地址')
-  //     fetchAddresses()
-  //   } catch (error) {
-  //     console.error('设置默认地址失败:', error)
-  //     showError('设置默认地址失败')
-  //   }
-  // }
+  // TODO: 待完善
+  async function setDefault (addressId: number) {
+    try {
+      await setDefaultAddressService(addressId)
+      showSuccess('已设为默认地址')
+      await fetchAddresses()
+    } catch (error) {
+      console.error('设置默认地址失败:', error)
+      showError('设置默认地址失败')
+    }
+  }
+
+  // 打开确认删除地址对话框
+  function confirmDeleteAddress (address: Address) {
+    addressToDelete.value = address
+    deleteDialog.value = true
+  }
 
   // 删除地址
-  // async function deleteAddress (addressId: string) {
-  //   try {
-  //     await deleteAddressService(addressId)
-  //     showSuccess('地址删除成功')
-  //     fetchAddresses()
-  //   } catch (error) {
-  //     console.error('删除地址失败:', error)
-  //     showError('删除地址失败')
-  //   }
-  // }
+  async function deleteAddress (addressId: number) {
+    try {
+      await deleteAddressService(addressId)
+      showSuccess('地址删除成功')
+      await fetchAddresses()
+      deleteDialog.value = false
+    } catch (error) {
+      console.error('删除地址失败:', error)
+      showError('删除地址失败')
+    }
+  }
 
   // 页面初始化
   onMounted(() => {
-    getAddresses()
+    fetchAddresses()
   })
 </script>
 
@@ -488,11 +545,6 @@
 .addresses-tab {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.address-card {
-  height: 100%;
-  transition: transform 0.2s ease;
 }
 
 .address-card:hover {
