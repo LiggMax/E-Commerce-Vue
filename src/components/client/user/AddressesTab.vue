@@ -241,7 +241,7 @@
 
 <script setup lang="ts">
   import area from '@/assets/area.json'
-  import { addAddressService } from '@/http/client/user.ts'
+  import { addAddressService, getAddressService } from '@/http/client/user.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   const { showSuccess, showError } = useNotification()
@@ -256,7 +256,7 @@
 
   // 地址数据
   interface Address {
-    id: string
+    id: number
     recipientName: string
     phone: string
     province: string
@@ -321,8 +321,23 @@
         postalCode: address.postalCode || '',
         isDefault: address.isDefault,
       })
-      handleProvinceChange(address.province)
-      handleCityChange(address.city)
+      
+      // 编辑模式下需要初始化城市和区县选项
+      nextTick(() => {
+        // 先加载城市选项
+        const provinceEntry = Object.values<any>(area).find((p: any) => p.n === address.province)
+        if (provinceEntry && provinceEntry.c) {
+          cities.value = Object.values<any>(provinceEntry.c).map((c: any) => c.n)
+        }
+        
+        // 再加载区县选项
+        if (address.city) {
+          const cityEntry = Object.values<any>(provinceEntry.c).find((c: any) => c.n === address.city)
+          if (cityEntry && cityEntry.c) {
+            districts.value = Object.values<any>(cityEntry.c).map((d: any) => d.n)
+          }
+        }
+      })
     } else {
       // 新增模式
       resetForm()
@@ -386,6 +401,25 @@
     districts.value = Object.values<any>(cityEntry.c).map((d: any) => d.n)
   }
 
+  /**
+   * 获取收货地址
+   */
+  async function getAddresses () {
+    getAddressService().then(response => {
+      addresses.value = response.data.map((item: any) => ({
+        id: item.id,
+        recipientName: item.receiverName,
+        phone: item.receiverPhone,
+        province: item.province,
+        city: item.city,
+        district: item.district,
+        detailAddress: item.detailAddress,
+        postalCode: item.postalCode,
+        isDefault: item.isDefault,
+      }))
+    })
+  }
+
   // 保存地址
   async function saveAddress () {
     if (!valid.value) return
@@ -446,7 +480,7 @@
 
   // 页面初始化
   onMounted(() => {
-    // fetchAddresses()
+    getAddresses()
   })
 </script>
 

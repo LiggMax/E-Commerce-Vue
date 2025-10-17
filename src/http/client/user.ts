@@ -28,3 +28,10 @@ export async function getUserInfoService () {
 export async function addAddressService (address: any) {
   return await request.post(ADDRESS, address)
 }
+
+/**
+ *  获取收货地址
+ */
+export async function getAddressService () {
+  return await request.get(ADDRESS)
+}

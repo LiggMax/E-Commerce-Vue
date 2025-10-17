@@ -30,7 +30,7 @@
               :color="activeTab === item.key ? 'primary' : undefined"
               :prepend-icon="item.icon"
               :title="item.title"
-              @click="activeTab = item.key"
+              @click="handleMenuClick(item.key)"
             />
           </v-list>
         </v-card>
@@ -93,11 +93,13 @@
 
   // import SettingsTab from '@/components/client/user/SettingsTab.vue'
   import { getUserInfoService } from '@/http/client/user.ts'
+  import router from '@/router'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   const { showError } = useNotification()
   const tokenStore = userTokenStore()
+  const route = useRoute()
 
   // 用户信息接口
   interface UserInfo {
@@ -111,9 +113,11 @@
   }
 
   // 响应式数据
-  const activeTab = ref('profile')
   const userInfo = ref<UserInfo>()
   const loading = ref(false)
+
+  // 从路由中获取查询参数
+  const activeTab = ref(route.query.tab as string || 'profile')
 
   // 菜单项配置
   const menuItems = [
@@ -165,6 +169,15 @@
     }
   }
 
+  // 菜单点击
+  function handleMenuClick (tabKey: string) {
+    activeTab.value = tabKey
+    router.replace({
+      path: route.path,
+      query: { ...route.query, tab: tabKey },
+    })
+  }
+
   // 处理用户信息更新
   function handleUserUpdate (updatedUserInfo: UserInfo) {
     userInfo.value = updatedUserInfo
@@ -173,6 +186,13 @@
   // 页面初始化
   onMounted(() => {
     getUserInfo()
+  })
+
+  // 监听路由变化，同步activeTab
+  watch(() => route.query.tab, newTab => {
+    if (newTab && typeof newTab === 'string') {
+      activeTab.value = newTab
+    }
   })
 
   // 监听登录状态变化
