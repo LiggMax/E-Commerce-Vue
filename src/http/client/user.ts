@@ -1,4 +1,4 @@
-import { ADDRESS, GET_USER_INFO, LOGIN, REGISTER } from '@/http/client/api.ts'
+import { ADDRESS, GET_USER_INFO, LOGIN, ORDER, REGISTER } from '@/http/client/api.ts'
 import request from '@/http/client/clientRequest.ts'
 
 /**

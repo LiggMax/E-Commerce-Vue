@@ -50,7 +50,7 @@
                   <v-card
                     class="address-card v-card--hover h-100"
                     :color="selectedAddress?.id === address.id ? 'primary' : undefined"
-                    elevation="2"
+                    elevation="0"
                     :variant="selectedAddress?.id === address.id ? 'outlined' : undefined"
                     @click="selectAddress(address)"
                   >
@@ -118,7 +118,7 @@
                       <v-card
                         class="address-card h-100"
                         :color="selectedAddress?.id === address.id ? 'primary' : undefined"
-                        elevation="1"
+                        elevation="0"
                         :variant="selectedAddress?.id === address.id ? 'outlined' : undefined"
                         @click="selectAddress(address)"
                       >
@@ -169,13 +169,30 @@
           </v-card-text>
         </v-card>
 
+        <!-- 订单备注 -->
+        <v-card class="mb-6" elevation="2" rounded="lg">
+          <v-card-title class="text-h6">订单备注</v-card-title>
+          <v-divider />
+          <v-card-text>
+            <v-textarea
+              v-model="orderRemark"
+              counter="200"
+              label="备注信息（选填）"
+              placeholder="请输入订单备注信息，如特殊配送要求等..."
+              rows="3"
+              :rules="remarkRules"
+              variant="outlined"
+            />
+          </v-card-text>
+        </v-card>
+
         <!-- 支付方式 -->
         <v-card class="mb-6" elevation="2" rounded="lg">
           <v-card-title class="text-h6">支付方式</v-card-title>
           <v-divider />
           <v-card-text>
             <v-radio-group v-model="paymentMethod" inline>
-              <v-radio label="微信支付" value="wechat" />
+              <v-radio label="微信支付" value="WX_PAY" />
               <v-radio label="支付宝" value="alipay" />
               <v-radio label="银行卡" value="bank" />
             </v-radio-group>
@@ -224,12 +241,14 @@
 
 <script setup lang="ts">
   import { Base64 } from 'js-base64'
-  import { useRoute, useRouter } from 'vue-router'
-  import { createOrderService } from '@/http/client/order.ts'
-  import { getAddressService } from '@/http/client/user.ts'
+  import { useRoute } from 'vue-router'
+  import { createOrderService } from '@/http/client/order'
+  import { getAddressService } from '@/http/client/user'
+  import router from '@/router'
+  import { useNotification } from '@/utils/notification.ts'
 
+  const { showSuccess } = useNotification()
   const route = useRoute()
-  const router = useRouter()
 
   // 订单数据接口
   interface OrderData {
@@ -264,8 +283,9 @@
 
   const addresses = ref<Address[]>([])
   const selectedAddress = ref<Address | null>(null)
-  const paymentMethod = ref('wechat')
+  const paymentMethod = ref('WX_PAY')
   const showAllAddresses = ref(false)
+  const orderRemark = ref('')
 
   // 计算属性：显示前三个地址
   const displayedAddresses = computed(() => {
@@ -276,6 +296,11 @@
   const hiddenAddresses = computed(() => {
     return addresses.value.slice(3)
   })
+
+  // 备注验证规则
+  const remarkRules = [
+    (v: string) => !v || v.length <= 200 || '备注信息不能超过200个字符',
+  ]
 
   // 从路由参数获取订单数据
   onMounted(() => {
@@ -343,23 +368,23 @@
       const params = {
         productId: orderData.value.productId,
         quantity: orderData.value.quantity,
-        spec: orderData.value.spec,
         addressId: selectedAddress.value.id,
-        paymentMethod: paymentMethod.value,
+        payType: paymentMethod.value,
+        remark: orderRemark.value,
+        spec: orderData.value.spec.map(item => ({
+          id: item.id,
+          specValue: {
+            id: item.specValue.id,
+          },
+        })),
       }
 
-      console.log('提交订单参数:', params)
-
-      // TODO: 调用创建订单API
-      // const orderService = createOrderService()
-      // const result = await orderService.createOrder(params)
-
-      // 模拟成功
-      alert('订单提交成功！')
-      router.push('/user/orders')
+      await createOrderService(params).then(response => {
+        showSuccess('订单提交成功')
+        router.push(`/client/OrderPayment?orderNo=${response.data}`)
+      })
     } catch (error) {
       console.error('提交订单失败:', error)
-      alert('提交订单失败，请重试')
     }
   }
 

@@ -38,7 +38,6 @@ instance.interceptors.response.use(
         case 401: {
           notification.showError('未授权，请重新登录')
           tokenStore.removeToken()
-          // router.push('/admin/login')
           break
         }
         case 403: {
@@ -52,6 +51,10 @@ instance.interceptors.response.use(
         }
         case 500: {
           notification.showError('服务器内部错误')
+          break
+        }
+        case 1001: {
+          notification.showError('请勿重复提交')
           break
         }
         default: {

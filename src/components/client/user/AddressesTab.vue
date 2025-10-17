@@ -497,7 +497,6 @@
       closeAddressDialog()
     } catch (error) {
       console.error('保存地址失败:', error)
-      showError('保存地址失败')
     } finally {
       saving.value = false
     }
