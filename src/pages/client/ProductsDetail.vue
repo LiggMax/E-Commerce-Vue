@@ -20,7 +20,7 @@
             />
           </div>
           <v-divider />
-          <v-sheet class="pa-3">
+          <v-sheet>
             <v-slide-group show-arrows>
               <v-slide-group-item
                 v-for="(img, idx) in allImages"
