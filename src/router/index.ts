@@ -4,15 +4,13 @@
  * Automatic routes for `./src/pages/*.vue`
  */
 
+import type { RouteRecordRaw } from 'vue-router'
 import { setupLayouts } from 'virtual:generated-layouts'
-// Composables
-// eslint-disable-next-line import/no-duplicates
-import { createRouter, createWebHistory } from 'vue-router/auto'
-// eslint-disable-next-line import/no-duplicates
+import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 
 // 为管理后台路由添加布局
-const routesWithLayouts = routes.map(route => {
+const routesWithLayouts: RouteRecordRaw[] = routes.map(route => {
   if (route.path.startsWith('/admin') && route.path !== '/admin/login') {
     return {
       ...route,
