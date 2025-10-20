@@ -31,12 +31,12 @@ export const CAPTCHA = '/api/client/captcha'
 /**
  * 注册
  */
-export const REGISTER = '/api/client/account/register'
+export const REGISTER = '/api/client/auth/register'
 
 /**
  * 登录
  */
-export const LOGIN = '/api/client/account/login'
+export const LOGIN = '/api/client/auth/login'
 
 /**
  * 获取用户信息
