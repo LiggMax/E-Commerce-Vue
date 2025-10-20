@@ -15,7 +15,7 @@
           <v-icon color="primary" size="32">mdi-shield-crown</v-icon>
         </template>
         <v-list-item-title class="text-h6 font-weight-bold">
-          后台管理系统
+          后台管理
         </v-list-item-title>
       </v-list-item>
 
