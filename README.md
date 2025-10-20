@@ -26,7 +26,7 @@
 
 ## 🏗️ 技术栈
 
-### 后端技术
+### [后端](https://github.com/LiggMax/E-Commerce-Server)
 * **核心框架**: Spring Boot 3.5.5
 * **数据库**: MySQL 8.0
 * **缓存**: Redis 6.0
@@ -34,7 +34,7 @@
 * **安全框架**: JWT + Redis Token管理
 * **构建工具**: Maven
 
-### 前端技术
+### [前端](https://github.com/LiggMax/E-Commerce-Vue)
 * **框架**: Vue 3 + TypeScript
 * **UI组件库**: Vuetify 3
 * **路由**: Vue Router
