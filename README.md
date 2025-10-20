@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Java-17-orange?logo=java" alt="Java 17" />
   <img src="https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen?logo=spring-boot" alt="Spring Boot 3.5.5" />
   <img src="https://img.shields.io/badge/Vue-3.5.x-4FC08D?logo=vue.js" alt="Vue 3" />
-  <img src="https://img.shields.io/badge/Vuetify-3.x-1867C0?logo=vuetify" alt="Vuetify 3" />
+  <img src="https://img.shields.io/badge/Vuetify-3.9.x-1867C0?logo=vuetify" alt="Vuetify 3" />
   <img src="https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql" alt="MySQL 8.0" />
   <img src="https://img.shields.io/badge/Redis-6.0-red?logo=redis" alt="Redis 6.0" />
   <img src="https://img.shields.io/badge/Maven-3.9+-orange?logo=apache-maven" alt="Maven" />
