@@ -13,7 +13,7 @@
             <div class="text-center mb-6">
               <div class="text-h6 mb-2">订单号：{{ orderInfo.orderNo }}</div>
               <div class="text-body-1 text-medium-emphasis">
-                请尽快完成支付，订单将在30分钟后自动取消
+                请尽快完成支付，订单将在 <span class="text-error font-weight-bold">{{ countdownText }}</span> 后过期
               </div>
             </div>
 
@@ -243,12 +243,25 @@
 
   const selectedPaymentMethod = ref('')
   const paying = ref(false)
+  const remainingSeconds = ref(0)
+  let countdownTimer: number | null = null
+
   const specText = computed(() =>
     (orderInfo.value.specValues || [])
       .map(spec => spec.value)
       .filter(Boolean)
       .join(' / '),
   )
+
+  // 倒计时文本格式化
+  const countdownText = computed(() => {
+    const seconds = remainingSeconds.value
+    if (seconds <= 0) return '00:00'
+
+    const minutes = Math.floor(seconds / 60)
+    const remainingSecs = seconds % 60
+    return `${minutes.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`
+  })
 
   // 支付方式配置
   const paymentMethods = ref<PaymentMethod[]>([
@@ -271,6 +284,28 @@
       icon: '/icons/bank-card.png',
     },
   ])
+
+  // 启动倒计时
+  function startCountdown (seconds: number) {
+    // 清除之前的定时器
+    if (countdownTimer) {
+      clearInterval(countdownTimer)
+    }
+
+    remainingSeconds.value = seconds
+
+    countdownTimer = setInterval(() => {
+      remainingSeconds.value--
+
+      if (remainingSeconds.value <= 0) {
+        clearInterval(countdownTimer!)
+        countdownTimer = null
+        showError('订单已过期，请重新下单')
+        // 可以跳转到首页或订单列表
+        // router.push('/')
+      }
+    }, 1000)
+  }
 
   // 获取订单详情
   async function getOrderDetail () {
@@ -310,6 +345,11 @@
           image: '',
         },
         paymentStatus: orderData.paymentStatus || '',
+      }
+
+      // 启动倒计时
+      if (orderInfo.value.expireTime > 0) {
+        startCountdown(orderInfo.value.expireTime)
       }
 
       // 如果后端返回支付方式，可在此设置；当前响应未包含
@@ -354,6 +394,14 @@
   // 页面初始化
   onMounted(() => {
     getOrderDetail()
+  })
+
+  // 页面卸载时清理定时器
+  onUnmounted(() => {
+    if (countdownTimer) {
+      clearInterval(countdownTimer)
+      countdownTimer = null
+    }
   })
 </script>
 
