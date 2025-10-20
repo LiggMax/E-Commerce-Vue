@@ -185,19 +185,6 @@
             />
           </v-card-text>
         </v-card>
-
-        <!-- 支付方式 -->
-        <v-card class="mb-6" elevation="2" rounded="lg">
-          <v-card-title class="text-h6">支付方式</v-card-title>
-          <v-divider />
-          <v-card-text>
-            <v-radio-group v-model="paymentMethod" inline>
-              <v-radio label="微信支付" value="WX_PAY" />
-              <v-radio label="支付宝" value="alipay" />
-              <v-radio label="银行卡" value="bank" />
-            </v-radio-group>
-          </v-card-text>
-        </v-card>
       </v-col>
 
       <!-- 右侧：订单摘要 -->
@@ -283,7 +270,6 @@
 
   const addresses = ref<Address[]>([])
   const selectedAddress = ref<Address | null>(null)
-  const paymentMethod = ref('WX_PAY')
   const showAllAddresses = ref(false)
   const orderRemark = ref('')
 
@@ -369,7 +355,6 @@
         productId: orderData.value.productId,
         quantity: orderData.value.quantity,
         addressId: selectedAddress.value.id,
-        payType: paymentMethod.value,
         remark: orderRemark.value,
         spec: orderData.value.spec.map(item => ({
           id: item.id,

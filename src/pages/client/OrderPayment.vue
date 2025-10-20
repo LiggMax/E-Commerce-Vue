@@ -24,15 +24,15 @@
                   <v-img
                     class="mr-4"
                     cover
-                    height="80"
+                    height="110"
                     rounded="lg"
-                    :src="orderInfo.productImage"
+                    :src="orderInfo.product?.image"
                     width="80"
                   />
                   <div class="flex-grow-1">
-                    <div class="text-h6">{{ orderInfo.productTitle }}</div>
+                    <div class="text-h6">{{ orderInfo.product?.title }}</div>
                     <div class="text-body-2 text-medium-emphasis">
-                      规格：{{ orderInfo.specText }}
+                      规格：{{ specText }}
                     </div>
                     <div class="text-body-2 text-medium-emphasis">
                       数量：{{ orderInfo.quantity }}
@@ -52,12 +52,12 @@
                   <v-icon class="mr-3 mt-1" icon="mdi-map-marker" />
                   <div>
                     <div class="text-body-1 font-weight-bold">
-                      {{ orderInfo.receiverName }} {{ orderInfo.receiverPhone }}
+                      {{ orderInfo.address?.receiverName }} {{ orderInfo.address?.receiverPhone }}
                     </div>
                     <div class="text-body-2">
-                      {{ orderInfo.province }} {{ orderInfo.city }} {{ orderInfo.district }}
+                      {{ orderInfo.address?.province }} {{ orderInfo.address?.city }} {{ orderInfo.address?.district }}
                     </div>
-                    <div class="text-body-2">{{ orderInfo.detailAddress }}</div>
+                    <div class="text-body-2">{{ orderInfo.address?.detailAddress }}</div>
                   </div>
                 </div>
               </v-card-text>
@@ -124,10 +124,12 @@
         <!-- 支付按钮 -->
         <div class="text-center">
           <v-btn
-            class="payment-btn"
+            class="text-h6 font-weight-bold"
             color="primary"
             :disabled="!selectedPaymentMethod"
+            height="50px"
             :loading="paying"
+            min-width="300px"
             rounded="lg"
             size="x-large"
             @click="handlePayment"
@@ -172,20 +174,33 @@
   // 订单信息接口
   interface OrderInfo {
     orderNo: string
-    productTitle: string
-    productImage: string
-    specText: string
-    quantity: number
-    totalAmount: string
-    receiverName: string
-    receiverPhone: string
-    province: string
-    city: string
-    district: string
-    detailAddress: string
-    remark?: string
-    payType: string
+    userId?: string
+    totalAmount: number
     status: string
+    quantity: number
+    remark?: string
+    expireTime: number
+    specValues: [
+      {
+        id: number
+        value: string
+      },
+    ]
+    address: {
+      id: number
+      receiverName: string
+      receiverPhone: string
+      province: string
+      city: string
+      district: string
+      detailAddress: string
+    }
+    product: {
+      id: string
+      title: string
+      image: string
+    }
+    paymentStatus: string
   }
 
   // 支付方式接口
@@ -199,23 +214,41 @@
   // 响应式数据
   const orderInfo = ref<OrderInfo>({
     orderNo: '',
-    productTitle: '',
-    productImage: '',
-    specText: '',
-    quantity: 0,
-    totalAmount: '0.00',
-    receiverName: '',
-    receiverPhone: '',
-    province: '',
-    city: '',
-    district: '',
-    detailAddress: '',
-    payType: '',
+    userId: '',
+    totalAmount: 0,
     status: '',
+    quantity: 0,
+    remark: '',
+    expireTime: 0,
+    specValues: [{
+      id: 0,
+      value: '',
+    }],
+    address: {
+      id: 0,
+      receiverName: '',
+      receiverPhone: '',
+      province: '',
+      city: '',
+      district: '',
+      detailAddress: '',
+    },
+    product: {
+      id: '',
+      title: '',
+      image: '',
+    },
+    paymentStatus: '',
   })
 
   const selectedPaymentMethod = ref('')
   const paying = ref(false)
+  const specText = computed(() =>
+    (orderInfo.value.specValues || [])
+      .map(spec => spec.value)
+      .filter(Boolean)
+      .join(' / '),
+  )
 
   // 支付方式配置
   const paymentMethods = ref<PaymentMethod[]>([
@@ -252,26 +285,35 @@
       const response = await getOrderDetailService(orderNo)
       const orderData = response.data
 
-      // 数据转换
+      // 后端结构映射到本地状态
       orderInfo.value = {
-        orderNo: orderData.orderNo,
-        productTitle: orderData.productTitle || '商品标题', // 需要从商品信息获取
-        productImage: orderData.productImage || '/default-product.png', // 需要从商品信息获取
-        specText: orderData.specText || '默认规格', // 需要从规格信息获取
-        quantity: orderData.quantity || 1, // 需要从订单项获取
-        totalAmount: orderData.totalAmount.toFixed(2), // 格式化金额
-        receiverName: orderData.receiverName || '收货人', // 需要从地址信息获取
-        receiverPhone: orderData.receiverPhone || '手机号', // 需要从地址信息获取
-        province: orderData.province || '省份', // 需要从地址信息获取
-        city: orderData.city || '城市', // 需要从地址信息获取
-        district: orderData.district || '区县', // 需要从地址信息获取
-        detailAddress: orderData.detailAddress || '详细地址', // 需要从地址信息获取
+        orderNo: orderData.orderNo || '',
+        userId: orderData.userId || '',
+        totalAmount: Number(orderData.totalAmount || 0),
+        status: orderData.status || '',
+        quantity: Number(orderData.quantity || 0),
         remark: orderData.remark || '',
-        payType: orderData.payType,
-        status: orderData.status,
+        expireTime: Number(orderData.expireTime || 0),
+        specValues: Array.isArray(orderData.specValues) ? orderData.specValues : [],
+        address: orderData.address || {
+          id: 0,
+          receiverName: '',
+          receiverPhone: '',
+          province: '',
+          city: '',
+          district: '',
+          detailAddress: '',
+        },
+        product: orderData.product || {
+          id: '',
+          title: '',
+          image: '',
+        },
+        paymentStatus: orderData.paymentStatus || '',
       }
 
-      selectedPaymentMethod.value = orderInfo.value.payType
+      // 如果后端返回支付方式，可在此设置；当前响应未包含
+      // selectedPaymentMethod.value = orderData.payType || ''
     } catch (error) {
       console.error('获取订单详情失败:', error)
     }
@@ -299,32 +341,6 @@
     }
   }
 
-  // 微信支付处理
-  function handleWechatPay (payData: any) {
-    // 这里应该调用微信支付SDK
-    console.log('微信支付数据:', payData)
-    showSuccess('正在跳转到微信支付...')
-    // 模拟支付成功
-    setTimeout(() => {
-      showSuccess('支付成功！')
-      router.push('/client/UserCenter?tab=orders')
-    }, 2000)
-  }
-
-  // 支付宝支付处理
-  function handleAlipay (payData: any) {
-    // 跳转到支付宝支付页面
-    window.open(payData.payUrl, '_blank')
-    showSuccess('正在跳转到支付宝支付...')
-  }
-
-  // 银行卡支付处理
-  function handleBankPay (payData: any) {
-    // 跳转到银行支付页面
-    window.open(payData.payUrl, '_blank')
-    showSuccess('正在跳转到银行支付...')
-  }
-
   // 查看订单详情
   function goToOrderDetail () {
     router.push(`/client/UserCenter?tab=orders`)
@@ -342,15 +358,4 @@
 </script>
 
 <style scoped>
-  .payment-btn {
-    min-width: 300px;
-    height: 56px;
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  .payment-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(var(--v-theme-primary), 0.3);
-  }
 </style>
