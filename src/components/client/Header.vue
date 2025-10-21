@@ -375,4 +375,16 @@
   transform: scale(1.05);
   transition: all 0.2s ease;
 }
+
+.v-btn-toggle {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* 隐藏滚动条的样式 */
+.v-btn-toggle::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 </style>
