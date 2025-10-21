@@ -381,7 +381,7 @@
 <style scoped>
   .sticky-card {
     position: sticky;
-    top: 20px;
+    top: 80px;
   }
 
   .address-card {

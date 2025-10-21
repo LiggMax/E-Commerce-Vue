@@ -18,7 +18,7 @@
             </div>
 
             <!-- 订单详情 -->
-            <v-card class="mb-4" variant="outlined">
+            <v-card :key="`order-detail-${orderInfo.orderNo}`" class="mb-4" variant="outlined">
               <v-card-text class="pa-4">
                 <div class="d-flex align-center mb-3">
                   <v-img
@@ -92,12 +92,7 @@
               >
                 <template #label>
                   <div class="d-flex align-center">
-                    <v-img
-                      class="mr-3"
-                      height="32"
-                      :src="payment.icon"
-                      width="32"
-                    />
+                    <img alt="" class="mr-2" :src="payment.icon" style="width: 30px">
                     <div>
                       <div class="text-body-1 font-weight-medium">{{ payment.name }}</div>
                       <div class="text-body-2 text-medium-emphasis">{{ payment.description }}</div>
@@ -144,9 +139,9 @@
           <v-btn
             color="medium-emphasis"
             variant="text"
-            @click="goToOrderDetail"
+            @click="goToOrderPage"
           >
-            查看订单详情
+            跳转订单页面
           </v-btn>
           <v-btn
             class="ml-4"
@@ -159,17 +154,57 @@
         </div>
       </v-col>
     </v-row>
+
+    <!-- 支付成功弹窗 -->
+    <v-dialog v-model="showPaymentSuccessDialog" max-width="500">
+      <v-card class="d-flex align-center text-center pa-6">
+        <v-icon class="mb-4" color="success" size="80">mdi-check-circle</v-icon>
+        <v-card-title class="text-h5 justify-center mb-2">
+          支付成功
+        </v-card-title>
+        <v-card-text>
+          <p class="text-body-1 mb-4">订单号：{{ orderInfo.orderNo }}</p>
+          <p class="text-h6 mb-2">支付金额：<span class="text-primary">¥{{ orderInfo.totalAmount }}</span></p>
+          <p class="text-body-2 text-medium-emphasis">
+            页面将在 <span class="text-primary font-weight-bold">{{ successCountdown }}</span> 秒后自动跳转到订单详情页
+          </p>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-btn
+            color="primary"
+            @click="goToOrderPage"
+          >
+            立即跳转
+          </v-btn>
+          <v-btn
+            color="primary"
+            @click="goToHome"
+          >
+            返回首页
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
+  import AILPAY from '@/assets/icon/ailpay.svg'
+  import BANKCARD from '@/assets/icon/bank-card.svg'
+  import WECHAT from '@/assets/icon/wechat.svg'
   import { getOrderDetailService, payOrderService } from '@/http/client/order'
+  import router from '@/router'
   import { useNotification } from '@/utils/notification.ts'
 
-  const { showSuccess, showError } = useNotification()
+  const { showError } = useNotification()
   const route = useRoute()
-  const router = useRouter()
+
+  // 规格值接口
+  interface SpecValue {
+    id: number
+    value: string
+  }
 
   // 订单信息接口
   interface OrderInfo {
@@ -180,12 +215,7 @@
     quantity: number
     remark?: string
     expireTime: number
-    specValues: [
-      {
-        id: number
-        value: string
-      },
-    ]
+    specValues: (SpecValue | null)[]
     address: {
       id: number
       receiverName: string
@@ -200,15 +230,7 @@
       title: string
       image: string
     }
-    paymentStatus: string
-  }
-
-  // 支付方式接口
-  interface PaymentMethod {
-    value: string
-    name: string
-    description: string
-    icon: string
+    paymentStatus?: string
   }
 
   // 响应式数据
@@ -220,10 +242,7 @@
     quantity: 0,
     remark: '',
     expireTime: 0,
-    specValues: [{
-      id: 0,
-      value: '',
-    }],
+    specValues: [],
     address: {
       id: 0,
       receiverName: '',
@@ -238,20 +257,25 @@
       title: '',
       image: '',
     },
-    paymentStatus: '',
   })
 
   const selectedPaymentMethod = ref('')
   const paying = ref(false)
   const remainingSeconds = ref(0)
+  const showPaymentSuccessDialog = ref(false)
+  const successCountdownValue = ref(5)
   let countdownTimer: number | null = null
+  let successCountdownTimer: number | null = null
 
-  const specText = computed(() =>
-    (orderInfo.value.specValues || [])
+  const specText = computed(() => {
+    if (!orderInfo.value.specValues || !Array.isArray(orderInfo.value.specValues)) {
+      return ''
+    }
+    return orderInfo.value.specValues
+      .filter((spec): spec is SpecValue => spec !== null && spec !== undefined && Boolean(spec.value))
       .map(spec => spec.value)
-      .filter(Boolean)
-      .join(' / '),
-  )
+      .join(' / ')
+  })
 
   // 倒计时文本格式化
   const countdownText = computed(() => {
@@ -263,25 +287,30 @@
     return `${minutes.toString().padStart(2, '0')}:${remainingSecs.toString().padStart(2, '0')}`
   })
 
+  // 支付成功倒计时文本
+  const successCountdown = computed(() => {
+    return successCountdownValue.value
+  })
+
   // 支付方式配置
-  const paymentMethods = ref<PaymentMethod[]>([
+  const paymentMethods = ref([
     {
       value: 'WX_PAY',
       name: '微信支付',
       description: '推荐使用，安全便捷',
-      icon: '/icons/wechat-pay.png',
+      icon: WECHAT,
     },
     {
-      value: 'ALIPAY',
+      value: 'ALI_PAY',
       name: '支付宝',
       description: '支持花呗分期',
-      icon: '/icons/alipay.png',
+      icon: AILPAY,
     },
     {
       value: 'BANK_CARD',
       name: '银行卡支付',
       description: '支持各大银行',
-      icon: '/icons/bank-card.png',
+      icon: BANKCARD,
     },
   ])
 
@@ -303,6 +332,25 @@
         showError('订单已过期，请重新下单')
         // 可以跳转到首页或订单列表
         // router.push('/')
+      }
+    }, 1000)
+  }
+
+  // 启动支付成功后的倒计时
+  function startSuccessCountdown () {
+    successCountdownValue.value = 5
+
+    if (successCountdownTimer) {
+      clearInterval(successCountdownTimer)
+    }
+
+    successCountdownTimer = setInterval(() => {
+      successCountdownValue.value--
+
+      if (successCountdownValue.value <= 0) {
+        clearInterval(successCountdownTimer!)
+        successCountdownTimer = null
+        goToOrderPage()
       }
     }, 1000)
   }
@@ -344,7 +392,7 @@
           title: '',
           image: '',
         },
-        paymentStatus: orderData.paymentStatus || '',
+        paymentStatus: orderData.paymentStatus,
       }
 
       // 启动倒计时
@@ -372,8 +420,11 @@
         orderNo: orderInfo.value.orderNo,
         payType: selectedPaymentMethod.value,
       }
-      const response = await payOrderService(params)
-      showSuccess('支付成功')
+      await payOrderService(params)
+      // 显示支付成功弹窗
+      showPaymentSuccessDialog.value = true
+      // 启动支付成功倒计时
+      startSuccessCountdown()
     } catch (error) {
       console.error('支付失败:', error)
     } finally {
@@ -382,12 +433,14 @@
   }
 
   // 查看订单详情
-  function goToOrderDetail () {
+  function goToOrderPage () {
+    showPaymentSuccessDialog.value = false
     router.push(`/client/UserCenter?tab=orders`)
   }
 
   // 返回首页
   function goToHome () {
+    showPaymentSuccessDialog.value = false
     router.push('/')
   }
 
@@ -401,6 +454,11 @@
     if (countdownTimer) {
       clearInterval(countdownTimer)
       countdownTimer = null
+    }
+
+    if (successCountdownTimer) {
+      clearInterval(successCountdownTimer)
+      successCountdownTimer = null
     }
   })
 </script>

@@ -3,7 +3,7 @@
     <v-row>
       <!-- 侧边栏 -->
       <v-col cols="12" md="3">
-        <v-card class="sidebar-card" elevation="2">
+        <v-card class="sticky-sidebar" elevation="2">
           <!-- 用户信息卡片 -->
           <v-card class="ma-4" elevation="0">
             <v-card-text class="text-center pa-6">
@@ -204,3 +204,21 @@
     }
   })
 </script>
+
+<style scoped>
+  .sticky-sidebar {
+    position: sticky;
+    top: 80px;
+    height: fit-content;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+  }
+
+  /* 确保侧边栏在移动端不粘性定位 */
+  @media (max-width: 960px) {
+    .sticky-sidebar {
+      position: static;
+      max-height: none;
+    }
+  }
+</style>
