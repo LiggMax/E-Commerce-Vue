@@ -5,7 +5,7 @@
       <v-col cols="12" md="3">
         <v-card class="sidebar-card" elevation="2">
           <!-- 用户信息卡片 -->
-          <v-card class="ma-4" elevation="1">
+          <v-card class="ma-4" elevation="0">
             <v-card-text class="text-center pa-6">
               <v-avatar class="mb-4" size="80">
                 <v-img v-if="userInfo?.avatar" :src="userInfo.avatar" />

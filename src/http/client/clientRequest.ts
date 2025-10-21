@@ -1,8 +1,10 @@
 import axios from 'axios'
+import { useAppStore } from '@/stores/app.ts'
 import { userTokenStore } from '@/stores/client/clientToken.ts'
 import notification from '@/utils/notification.ts'
 
 const tokenStore = userTokenStore()
+const appStore = useAppStore()
 const instance = axios.create({
   baseURL: '/',
   timeout: 30_000,
@@ -36,8 +38,10 @@ instance.interceptors.response.use(
       // 服务器返回错误状态码
       switch (error.response.status) {
         case 401: {
-          notification.showError('未授权，请重新登录')
+          // 清除token
           tokenStore.removeToken()
+          // 弹出登录弹窗
+          appStore.openAuthDialog()
           break
         }
         case 403: {
