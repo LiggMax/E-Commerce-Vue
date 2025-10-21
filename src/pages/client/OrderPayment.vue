@@ -18,7 +18,7 @@
             </div>
 
             <!-- 订单详情 -->
-            <v-card :key="`order-detail-${orderInfo.orderNo}`" class="mb-4" variant="outlined">
+            <v-card :key="`order-detail-${orderInfo.orderNo}`" class="mb-4" variant="flat">
               <v-card-text class="pa-4">
                 <div class="d-flex align-center mb-3">
                   <v-img
@@ -46,7 +46,7 @@
             </v-card>
 
             <!-- 收货地址 -->
-            <v-card class="mb-4" variant="outlined">
+            <v-card class="mb-4" variant="flat">
               <v-card-text class="pa-4">
                 <div class="d-flex align-start">
                   <v-icon class="mr-3 mt-1" icon="mdi-map-marker" />
@@ -259,7 +259,7 @@
     },
   })
 
-  const selectedPaymentMethod = ref('')
+  const selectedPaymentMethod = ref('WX_PAY')
   const paying = ref(false)
   const remainingSeconds = ref(0)
   const showPaymentSuccessDialog = ref(false)
