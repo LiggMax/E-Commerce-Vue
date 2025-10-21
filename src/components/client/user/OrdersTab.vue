@@ -126,7 +126,7 @@
 
             <v-btn
               variant="outlined"
-              @click="viewOrderDetail(order)"
+              @click="viewOrderDetail(order.orderNo)"
             >
               查看详情
             </v-btn>
@@ -175,12 +175,20 @@
       </div>
     </template>
   </ConfirmDeleteDialog>
+
+  <!-- 订单详情弹窗 -->
+  <OrderDetailDialog
+    v-model="showOrderDetailDialog"
+    :loading="orderDetailLoading"
+    :order-detail="orderDetailData"
+  />
 </template>
 
 <script setup lang="ts">
   import { useRoute } from 'vue-router'
-  import ConfirmDeleteDialog from '@/components/client/ConfirmDeleteDialog.vue'
-  import { cancelOrderService, getOrderListService } from '@/http/client/order.ts'
+  import ConfirmDeleteDialog from '@/components/client/dialog/ConfirmDeleteDialog.vue'
+  import OrderDetailDialog from '@/components/client/dialog/OrderDetailDialog.vue'
+  import { cancelOrderService, getOrderDetailService, getOrderListService } from '@/http/client/order.ts'
   import router from '@/router'
   import { useNotification } from '@/utils/notification.ts'
 
@@ -198,6 +206,12 @@
   const showCancelDialog = ref(false)
   const cancelLoading = ref(false)
   const selectedOrder = ref<OrderItem | null>(null)
+
+  // 订单详情弹窗相关
+  const showOrderDetailDialog = ref(false)
+  const selectedOrderNo = ref('')
+  const orderDetailData = ref<any>(null)
+  const orderDetailLoading = ref(false)
 
   // 订单数据
   interface OrderItem {
@@ -347,10 +361,20 @@
   }
 
   // 查看订单详情
-  function viewOrderDetail (order: OrderItem) {
-    // 跳转到订单详情页
-    // this.$router.push(`/orders/${order.id}`)
-    console.log('查看订单详情:', order)
+  async function viewOrderDetail (orderNo: string) {
+    selectedOrderNo.value = orderNo
+    orderDetailLoading.value = true
+    showOrderDetailDialog.value = true
+
+    try {
+      const response = await getOrderDetailService(orderNo)
+      orderDetailData.value = response.data
+    } catch (error) {
+      console.error('获取订单详情失败:', error)
+      orderDetailData.value = null
+    } finally {
+      orderDetailLoading.value = false
+    }
   }
 
   // 更新路由参数

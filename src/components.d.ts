@@ -10,7 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AddressesTab: typeof import('./components/client/user/AddressesTab.vue')['default']
     AuthDialog: typeof import('./components/client/AuthDialog.vue')['default']
-    ConfirmDeleteDialog: typeof import('./components/client/ConfirmDeleteDialog.vue')['default']
+    ConfirmDeleteDialog: typeof import('./components/client/dialog/ConfirmDeleteDialog.vue')['default']
     DeleteConfirmDialog: typeof import('./components/admin/DeleteConfirmDialog.vue')['default']
     FavoritesTab: typeof import('./components/client/user/FavoritesTab.vue')['default']
     FeaturedEditDialog: typeof import('./components/admin/FeaturedEditDialog.vue')['default']
@@ -20,6 +20,7 @@ declare module 'vue' {
     HeroSection: typeof import('./components/client/HeroSection.vue')['default']
     ImageUploadDialog: typeof import('./components/admin/ImageUploadDialog.vue')['default']
     Notification: typeof import('./components/common/Notification.vue')['default']
+    OrderDetailDialog: typeof import('./components/client/dialog/OrderDetailDialog.vue')['default']
     OrdersTab: typeof import('./components/client/user/OrdersTab.vue')['default']
     ProductCategories: typeof import('./components/client/ProductCategories.vue')['default']
     ProfileTab: typeof import('./components/client/user/ProfileTab.vue')['default']
