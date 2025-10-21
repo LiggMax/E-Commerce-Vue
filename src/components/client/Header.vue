@@ -270,16 +270,18 @@
   ]
 
   const userMenuItems = [
-    { title: '个人中心', icon: 'mdi-account', action: () => gotoPersonalCenter() },
-    { title: '订单历史', icon: 'mdi-package-variant', action: () => console.log('订单') },
-    { title: '收藏夹', icon: 'mdi-heart', action: () => console.log('收藏') },
+    { title: '个人中心', icon: 'mdi-account',
+      action: () => router.push('/client/UserCenter'),
+    },
+    { title: '订单历史', icon: 'mdi-package-variant',
+      action: () => router.push('/client/UserCenter?tab=orders'),
+    },
+    { title: '收藏夹', icon: 'mdi-heart',
+      action: () => router.push('/client/UserCenter?tab=favorites'),
+    },
     { title: '设置', icon: 'mdi-cog', action: () => console.log('设置') },
     { title: '退出登录', icon: 'mdi-logout', action: () => logout() },
   ]
-
-  function closeSearchDialog () {
-    searchDialog.value = false
-  }
 
   function handleSearch () {
     if (!searchQuery.value.trim()) return
@@ -289,13 +291,6 @@
         keyword: searchQuery.value,
       },
     })
-  }
-
-  /**
-   * goto 个人中心
-   */
-  function gotoPersonalCenter () {
-    router.push('/client/UserCenter')
   }
 
   /**

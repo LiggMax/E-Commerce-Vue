@@ -33,7 +33,7 @@ export async function getOrderListService (params: any) {
  * 取消订单
  */
 export async function cancelOrderService (orderNo: string) {
-  return await request.put(`${ORDER}/${orderNo}/cancel`)
+  return await request.patch(`${ORDER}/${orderNo}`)
 }
 
 /**

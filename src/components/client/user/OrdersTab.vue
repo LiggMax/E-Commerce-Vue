@@ -135,7 +135,7 @@
               v-if="order.status === 'UNPAID'"
               color="error"
               variant="text"
-              @click=""
+              @click="cancelOrder(order)"
             >
               取消订单
             </v-btn>
@@ -153,14 +153,39 @@
       />
     </div>
   </div>
+
+  <!-- 确认取消订单弹窗 -->
+  <ConfirmDeleteDialog
+    v-model="showCancelDialog"
+    cancel-text="继续保留"
+    confirm-text="确认取消"
+    :loading="cancelLoading"
+    message="确定要取消这个订单吗？"
+    :show-details="true"
+    title="确认取消订单"
+    @cancel="handleCancelDelete"
+    @confirm="handleConfirmCancel"
+  >
+    <template #details>
+      <div v-if="selectedOrder" class="text-left">
+        <p class="mb-2"><strong>订单号：</strong>{{ selectedOrder.orderNo }}</p>
+        <p class="mb-2"><strong>商品：</strong>{{ selectedOrder.title }}</p>
+        <p class="mb-2"><strong>金额：</strong>¥{{ selectedOrder.totalAmount }}</p>
+        <p class="text-error text-body-2">取消后订单将无法恢复，请谨慎操作</p>
+      </div>
+    </template>
+  </ConfirmDeleteDialog>
 </template>
 
 <script setup lang="ts">
   import { useRoute, useRouter } from 'vue-router'
-  import { getOrderListService } from '@/http/client/order.ts'
+  import ConfirmDeleteDialog from '@/components/client/ConfirmDeleteDialog.vue'
+  import { cancelOrderService, getOrderListService } from '@/http/client/order.ts'
+  import { useNotification } from '@/utils/notification.ts'
 
   const route = useRoute()
   const router = useRouter()
+  const { showSuccess } = useNotification()
 
   // 响应式数据
   const loading = ref(false)
@@ -168,6 +193,11 @@
   const searchKeyword = ref('')
   const currentPage = ref(1)
   const pageSize = ref(5)
+
+  // 确认删除弹窗相关
+  const showCancelDialog = ref(false)
+  const cancelLoading = ref(false)
+  const selectedOrder = ref<OrderItem | null>(null)
 
   // 订单数据
   interface OrderItem {
@@ -276,6 +306,36 @@
     } finally {
       loading.value = false
     }
+  }
+
+  // 取消订单
+  function cancelOrder (order: OrderItem) {
+    selectedOrder.value = order
+    showCancelDialog.value = true
+  }
+
+  // 确认取消订单
+  async function handleConfirmCancel () {
+    if (!selectedOrder.value) return
+
+    cancelLoading.value = true
+    try {
+      await cancelOrderService(selectedOrder.value.orderNo)
+      showSuccess('订单已取消')
+      showCancelDialog.value = false
+      // 重新获取订单列表
+      await getOrderList()
+    } catch (error) {
+      console.error('取消订单失败:', error)
+    } finally {
+      cancelLoading.value = false
+    }
+  }
+
+  // 取消删除操作
+  function handleCancelDelete () {
+    selectedOrder.value = null
+    showCancelDialog.value = false
   }
 
   // 查看订单详情

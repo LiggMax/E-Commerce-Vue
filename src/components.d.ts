@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AddressesTab: typeof import('./components/client/user/AddressesTab.vue')['default']
     AuthDialog: typeof import('./components/client/AuthDialog.vue')['default']
+    ConfirmDeleteDialog: typeof import('./components/client/ConfirmDeleteDialog.vue')['default']
     DeleteConfirmDialog: typeof import('./components/admin/DeleteConfirmDialog.vue')['default']
     FavoritesTab: typeof import('./components/client/user/FavoritesTab.vue')['default']
     FeaturedEditDialog: typeof import('./components/admin/FeaturedEditDialog.vue')['default']
