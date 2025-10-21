@@ -4,7 +4,7 @@
       <v-row>
         <!-- 头像上传 -->
         <v-col class="text-center" cols="12">
-          <div class="avatar-section mb-6">
+          <div class="mb-6">
             <v-avatar class="mb-4" size="120">
               <v-img v-if="formData.avatar" :src="formData.avatar" />
               <v-icon v-else color="primary" icon="mdi-account-circle" size="120" />
@@ -136,7 +136,7 @@
     update: [userInfo: any]
   }>()
 
-  const { showSuccess, showError } = useNotification()
+  const { showError } = useNotification()
 
   // 响应式数据
   const form = ref()
@@ -226,12 +226,5 @@
 .profile-tab {
   max-width: 800px;
   margin: 0 auto;
-}
-
-.avatar-section {
-  padding: 20px;
-  border: 2px dashed rgb(var(--v-theme-outline));
-  border-radius: 12px;
-  background-color: rgba(var(--v-theme-surface-variant), 0.1);
 }
 </style>

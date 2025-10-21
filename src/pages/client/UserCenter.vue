@@ -163,7 +163,6 @@
       userInfo.value = res.data
     } catch (error) {
       console.error('获取用户信息失败:', error)
-      showError('获取用户信息失败')
     } finally {
       loading.value = false
     }

@@ -48,7 +48,7 @@
           lg="4"
           md="6"
         >
-          <v-card class="opacity-hover" elevation="1">
+          <v-card class="" elevation="1">
             <!-- 默认地址标识 -->
             <v-chip
               v-if="address.isDefault"
@@ -544,11 +544,6 @@
 .addresses-tab {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.address-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .position-absolute {

@@ -22,7 +22,7 @@
           v-model="searchKeyword"
           density="compact"
           hide-details
-          label="搜索订单号"
+          label="搜索商品名/订单号"
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           @input="handleSearch"
@@ -110,7 +110,7 @@
               v-if="order.status === 'UNPAID'"
               color="primary"
               variant="flat"
-              @click=""
+              @click="goToPayment(order.orderNo)"
             >
               立即付款
             </v-btn>
@@ -178,13 +178,13 @@
 </template>
 
 <script setup lang="ts">
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import ConfirmDeleteDialog from '@/components/client/ConfirmDeleteDialog.vue'
   import { cancelOrderService, getOrderListService } from '@/http/client/order.ts'
+  import router from '@/router'
   import { useNotification } from '@/utils/notification.ts'
 
   const route = useRoute()
-  const router = useRouter()
   const { showSuccess } = useNotification()
 
   // 响应式数据
@@ -338,6 +338,14 @@
     showCancelDialog.value = false
   }
 
+  // 前往付款页面
+  function goToPayment (orderNo: string) {
+    router.push({
+      path: '/client/OrderPayment',
+      query: { orderNo },
+    })
+  }
+
   // 查看订单详情
   function viewOrderDetail (order: OrderItem) {
     // 跳转到订单详情页
@@ -392,21 +400,29 @@
   function handlePageChange (page: number) {
     currentPage.value = page
     updateRoute()
-    // 不在这里调用 getOrderList()，让路由监听器处理
   }
+
+  // 防抖定时器
+  let searchTimer: number | null = null
 
   // 搜索处理
   function handleSearch () {
-    currentPage.value = 1 // 重置到第一页
-    updateRoute()
-    // 不在这里调用 getOrderList()，让路由监听器处理
+    // 清除之前的定时器
+    if (searchTimer) {
+      clearTimeout(searchTimer)
+    }
+
+    // 设置新的定时器，500ms后执行搜索
+    searchTimer = setTimeout(() => {
+      currentPage.value = 1 // 重置到第一页
+      updateRoute()
+    }, 500)
   }
 
   // 监听状态变化
   watch(activeStatus, () => {
     currentPage.value = 1
     updateRoute()
-    // 不在这里调用 getOrderList()，让路由监听器处理
   })
 
   // 监听路由变化
@@ -419,6 +435,13 @@
   onMounted(() => {
     initFromRoute()
     getOrderList()
+  })
+
+  // 组件卸载时清理定时器
+  onUnmounted(() => {
+    if (searchTimer) {
+      clearTimeout(searchTimer)
+    }
   })
 </script>
 
