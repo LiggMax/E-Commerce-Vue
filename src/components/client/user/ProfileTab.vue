@@ -1,33 +1,53 @@
 <template>
   <div class="profile-tab">
-    <v-form v-model="valid">
+    <v-form ref="form" v-model="valid" @submit.prevent="">
       <v-row>
-        <!-- 头像上传 -->
-        <v-col class="text-center" cols="12">
-          <div class="mb-6">
-            <v-avatar class="mb-4" size="120">
-              <v-img v-if="formData.avatar" :src="formData.avatar" />
-              <v-icon v-else color="primary" icon="mdi-account-circle" size="120" />
-            </v-avatar>
-            <div>
-              <v-btn
-                color="primary"
-                size="small"
-                variant="outlined"
-                @click="selectAvatar"
-              >
-                <v-icon icon="mdi-camera" start />
-                更换头像
-              </v-btn>
-              <input
-                ref="avatarInput"
-                accept="image/*"
-                style="display: none"
-                type="file"
-                @change="handleAvatarChange"
-              >
-            </div>
-          </div>
+        <!-- 头像上传和账户余额 -->
+        <v-col cols="12">
+          <v-row align="center" justify="center">
+            <!-- 头像上传 -->
+            <v-col class="text-center" cols="12" height="height" md="6">
+              <div class="pa-3 border" style="border-radius: 10px">
+                <v-avatar class="mb-4" size="100">
+                  <v-img v-if="formData.avatar" :src="formData.avatar" />
+                  <v-icon v-else color="primary" icon="mdi-account-circle" size="120" />
+                </v-avatar>
+                <div>
+                  <v-btn
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                    @click="selectAvatar"
+                  >
+                    <v-icon icon="mdi-camera" start />
+                    更换头像
+                  </v-btn>
+                  <input
+                    ref="avatarInput"
+                    accept="image/*"
+                    style="display: none"
+                    type="file"
+                    @change="handleAvatarChange"
+                  >
+                </div>
+              </div>
+            </v-col>
+
+            <!-- 账户余额 -->
+            <v-col class="text-center" cols="12" md="6">
+              <div class="border pa-3" style="border-radius: 10px">
+                <v-icon color="primary lighten-1" icon="mdi-account-credit-card-outline" size="70" />
+                <div class=" d-flex align-center justify-center">
+                  <v-icon color="lighten-1" icon="mdi-cash-multiple" size="24" />
+                  <div class="text-h5 font-weight-bold">{{ userInfo?.accountBalance }}</div>
+                </div>
+                <v-btn class="mt-4" color="primary" size="small" variant="outlined">
+                  <v-icon icon="mdi-credit-card-outline" start />
+                  充值
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
         </v-col>
 
         <!-- 基本信息 -->
@@ -129,6 +149,7 @@
       role: string
       createTime: string
       lastLoginTime: string
+      accountBalance: number
     }
   }
 
@@ -260,4 +281,10 @@
   max-width: 800px;
   margin: 0 auto;
 }
+
+.balance-label {
+  font-size: 14px;
+  color: #666;
+}
+
 </style>
