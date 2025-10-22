@@ -102,7 +102,7 @@
                 color="primary"
                 size="small"
                 variant="text"
-                @click=""
+                @click="setDefault(address.id)"
               >
                 设为默认
               </v-btn>
@@ -282,7 +282,7 @@
     getAddressService,
     setDefaultAddressService,
     updateAddressService,
-  } from '@/http/client/user.ts'
+  } from '@/http/client/address.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   const { showSuccess, showError } = useNotification()
@@ -503,7 +503,6 @@
   }
 
   // 设为默认地址
-  // TODO: 待完善
   async function setDefault (addressId: number) {
     try {
       await setDefaultAddressService(addressId)
@@ -511,7 +510,6 @@
       await fetchAddresses()
     } catch (error) {
       console.error('设置默认地址失败:', error)
-      showError('设置默认地址失败')
     }
   }
 
