@@ -41,7 +41,13 @@
                   <v-icon color="lighten-1" icon="mdi-cash-multiple" size="24" />
                   <div class="text-h5 font-weight-bold">{{ userInfo?.accountBalance }}</div>
                 </div>
-                <v-btn class="mt-4" color="primary" size="small" variant="outlined">
+                <v-btn
+                  class="mt-4"
+                  color="primary"
+                  size="small"
+                  variant="outlined"
+                  @click="openRechargeDialog"
+                >
                   <v-icon icon="mdi-credit-card-outline" start />
                   充值
                 </v-btn>
@@ -133,11 +139,19 @@
         </v-col>
       </v-row>
     </v-form>
+
+    <!-- 充值弹窗 -->
+    <RechargeDialog
+      v-model="showRechargeDialog"
+      :current-balance="userInfo?.accountBalance || 0"
+      @recharge="handleRecharge"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { updateUserInfoService } from '@/http/client/user.ts'
+  import RechargeDialog from '@/components/client/dialog/RechargeDialog.vue'
+  import { rechargeService, updateUserInfoService } from '@/http/client/user.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   interface Props {
@@ -158,13 +172,14 @@
     update: [userInfo: any]
   }>()
 
-  const { showError } = useNotification()
+  const { showError, showSuccess } = useNotification()
 
   // 响应式数据
   const valid = ref(false)
   const loading = ref(false)
   const avatarInput = ref<HTMLInputElement>()
   const avatarFile = ref<File | null>(null)
+  const showRechargeDialog = ref(false)
 
   // 表单数据
   const formData = reactive({
@@ -274,6 +289,28 @@
       loading.value = false
     }
   }
+
+  // 打开充值弹窗
+  function openRechargeDialog () {
+    showRechargeDialog.value = true
+  }
+
+  // 处理充值
+  async function handleRecharge (data: { amount: number, paymentMethod: string }) {
+    await rechargeService({
+      amount: data.amount,
+      paymentMethod: data.paymentMethod,
+    }).then(() => {
+      showSuccess('充值成功')
+    })
+    if (props.userInfo) {
+      const updatedUserInfo = {
+        ...props.userInfo,
+        accountBalance: props.userInfo.accountBalance + data.amount,
+      }
+      emit('update', updatedUserInfo)
+    }
+  }
 </script>
 
 <style scoped>
@@ -281,10 +318,4 @@
   max-width: 800px;
   margin: 0 auto;
 }
-
-.balance-label {
-  font-size: 14px;
-  color: #666;
-}
-
 </style>

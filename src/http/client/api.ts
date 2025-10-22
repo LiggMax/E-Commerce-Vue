@@ -54,3 +54,8 @@ export const ORDER = `${USER}/order`
  * 收货地址
  */
 export const ADDRESS = `${USER}/address`
+
+/**
+ * 账户充值
+ */
+export const RECHARGE = `${USER}/recharge`

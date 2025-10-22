@@ -24,6 +24,7 @@ declare module 'vue' {
     OrdersTab: typeof import('./components/client/user/OrdersTab.vue')['default']
     ProductCategories: typeof import('./components/client/ProductCategories.vue')['default']
     ProfileTab: typeof import('./components/client/user/ProfileTab.vue')['default']
+    RechargeDialog: typeof import('./components/client/dialog/RechargeDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SpecEditDialog: typeof import('./components/admin/SpecEditDialog.vue')['default']

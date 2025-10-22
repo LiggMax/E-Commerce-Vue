@@ -1,4 +1,4 @@
-import { GET_USER_INFO, LOGIN, REGISTER, USER } from '@/http/client/api.ts'
+import { GET_USER_INFO, LOGIN, RECHARGE, REGISTER, USER } from '@/http/client/api.ts'
 import request from '@/http/client/clientRequest.ts'
 
 /**
@@ -27,4 +27,11 @@ export async function getUserInfoService () {
  */
 export async function updateUserInfoService (userData: FormData) {
   return await request.put(USER, userData)
+}
+
+/**
+ * 充值
+ */
+export async function rechargeService (recharge: any) {
+  return await request.patch(RECHARGE, recharge)
 }
