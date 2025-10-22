@@ -229,8 +229,8 @@
 <script setup lang="ts">
   import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
+  import { getAddressService } from '@/http/client/address.ts'
   import { createOrderService } from '@/http/client/order'
-  import { getAddressService } from '@/http/client/user'
   import router from '@/router'
   import { useNotification } from '@/utils/notification.ts'
 

@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800px" persistent>
-    <v-card class="order-detail-dialog">
+  <v-dialog v-model="dialog" max-width="800px" max-height="90vh" persistent>
+    <v-card class="order-detail-dialog d-flex flex-column" style="height: 90vh;">
       <!-- 头部 -->
       <v-card-title class="d-flex align-center pa-6 pb-4">
         <v-icon class="mr-3" color="primary" size="32">mdi-package-variant</v-icon>
@@ -16,13 +16,13 @@
       <v-divider />
 
       <!-- 内容 -->
-      <v-card-text class="pa-6">
+      <v-card-text class="pa-6 flex-grow-1" style="overflow-y: auto;">
         <div v-if="props.loading" class="text-center py-8">
           <v-progress-circular color="primary" indeterminate size="48" />
           <p class="text-body-2 text-medium-emphasis mt-4">加载订单详情中...</p>
         </div>
 
-        <div v-else-if="props.orderDetail" class="order-detail-content">
+        <div v-else-if="props.orderDetail">
           <!-- 订单基本信息 -->
           <v-card class="mb-4" elevation="1">
             <v-card-subtitle class="text-h6 pa-4 pb-2">订单信息</v-card-subtitle>
@@ -114,7 +114,7 @@
       <v-divider />
 
       <!-- 操作按钮 -->
-      <v-card-actions class="pa-6">
+      <v-card-actions class="pa-6 flex-shrink-0">
         <v-spacer />
         <v-btn
           color="primary"
@@ -204,11 +204,6 @@
 <style scoped>
 .order-detail-dialog {
   border-radius: 12px;
-}
-
-.order-detail-content {
-  max-height: 70vh;
-  overflow-y: auto;
 }
 
 .detail-item {
