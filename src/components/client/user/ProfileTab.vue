@@ -1,6 +1,6 @@
 <template>
   <div class="profile-tab">
-    <v-form ref="form" v-model="valid" @submit="">
+    <v-form v-model="valid">
       <v-row>
         <!-- 头像上传 -->
         <v-col class="text-center" cols="12">
@@ -101,11 +101,11 @@
         <v-col class="text-center" cols="12">
           <v-btn
             color="primary"
-            :disabled="!valid"
+            :disabled="!isFormChanged"
             :loading="loading"
             size="large"
-            type="submit"
             variant="flat"
+            @click="submitForm"
           >
             <v-icon icon="mdi-content-save" start />
             保存修改
@@ -117,6 +117,7 @@
 </template>
 
 <script setup lang="ts">
+  import { updateUserInfoService } from '@/http/client/user.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   interface Props {
@@ -139,10 +140,10 @@
   const { showError } = useNotification()
 
   // 响应式数据
-  const form = ref()
   const valid = ref(false)
   const loading = ref(false)
   const avatarInput = ref<HTMLInputElement>()
+  const avatarFile = ref<File | null>(null)
 
   // 表单数据
   const formData = reactive({
@@ -162,6 +163,16 @@
     (v: string) => !!v || '请输入邮箱',
     (v: string) => /.+@.+\..+/.test(v) || '邮箱格式不正确',
   ]
+
+  // 检查表单是否已更改
+  const isFormChanged = computed(() => {
+    if (!props.userInfo) return false
+    return (
+      formData.nickName !== props.userInfo.nickName
+      || formData.email !== props.userInfo.email
+      || avatarFile.value !== null
+    )
+  })
 
   // 监听用户信息变化，更新表单数据
   watch(() => props.userInfo, newUserInfo => {
@@ -195,6 +206,9 @@
         return
       }
 
+      // 保存文件引用
+      avatarFile.value = file
+
       // 创建预览URL
       const reader = new FileReader()
       reader.addEventListener('load', e => {
@@ -220,6 +234,25 @@
     return roleMap[role || 'USER'] || '普通用户'
   }
 
+  // 提交表单
+  async function submitForm () {
+    try {
+      loading.value = true
+      const form = new FormData()
+      form.append('nickName', formData.nickName)
+      form.append('email', formData.email)
+      if (avatarFile.value) {
+        form.append('avatarFile', avatarFile.value)
+      }
+      await updateUserInfoService(form)
+      emit('update', formData)
+      avatarFile.value = null
+    } catch (error) {
+      console.error('更新用户信息失败:', error)
+    } finally {
+      loading.value = false
+    }
+  }
 </script>
 
 <style scoped>
