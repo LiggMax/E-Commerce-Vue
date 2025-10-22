@@ -10,10 +10,10 @@
             <div v-if="orderData.product" class="d-flex ga-4">
               <v-img
                 cover
-                height="120"
+                height="220"
                 rounded="lg"
                 :src="orderData.product.images.largeImage"
-                width="120"
+                width="90"
               />
               <div class="flex-grow-1">
                 <div class="text-h6">{{ orderData.product.title }}</div>

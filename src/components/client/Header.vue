@@ -13,7 +13,7 @@
           <!-- Logo -->
           <v-btn to="/" variant="text">
             <v-icon class="mr-1" color="primary" icon="mdi-storefront" size="24" />
-            <span class="text-h6 font-weight-bold">ShopVue</span>
+            <span class="text-h6 font-weight-bold">{{ logoText }}</span>
           </v-btn>
 
           <!-- Mobile Actions -->
@@ -37,7 +37,7 @@
                 icon="mdi-storefront"
                 size="32"
               />
-              <span class="text-h5 font-weight-bold primary--text">ShopVue</span>
+              <span class="text-h5 font-weight-bold primary--text">{{ logoText }}</span>
             </v-btn>
           </v-col>
 
@@ -233,6 +233,7 @@
   import { userTokenStore } from '@/stores/client/clientToken.ts'
 
   const display = useDisplay()
+  const logoText = ref('电商商城')
   const searchQuery = ref('')
   const drawer = ref(false)
   const searchDialog = ref(false)
