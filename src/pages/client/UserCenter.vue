@@ -95,9 +95,7 @@
   import { getUserInfoService } from '@/http/client/user.ts'
   import router from '@/router'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
-  import { useNotification } from '@/utils/notification.ts'
 
-  const { showError } = useNotification()
   const tokenStore = userTokenStore()
   const route = useRoute()
 
@@ -110,6 +108,7 @@
     role: string
     createTime: string
     lastLoginTime: string
+    accountBalance: number
   }
 
   // 响应式数据
