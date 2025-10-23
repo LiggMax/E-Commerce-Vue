@@ -163,6 +163,117 @@
 
               <!-- 评价 Tab -->
               <v-window-item value="review">
+                <!-- 发表评价框 -->
+                <v-card class="mb-6" elevation="1" rounded="lg">
+                  <v-card-title class="text-h6">发表评价</v-card-title>
+                  <v-divider />
+                  <v-card-text class="pa-4">
+                    <v-form ref="reviewForm" v-model="reviewFormValid">
+                      <!-- 评分 -->
+                      <div class="mb-4">
+                        <div class="text-body-2 text-medium-emphasis mb-2">评分</div>
+                        <v-rating
+                          v-model="newReview.rating"
+                          color="amber"
+                          half-increments
+                          size="large"
+                        />
+                      </div>
+
+                      <!-- 评价内容 -->
+                      <div class="mb-4">
+                        <v-textarea
+                          v-model="newReview.content"
+                          label="分享您的使用体验..."
+                          placeholder="请详细描述您对商品的感受，帮助其他用户做出选择"
+                          rows="4"
+                          variant="outlined"
+                        />
+                      </div>
+
+                      <!-- 图片上传 -->
+                      <div class="mb-4">
+                        <div class="text-body-2 text-medium-emphasis mb-2">上传图片（最多9张）</div>
+                        <div class="d-flex flex-wrap ga-2">
+                          <!-- 已上传的图片 -->
+                          <div
+                            v-for="(img, index) in newReview.images"
+                            :key="index"
+                            class="position-relative"
+                          >
+                            <v-img
+                              :src="img"
+                              class="rounded"
+                              height="80"
+                              width="80"
+                            />
+                            <v-btn
+                              class="position-absolute"
+                              color="error"
+                              density="compact"
+                              icon="mdi-close"
+                              size="small"
+                              style="top: -8px; right: -8px;"
+                              @click="removeImage(index)"
+                            />
+                          </div>
+                          <!-- 上传按钮 -->
+                          <v-btn
+                            v-if="newReview.images.length < 9"
+                            class="d-flex flex-column align-center justify-center"
+                            color="grey-lighten-3"
+                            height="80"
+                            variant="outlined"
+                            width="80"
+                            @click="triggerImageUpload"
+                          >
+                            <v-icon icon="mdi-camera-plus" size="24" />
+                            <span class="text-caption mt-1">添加图片</span>
+                          </v-btn>
+                        </div>
+                        <input
+                          ref="imageInput"
+                          accept="image/*"
+                          multiple
+                          style="display: none;"
+                          type="file"
+                          @change="handleImageUpload"
+                        />
+                      </div>
+
+                      <!-- 表情选择 -->
+                      <div class="mb-4">
+                        <div class="text-body-2 text-medium-emphasis mb-2">选择表情</div>
+                        <div class="d-flex ga-2">
+                          <v-btn
+                            v-for="emoji in emojis"
+                            :key="emoji"
+                            :color="newReview.emoji === emoji ? 'primary' : 'grey-lighten-3'"
+                            :variant="newReview.emoji === emoji ? 'flat' : 'outlined'"
+                            size="small"
+                            @click="newReview.emoji = emoji"
+                          >
+                            {{ emoji }}
+                          </v-btn>
+                        </div>
+                      </div>
+
+                      <!-- 提交按钮 -->
+                      <div class="d-flex justify-end">
+                        <v-btn
+                          color="primary"
+                          :disabled="!reviewFormValid || !newReview.rating || !newReview.content.trim()"
+                          :loading="submittingReview"
+                          variant="flat"
+                          @click="submitReview"
+                        >
+                          发表评价
+                        </v-btn>
+                      </div>
+                    </v-form>
+                  </v-card-text>
+                </v-card>
+
                 <div class="mb-6">
                   <div class="d-flex align-center mb-4">
                     <v-rating
@@ -366,6 +477,29 @@
     { count: 0, percentage: 0 },
   ])
 
+  // 新评价表单数据
+  interface NewReview {
+    rating: number
+    content: string
+    images: string[]
+    emoji: string
+  }
+
+  const newReview = ref<NewReview>({
+    rating: 0,
+    content: '',
+    images: [],
+    emoji: '',
+  })
+
+  const reviewFormValid = ref(false)
+  const submittingReview = ref(false)
+  const reviewForm = ref()
+  const imageInput = ref()
+
+  // 表情选项
+  const emojis = ref(['😊', '😍', '👍', '👎', '😢', '😡', '🤔', '😴'])
+
   // 计算所有图片数组，第一张是largeImage，后面是detailImages中的所有url
   const allImages = computed(() => {
     if (!productDetail.value) return []
@@ -388,6 +522,78 @@
   function previewImage (imageUrl: string) {
     // 这里可以实现图片预览功能
     console.log('预览图片:', imageUrl)
+  }
+
+  // 触发图片上传
+  function triggerImageUpload () {
+    imageInput.value?.click()
+  }
+
+  // 处理图片上传
+  function handleImageUpload (event: Event) {
+    const target = event.target as HTMLInputElement
+    const files = target.files
+    if (!files) return
+
+    Array.from(files).forEach(file => {
+      if (file.type.startsWith('image/') && newReview.value.images.length < 9) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const result = e.target?.result as string
+          if (result) {
+            newReview.value.images.push(result)
+          }
+        }
+        reader.readAsDataURL(file)
+      }
+    })
+
+    // 清空 input 值，允许重复选择同一文件
+    target.value = ''
+  }
+
+  // 移除图片
+  function removeImage (index: number) {
+    newReview.value.images.splice(index, 1)
+  }
+
+  // 提交评价
+  async function submitReview () {
+    if (!newReview.value.rating || !newReview.value.content.trim()) {
+      return
+    }
+
+    submittingReview.value = true
+    try {
+      // 模拟提交评价
+      const reviewData = {
+        id: Date.now(),
+        userName: '当前用户',
+        userAvatar: 'https://randomuser.me/api/portraits/men/0.jpg',
+        rating: newReview.value.rating,
+        content: newReview.value.content,
+        createTime: new Date().toISOString().split('T')[0],
+        images: newReview.value.images,
+        specs: selectedSpecsText.value,
+      }
+
+      // 添加到评价列表顶部
+      reviews.value.unshift(reviewData)
+
+      // 重置表单
+      newReview.value = {
+        rating: 0,
+        content: '',
+        images: [],
+        emoji: '',
+      }
+
+      console.log('评价提交成功:', reviewData)
+    } catch (error) {
+      console.error('提交评价失败:', error)
+    } finally {
+      submittingReview.value = false
+    }
   }
 
   // 选择规格
@@ -600,4 +806,11 @@
 </script>
 
 <style scoped>
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
 </style>
