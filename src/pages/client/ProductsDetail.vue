@@ -131,27 +131,149 @@
     <v-row class="mt-8">
       <v-col cols="12">
         <v-card elevation="2" rounded="lg">
-          <v-tabs color="primary" grow>
+          <v-tabs
+            v-model="activeTab"
+            color="primary"
+            grow
+          >
             <v-tab value="detail">详情</v-tab>
-            <v-tab value="spec">参数</v-tab>
             <v-tab value="review">评价</v-tab>
+            <v-tab value="spec">参数</v-tab>
           </v-tabs>
           <v-divider />
           <v-card-text>
-            <v-row>
-              <v-col cols="12" md="8">
-                <p class="text-body-1 mb-4">{{ productDetail.description }}</p>
-              </v-col>
-              <v-col cols="12" md="4">
+            <v-window v-model="activeTab">
+              <!-- 详情 Tab -->
+              <v-window-item value="detail">
+                <v-row>
+                  <v-col cols="12" md="8">
+                    <p class="text-body-1 mb-4">{{ productDetail.description }}</p>
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-list density="compact" subheader>
+                      <v-list-subheader>规格参数</v-list-subheader>
+                      <v-list-item subtitle="IPS" title="面板" />
+                      <v-list-item subtitle="3840 x 2160" title="分辨率" />
+                      <v-list-item subtitle="144Hz" title="刷新率" />
+                      <v-list-item subtitle="HDMI 2.1 / DP 1.4 / Type‑C" title="接口" />
+                    </v-list>
+                  </v-col>
+                </v-row>
+              </v-window-item>
+
+              <!-- 评价 Tab -->
+              <v-window-item value="review">
+                <div class="mb-6">
+                  <div class="d-flex align-center mb-4">
+                    <v-rating
+                      color="amber"
+                      half-increments
+                      :model-value="productDetail.rating / 2"
+                      readonly
+                      size="large"
+                    />
+                    <div class="ml-4">
+                      <div class="text-h4 font-weight-bold">{{ productDetail.rating }}</div>
+                      <div class="text-body-2 text-medium-emphasis">基于 {{ productDetail.reviews }} 条评价</div>
+                    </div>
+                  </div>
+
+                  <!-- 评价统计 -->
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <v-list density="compact">
+                        <v-list-item
+                          v-for="(rating, index) in ratingStats"
+                          :key="index"
+                          class="px-0"
+                        >
+                          <template #prepend>
+                            <span class="text-body-2">{{ 5 - index }}星</span>
+                          </template>
+                          <v-progress-linear
+                            color="amber"
+                            height="8"
+                            :model-value="rating.percentage"
+                            rounded
+                          />
+                          <template #append>
+                            <span class="text-body-2 text-medium-emphasis">{{ rating.count }}</span>
+                          </template>
+                        </v-list-item>
+                      </v-list>
+                    </v-col>
+                  </v-row>
+                </div>
+
+                <!-- 评价列表 -->
+                <div v-if="reviews.length > 0">
+                  <v-card
+                    v-for="review in reviews"
+                    :key="review.id"
+                    class="mb-4"
+                    elevation="1"
+                    rounded="lg"
+                  >
+                    <v-card-text class="pa-4">
+                      <div class="d-flex align-start">
+                        <v-avatar class="mr-4" size="40">
+                          <v-img :src="review.userAvatar" />
+                        </v-avatar>
+                        <div class="flex-grow-1">
+                          <div class="d-flex align-center mb-2">
+                            <span class="text-subtitle-2 font-weight-medium">{{ review.userName }}</span>
+                            <v-rating
+                              class="ml-2"
+                              color="amber"
+                              :model-value="review.rating"
+                              readonly
+                              size="small"
+                            />
+                            <span class="text-caption text-medium-emphasis ml-2">{{ review.createTime }}</span>
+                          </div>
+                          <p class="text-body-2 mb-2">{{ review.content }}</p>
+                          <div v-if="review.images && review.images.length > 0" class="d-flex ga-2 mb-2">
+                            <v-img
+                              v-for="(img, idx) in review.images"
+                              :key="idx"
+                              class="rounded"
+                              height="60"
+                              :src="img"
+                              width="60"
+                              @click="previewImage(img)"
+                            />
+                          </div>
+                          <div v-if="review.specs" class="text-caption text-medium-emphasis">
+                            规格：{{ review.specs }}
+                          </div>
+                        </div>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </div>
+
+                <div v-else class="text-center py-8">
+                  <v-icon class="mb-4" color="grey-lighten-1" icon="mdi-comment-outline" size="64" />
+                  <h3 class="text-h6 text-medium-emphasis">暂无评价</h3>
+                  <p class="text-body-2 text-medium-emphasis">成为第一个评价此商品的用户</p>
+                </div>
+              </v-window-item>
+
+              <!-- 参数 Tab -->
+              <v-window-item value="spec">
                 <v-list density="compact" subheader>
-                  <v-list-subheader>规格参数</v-list-subheader>
+                  <v-list-subheader>详细参数</v-list-subheader>
                   <v-list-item subtitle="IPS" title="面板" />
                   <v-list-item subtitle="3840 x 2160" title="分辨率" />
                   <v-list-item subtitle="144Hz" title="刷新率" />
                   <v-list-item subtitle="HDMI 2.1 / DP 1.4 / Type‑C" title="接口" />
+                  <v-list-item subtitle="27英寸" title="屏幕尺寸" />
+                  <v-list-item subtitle="1ms" title="响应时间" />
+                  <v-list-item subtitle="HDR400" title="HDR支持" />
+                  <v-list-item subtitle="FreeSync Premium Pro" title="同步技术" />
                 </v-list>
-              </v-col>
-            </v-row>
+              </v-window-item>
+            </v-window>
           </v-card-text>
         </v-card>
       </v-col>
@@ -216,9 +338,33 @@
   const productDetail = ref<Product>()
   const activeIndex = ref(0)
   const quantity = ref(1)
+  const activeTab = ref('detail')
 
   // 选中的规格，key为规格id，value为规格值id
   const selectedSpecs = ref<Record<number, number>>({})
+
+  // 评价数据
+  interface Review {
+    id: number
+    userName: string
+    userAvatar: string
+    rating: number
+    content: string
+    createTime: string
+    images?: string[]
+    specs?: string
+  }
+
+  const reviews = ref<Review[]>([])
+
+  // 评价统计数据
+  const ratingStats = ref([
+    { count: 45, percentage: 75 },
+    { count: 12, percentage: 20 },
+    { count: 2, percentage: 3 },
+    { count: 1, percentage: 2 },
+    { count: 0, percentage: 0 },
+  ])
 
   // 计算所有图片数组，第一张是largeImage，后面是detailImages中的所有url
   const allImages = computed(() => {
@@ -236,6 +382,12 @@
 
   function selectImage (idx: number) {
     activeIndex.value = idx
+  }
+
+  // 预览图片
+  function previewImage (imageUrl: string) {
+    // 这里可以实现图片预览功能
+    console.log('预览图片:', imageUrl)
   }
 
   // 选择规格
@@ -373,8 +525,77 @@
     }
   }
 
+  /**
+   * 获取评价数据
+   */
+  async function getReviews () {
+    console.log('开始加载评价数据...')
+    // 模拟评价数据
+    reviews.value = [
+      {
+        id: 1,
+        userName: '张三',
+        userAvatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+        rating: 5,
+        content: '显示器质量很好，色彩鲜艳，144Hz刷新率玩游戏很流畅。包装也很仔细，物流很快。',
+        createTime: '2024-01-15',
+        images: [
+          'https://picsum.photos/200/200?random=1',
+          'https://picsum.photos/200/200?random=2',
+        ],
+        specs: '颜色：黑色，尺寸：27英寸',
+      },
+      {
+        id: 2,
+        userName: '李四',
+        userAvatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+        rating: 4,
+        content: '整体不错，但是支架有点松动，不过不影响使用。画质清晰，性价比很高。',
+        createTime: '2024-01-10',
+        specs: '颜色：白色，尺寸：27英寸',
+      },
+      {
+        id: 3,
+        userName: '王五',
+        userAvatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+        rating: 5,
+        content: '非常满意！4K分辨率看电影效果很棒，HDR效果也很不错。推荐购买！',
+        createTime: '2024-01-08',
+        images: [
+          'https://picsum.photos/200/200?random=3',
+        ],
+        specs: '颜色：黑色，尺寸：27英寸',
+      },
+      {
+        id: 4,
+        userName: '赵六',
+        userAvatar: 'https://randomuser.me/api/portraits/women/4.jpg',
+        rating: 3,
+        content: '显示器还可以，但是有个坏点，联系客服后很快就处理了。服务态度不错。',
+        createTime: '2024-01-05',
+        specs: '颜色：银色，尺寸：27英寸',
+      },
+      {
+        id: 5,
+        userName: '钱七',
+        userAvatar: 'https://randomuser.me/api/portraits/men/5.jpg',
+        rating: 5,
+        content: '完美！从下单到收货只用了2天，显示器没有任何问题，画质清晰，色彩准确。',
+        createTime: '2024-01-03',
+        images: [
+          'https://picsum.photos/200/200?random=4',
+          'https://picsum.photos/200/200?random=5',
+          'https://picsum.photos/200/200?random=6',
+        ],
+        specs: '颜色：黑色，尺寸：27英寸',
+      },
+    ]
+    console.log('评价数据加载完成:', reviews.value.length, '条评价')
+  }
+
   onMounted(() => {
     getProduct()
+    getReviews()
   })
 </script>
 
