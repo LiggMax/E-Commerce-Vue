@@ -25,15 +25,15 @@ export async function payOrderService (payData: any) {
 /**
  * 获取订单列表
  */
-export async function getOrderListService (params?: any) {
-  return await request.get(ORDER, { params })
+export async function getOrderListService (params: any) {
+  return await request.get(`${ORDER}/list`, params)
 }
 
 /**
  * 取消订单
  */
 export async function cancelOrderService (orderNo: string) {
-  return await request.put(`${ORDER}/${orderNo}/cancel`)
+  return await request.patch(`${ORDER}/${orderNo}`)
 }
 
 /**

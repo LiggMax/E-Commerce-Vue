@@ -13,7 +13,7 @@
           <!-- Logo -->
           <v-btn to="/" variant="text">
             <v-icon class="mr-1" color="primary" icon="mdi-storefront" size="24" />
-            <span class="text-h6 font-weight-bold">ShopVue</span>
+            <span class="text-h6 font-weight-bold">{{ logoText }}</span>
           </v-btn>
 
           <!-- Mobile Actions -->
@@ -37,7 +37,7 @@
                 icon="mdi-storefront"
                 size="32"
               />
-              <span class="text-h5 font-weight-bold primary--text">ShopVue</span>
+              <span class="text-h5 font-weight-bold primary--text">{{ logoText }}</span>
             </v-btn>
           </v-col>
 
@@ -233,6 +233,7 @@
   import { userTokenStore } from '@/stores/client/clientToken.ts'
 
   const display = useDisplay()
+  const logoText = ref('电商商城')
   const searchQuery = ref('')
   const drawer = ref(false)
   const searchDialog = ref(false)
@@ -270,16 +271,18 @@
   ]
 
   const userMenuItems = [
-    { title: '个人中心', icon: 'mdi-account', action: () => gotoPersonalCenter() },
-    { title: '订单历史', icon: 'mdi-package-variant', action: () => console.log('订单') },
-    { title: '收藏夹', icon: 'mdi-heart', action: () => console.log('收藏') },
+    { title: '个人中心', icon: 'mdi-account',
+      action: () => router.push('/client/UserCenter'),
+    },
+    { title: '订单历史', icon: 'mdi-package-variant',
+      action: () => router.push('/client/UserCenter?tab=orders'),
+    },
+    { title: '收藏夹', icon: 'mdi-heart',
+      action: () => router.push('/client/UserCenter?tab=favorites'),
+    },
     { title: '设置', icon: 'mdi-cog', action: () => console.log('设置') },
     { title: '退出登录', icon: 'mdi-logout', action: () => logout() },
   ]
-
-  function closeSearchDialog () {
-    searchDialog.value = false
-  }
 
   function handleSearch () {
     if (!searchQuery.value.trim()) return
@@ -289,13 +292,6 @@
         keyword: searchQuery.value,
       },
     })
-  }
-
-  /**
-   * goto 个人中心
-   */
-  function gotoPersonalCenter () {
-    router.push('/client/UserCenter')
   }
 
   /**
@@ -379,5 +375,17 @@
   opacity: 0.8;
   transform: scale(1.05);
   transition: all 0.2s ease;
+}
+
+.v-btn-toggle {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* 隐藏滚动条的样式 */
+.v-btn-toggle::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 </style>

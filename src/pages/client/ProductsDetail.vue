@@ -20,7 +20,7 @@
             />
           </div>
           <v-divider />
-          <v-sheet class="pa-3">
+          <v-sheet>
             <v-slide-group show-arrows>
               <v-slide-group-item
                 v-for="(img, idx) in allImages"
@@ -100,10 +100,13 @@
                 v-model.number="quantity"
                 density="compact"
                 hide-details
+                :max="productDetail.stock"
                 style="max-width: 80px"
                 type="number"
+                @input="validateQuantity"
               />
-              <v-btn density="comfortable" icon="mdi-plus" variant="outlined" @click="quantity++" />
+              <v-btn density="comfortable" icon="mdi-plus" variant="outlined" @click="quantity = Math.min(productDetail.stock, quantity + 1)" />
+              <div class="font-weight-bold text-medium-emphasis">库存: {{ productDetail.stock }}</div>
             </div>
 
             <div class="d-flex ga-4">
@@ -399,9 +402,11 @@
   import router from '@/router'
   import { useAppStore } from '@/stores/client/app.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
+  import { useNotification } from '@/utils/notification.ts'
 
   const route = useRoute()
   const appStore = useAppStore()
+  const { showWarning } = useNotification()
 
   // 数据模型
   interface DetailImage {
@@ -441,6 +446,7 @@
     rating: number
     discount: number
     createdAt: string
+    stock: number | 0
     description: string | null
     detailImages: DetailImage[]
     specs: Spec[]
@@ -645,8 +651,19 @@
     return productDetail.value.originalPrice + selectedSpecsPrice.value
   })
 
+  // 验证库存是否充足
+  function validateStock () {
+    if (!productDetail.value) return false
+    if (quantity.value > productDetail.value.stock) {
+      showWarning(`库存不足，当前库存为 ${productDetail.value.stock}`)
+      return false
+    }
+    return true
+  }
+
   function addToCart () {
     if (!validateSpecs()) return
+    if (!validateStock()) return
     console.log('加入购物车', {
       product: productDetail.value,
       quantity: quantity.value,
@@ -664,6 +681,7 @@
       return
     }
     if (!validateSpecs()) return
+    if (!validateStock()) return
     // 构建参数
     const params = {
       productId: productDetail.value!.id,
@@ -687,6 +705,16 @@
         data: encodedData,
       },
     })
+  }
+
+  // 验证数量是否超过库存
+  function validateQuantity () {
+    if (productDetail.value && quantity.value > productDetail.value.stock) {
+      quantity.value = productDetail.value.stock
+      showWarning(`数量不能超过库存 ${productDetail.value.stock}`)
+    } else if (quantity.value < 1) {
+      quantity.value = 1
+    }
   }
 
   // 验证是否所有规格都已选择

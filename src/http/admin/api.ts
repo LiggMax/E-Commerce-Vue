@@ -1,7 +1,7 @@
 /**
  * 登录接口
  */
-export const LOGIN = `/api/admin/account/login`
+export const LOGIN = `/api/admin/auth/login`
 
 /**
  * 轮播图

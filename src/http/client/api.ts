@@ -31,24 +31,31 @@ export const CAPTCHA = '/api/client/captcha'
 /**
  * 注册
  */
-export const REGISTER = '/api/client/account/register'
+export const REGISTER = '/api/client/auth/register'
 
 /**
  * 登录
  */
-export const LOGIN = '/api/client/account/login'
+export const LOGIN = '/api/client/auth/login'
+
+export const USER = '/api/client/user'
 
 /**
  * 获取用户信息
  */
-export const GET_USER_INFO = '/api/client/user/info'
+export const GET_USER_INFO = `${USER}/info`
 
 /**
  * 订单
  */
-export const ORDER = '/api/client/user/order'
+export const ORDER = `${USER}/order`
 
 /**
  * 收货地址
  */
-export const ADDRESS = '/api/client/user/address'
+export const ADDRESS = `${USER}/address`
+
+/**
+ * 账户充值
+ */
+export const RECHARGE = `${USER}/recharge`

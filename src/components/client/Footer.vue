@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="bg-grey-darken-4 text-white pt-12">
+  <v-footer class="bg-grey-darken-4 text-white">
     <v-container>
       <!-- Main Footer Content -->
       <v-row>

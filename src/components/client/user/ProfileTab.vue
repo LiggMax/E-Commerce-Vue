@@ -1,33 +1,59 @@
 <template>
   <div class="profile-tab">
-    <v-form ref="form" v-model="valid" @submit="">
+    <v-form ref="form" v-model="valid" @submit.prevent="">
       <v-row>
-        <!-- 头像上传 -->
-        <v-col class="text-center" cols="12">
-          <div class="avatar-section mb-6">
-            <v-avatar class="mb-4" size="120">
-              <v-img v-if="formData.avatar" :src="formData.avatar" />
-              <v-icon v-else color="primary" icon="mdi-account-circle" size="120" />
-            </v-avatar>
-            <div>
-              <v-btn
-                color="primary"
-                size="small"
-                variant="outlined"
-                @click="selectAvatar"
-              >
-                <v-icon icon="mdi-camera" start />
-                更换头像
-              </v-btn>
-              <input
-                ref="avatarInput"
-                accept="image/*"
-                style="display: none"
-                type="file"
-                @change="handleAvatarChange"
-              >
-            </div>
-          </div>
+        <!-- 头像上传和账户余额 -->
+        <v-col cols="12">
+          <v-row align="center" justify="center">
+            <!-- 头像上传 -->
+            <v-col class="text-center" cols="12" height="height" md="6">
+              <div class="pa-3 border" style="border-radius: 10px">
+                <v-avatar class="mb-4" size="100">
+                  <v-img v-if="formData.avatar" :src="formData.avatar" />
+                  <v-icon v-else color="primary" icon="mdi-account-circle" size="120" />
+                </v-avatar>
+                <div>
+                  <v-btn
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                    @click="selectAvatar"
+                  >
+                    <v-icon icon="mdi-camera" start />
+                    更换头像
+                  </v-btn>
+                  <input
+                    ref="avatarInput"
+                    accept="image/*"
+                    style="display: none"
+                    type="file"
+                    @change="handleAvatarChange"
+                  >
+                </div>
+              </div>
+            </v-col>
+
+            <!-- 账户余额 -->
+            <v-col class="text-center" cols="12" md="6">
+              <div class="border pa-3" style="border-radius: 10px">
+                <v-icon color="primary lighten-1" icon="mdi-account-credit-card-outline" size="70" />
+                <div class=" d-flex align-center justify-center">
+                  <v-icon color="lighten-1" icon="mdi-cash-multiple" size="24" />
+                  <div class="text-h5 font-weight-bold">{{ userInfo?.accountBalance }}</div>
+                </div>
+                <v-btn
+                  class="mt-4"
+                  color="primary"
+                  size="small"
+                  variant="outlined"
+                  @click="openRechargeDialog"
+                >
+                  <v-icon icon="mdi-credit-card-outline" start />
+                  充值
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
         </v-col>
 
         <!-- 基本信息 -->
@@ -101,11 +127,11 @@
         <v-col class="text-center" cols="12">
           <v-btn
             color="primary"
-            :disabled="!valid"
+            :disabled="!isFormChanged"
             :loading="loading"
             size="large"
-            type="submit"
             variant="flat"
+            @click="submitForm"
           >
             <v-icon icon="mdi-content-save" start />
             保存修改
@@ -113,10 +139,19 @@
         </v-col>
       </v-row>
     </v-form>
+
+    <!-- 充值弹窗 -->
+    <RechargeDialog
+      v-model="showRechargeDialog"
+      :current-balance="userInfo?.accountBalance || 0"
+      @recharge="handleRecharge"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+  import RechargeDialog from '@/components/client/dialog/RechargeDialog.vue'
+  import { rechargeService, updateUserInfoService } from '@/http/client/user.ts'
   import { useNotification } from '@/utils/notification.ts'
 
   interface Props {
@@ -128,6 +163,7 @@
       role: string
       createTime: string
       lastLoginTime: string
+      accountBalance: number
     }
   }
 
@@ -136,13 +172,14 @@
     update: [userInfo: any]
   }>()
 
-  const { showSuccess, showError } = useNotification()
+  const { showError, showSuccess } = useNotification()
 
   // 响应式数据
-  const form = ref()
   const valid = ref(false)
   const loading = ref(false)
   const avatarInput = ref<HTMLInputElement>()
+  const avatarFile = ref<File | null>(null)
+  const showRechargeDialog = ref(false)
 
   // 表单数据
   const formData = reactive({
@@ -162,6 +199,16 @@
     (v: string) => !!v || '请输入邮箱',
     (v: string) => /.+@.+\..+/.test(v) || '邮箱格式不正确',
   ]
+
+  // 检查表单是否已更改
+  const isFormChanged = computed(() => {
+    if (!props.userInfo) return false
+    return (
+      formData.nickName !== props.userInfo.nickName
+      || formData.email !== props.userInfo.email
+      || avatarFile.value !== null
+    )
+  })
 
   // 监听用户信息变化，更新表单数据
   watch(() => props.userInfo, newUserInfo => {
@@ -195,6 +242,9 @@
         return
       }
 
+      // 保存文件引用
+      avatarFile.value = file
+
       // 创建预览URL
       const reader = new FileReader()
       reader.addEventListener('load', e => {
@@ -220,18 +270,52 @@
     return roleMap[role || 'USER'] || '普通用户'
   }
 
+  // 提交表单
+  async function submitForm () {
+    try {
+      loading.value = true
+      const form = new FormData()
+      form.append('nickName', formData.nickName)
+      form.append('email', formData.email)
+      if (avatarFile.value) {
+        form.append('avatarFile', avatarFile.value)
+      }
+      await updateUserInfoService(form)
+      emit('update', formData)
+      avatarFile.value = null
+    } catch (error) {
+      console.error('更新用户信息失败:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 打开充值弹窗
+  function openRechargeDialog () {
+    showRechargeDialog.value = true
+  }
+
+  // 处理充值
+  async function handleRecharge (data: { amount: number, paymentMethod: string }) {
+    await rechargeService({
+      amount: data.amount,
+      paymentMethod: data.paymentMethod,
+    }).then(() => {
+      showSuccess('充值成功')
+    })
+    if (props.userInfo) {
+      const updatedUserInfo = {
+        ...props.userInfo,
+        accountBalance: props.userInfo.accountBalance + data.amount,
+      }
+      emit('update', updatedUserInfo)
+    }
+  }
 </script>
 
 <style scoped>
 .profile-tab {
   max-width: 800px;
   margin: 0 auto;
-}
-
-.avatar-section {
-  padding: 20px;
-  border: 2px dashed rgb(var(--v-theme-outline));
-  border-radius: 12px;
-  background-color: rgba(var(--v-theme-surface-variant), 0.1);
 }
 </style>
