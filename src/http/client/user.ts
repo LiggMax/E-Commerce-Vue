@@ -35,3 +35,10 @@ export async function updateUserInfoService (userData: FormData) {
 export async function rechargeService (recharge: any) {
   return await request.patch(RECHARGE, recharge)
 }
+
+/**
+ * 发布评论
+ */
+export async function publishCommentService (comment: any) {
+  return await request.post(`${USER}/comment`, comment)
+}

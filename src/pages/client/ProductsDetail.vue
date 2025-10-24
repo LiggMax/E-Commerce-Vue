@@ -205,9 +205,9 @@
                             class="position-relative"
                           >
                             <v-img
-                              :src="img"
                               class="rounded"
                               height="80"
+                              :src="img"
                               width="80"
                             />
                             <v-btn
@@ -241,7 +241,7 @@
                           style="display: none;"
                           type="file"
                           @change="handleImageUpload"
-                        />
+                        >
                       </div>
 
                       <!-- 表情选择 -->
@@ -252,8 +252,8 @@
                             v-for="emoji in emojis"
                             :key="emoji"
                             :color="newReview.emoji === emoji ? 'primary' : 'grey-lighten-3'"
-                            :variant="newReview.emoji === emoji ? 'flat' : 'outlined'"
                             size="small"
+                            :variant="newReview.emoji === emoji ? 'flat' : 'outlined'"
                             @click="newReview.emoji = emoji"
                           >
                             {{ emoji }}
@@ -399,6 +399,7 @@
   import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
   import { getFeaturedDetailServer } from '@/http/client/product.ts'
+  import { publishCommentService } from '@/http/client/user.ts'
   import router from '@/router'
   import { useAppStore } from '@/stores/client/app.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
@@ -488,6 +489,7 @@
     rating: number
     content: string
     images: string[]
+    imageFiles: File[]
     emoji: string
   }
 
@@ -495,6 +497,7 @@
     rating: 0,
     content: '',
     images: [],
+    imageFiles: [],
     emoji: '',
   })
 
@@ -541,18 +544,21 @@
     const files = target.files
     if (!files) return
 
-    Array.from(files).forEach(file => {
+    for (const file of Array.from(files)) {
       if (file.type.startsWith('image/') && newReview.value.images.length < 9) {
+        // 保存原始文件对象
+        newReview.value.imageFiles.push(file)
+
         const reader = new FileReader()
-        reader.onload = (e) => {
+        reader.addEventListener('load', e => {
           const result = e.target?.result as string
           if (result) {
             newReview.value.images.push(result)
           }
-        }
+        })
         reader.readAsDataURL(file)
       }
-    })
+    }
 
     // 清空 input 值，允许重复选择同一文件
     target.value = ''
@@ -561,6 +567,7 @@
   // 移除图片
   function removeImage (index: number) {
     newReview.value.images.splice(index, 1)
+    newReview.value.imageFiles.splice(index, 1)
   }
 
   // 提交评价
@@ -571,26 +578,30 @@
 
     submittingReview.value = true
     try {
-      // 模拟提交评价
       const reviewData = {
-        id: Date.now(),
-        userName: '当前用户',
-        userAvatar: 'https://randomuser.me/api/portraits/men/0.jpg',
+        productId: productDetail.value!.id,
         rating: newReview.value.rating,
         content: newReview.value.content,
-        createTime: new Date().toISOString().split('T')[0],
         images: newReview.value.images,
         specs: selectedSpecsText.value,
       }
 
-      // 添加到评价列表顶部
-      reviews.value.unshift(reviewData)
+      const formData = new FormData()
+      formData.append('productId', productDetail.value!.id)
+      formData.append('rating', newReview.value.rating.toString())
+      formData.append('content', newReview.value.content)
+      for (const [index, file] of newReview.value.imageFiles.entries()) {
+        formData.append('imageFiles', file)
+      }
+
+      await publishCommentService(formData)
 
       // 重置表单
       newReview.value = {
         rating: 0,
         content: '',
         images: [],
+        imageFiles: [],
         emoji: '',
       }
 
