@@ -41,6 +41,7 @@
 * **状态管理**: Pinia
 * **HTTP客户端**: Axios
 * **构建工具**: Vite
+* **后台管理地址**: http://localhost:3000/admin
 
 ## 📂 项目结构
 

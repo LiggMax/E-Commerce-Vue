@@ -10,19 +10,25 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 
 // 为管理后台路由添加布局
-const routesWithLayouts: RouteRecordRaw[] = routes.map(route => {
-  if (route.path.startsWith('/admin') && route.path !== '/admin/login') {
-    return {
-      ...route,
-      meta: {
-        ...route.meta,
-        layout: 'admin',
-      },
+const routesWithLayouts: RouteRecordRaw[] = [
+  // 添加 /admin 重定向到 /admin/dashboard
+  {
+    path: '/admin',
+    redirect: '/admin/dashboard',
+  },
+  ...routes.map(route => {
+    if (route.path.startsWith('/admin') && route.path !== '/admin/login') {
+      return {
+        ...route,
+        meta: {
+          ...route.meta,
+          layout: 'admin',
+        },
+      }
     }
-  }
-  return route
-})
-
+    return route
+  }),
+]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: setupLayouts(routesWithLayouts),
