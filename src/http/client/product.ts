@@ -16,3 +16,14 @@ export async function getFeaturedDetailServer (productId: string) {
     productId,
   })
 }
+
+/**
+ * 获取商品评论
+ */
+export async function getFeaturedCommentServer (productId: string, pageNumber: number, pageSize: number) {
+  return request.get(`${FEATURED}/comment`, {
+    productId,
+    pageNumber,
+    pageSize,
+  })
+}

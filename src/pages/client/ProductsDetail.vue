@@ -66,9 +66,16 @@
 
             <v-sheet class=" mb-4 rounded-lg">
               <div class="d-flex align-end ga-3">
-                <div class="text-h4 font-weight-bold text-primary">¥{{ (finalCurrentPrice * quantity).toFixed(2) }}</div>
-                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">¥{{ (finalOriginalPrice * quantity).toFixed(2) }}</div>
-                <v-chip color="error" size="small" variant="flat">直降 ¥{{ (finalOriginalPrice - finalCurrentPrice).toFixed(2) }}</v-chip>
+                <div class="text-h4 font-weight-bold text-primary">¥{{
+                  (finalCurrentPrice * quantity).toFixed(2)
+                }}
+                </div>
+                <div class="text-subtitle-2 text-medium-emphasis text-decoration-line-through">
+                  ¥{{ (finalOriginalPrice * quantity).toFixed(2) }}
+                </div>
+                <v-chip color="error" size="small" variant="flat">直降
+                  ¥{{ (finalOriginalPrice - finalCurrentPrice).toFixed(2) }}
+                </v-chip>
               </div>
               <div v-if="selectedSpecsPrice > 0" class="mt-2 text-caption text-medium-emphasis">
                 基础价格 ¥{{ productDetail.currentPrice.toFixed(2) }} + 规格价格 ¥{{ selectedSpecsPrice.toFixed(2) }}
@@ -95,7 +102,12 @@
 
             <div class="mb-6 d-flex align-center ga-4">
               <div class="text-body-2 text-medium-emphasis">数量</div>
-              <v-btn density="comfortable" icon="mdi-minus" variant="outlined" @click="quantity = Math.max(1, quantity - 1)" />
+              <v-btn
+                density="comfortable"
+                icon="mdi-minus"
+                variant="outlined"
+                @click="quantity = Math.max(1, quantity - 1)"
+              />
               <v-text-field
                 v-model.number="quantity"
                 density="compact"
@@ -105,13 +117,19 @@
                 type="number"
                 @input="validateQuantity"
               />
-              <v-btn density="comfortable" icon="mdi-plus" variant="outlined" @click="quantity = Math.min(productDetail.stock, quantity + 1)" />
+              <v-btn
+                density="comfortable"
+                icon="mdi-plus"
+                variant="outlined"
+                @click="quantity = Math.min(productDetail.stock, quantity + 1)"
+              />
               <div class="font-weight-bold text-medium-emphasis">库存: {{ productDetail.stock }}</div>
             </div>
 
             <div class="d-flex ga-4">
               <v-btn color="primary" rounded="lg" size="large" @click="addToCart">
-                <v-icon icon="mdi-cart-plus" start /> 加入购物车
+                <v-icon icon="mdi-cart-plus" start />
+                加入购物车
               </v-btn>
               <v-btn
                 color="error"
@@ -174,29 +192,36 @@
                     <v-form ref="reviewForm" v-model="reviewFormValid">
                       <!-- 评分 -->
                       <div class="mb-4">
-                        <div class="text-body-2 text-medium-emphasis mb-2">评分</div>
+                        <div class="text-body-2 text-medium-emphasis mb-2">
+                          评分 <span class="text-error">*</span>
+                        </div>
                         <v-rating
                           v-model="newReview.rating"
                           color="amber"
                           half-increments
                           size="large"
                         />
+                        <div v-if="newReview.rating === 0" class="text-caption text-error mt-1">
+                          请选择评分
+                        </div>
                       </div>
 
                       <!-- 评价内容 -->
                       <div class="mb-4">
                         <v-textarea
                           v-model="newReview.content"
-                          label="分享您的使用体验..."
+                          label="分享您的使用体验... *"
                           placeholder="请详细描述您对商品的感受，帮助其他用户做出选择"
+                          required
                           rows="4"
+                          :rules="[v => !!v && v.trim().length > 0 || '评价内容不能为空']"
                           variant="outlined"
                         />
                       </div>
 
                       <!-- 图片上传 -->
                       <div class="mb-4">
-                        <div class="text-body-2 text-medium-emphasis mb-2">上传图片（最多9张）</div>
+                        <div class="text-body-2 text-medium-emphasis mb-2">上传图片（最多6张）</div>
                         <div class="d-flex flex-wrap ga-2">
                           <!-- 已上传的图片 -->
                           <div
@@ -222,7 +247,7 @@
                           </div>
                           <!-- 上传按钮 -->
                           <v-btn
-                            v-if="newReview.images.length < 9"
+                            v-if="newReview.images.length < 6"
                             class="d-flex flex-column align-center justify-center"
                             color="grey-lighten-3"
                             height="80"
@@ -246,7 +271,9 @@
 
                       <!-- 表情选择 -->
                       <div class="mb-4">
-                        <div class="text-body-2 text-medium-emphasis mb-2">选择表情</div>
+                        <div class="text-body-2 text-medium-emphasis mb-2">
+                          选择表情 <span class="text-error">*</span>
+                        </div>
                         <div class="d-flex ga-2">
                           <v-btn
                             v-for="emoji in emojis"
@@ -259,13 +286,16 @@
                             {{ emoji }}
                           </v-btn>
                         </div>
+                        <div v-if="!newReview.emoji" class="text-caption text-error mt-1">
+                          请选择一个表情
+                        </div>
                       </div>
 
                       <!-- 提交按钮 -->
                       <div class="d-flex justify-end">
                         <v-btn
                           color="primary"
-                          :disabled="!reviewFormValid || !newReview.rating || !newReview.content.trim()"
+                          :disabled="!isReviewFormValid"
                           :loading="submittingReview"
                           variant="flat"
                           @click="submitReview"
@@ -331,11 +361,11 @@
                     <v-card-text class="pa-4">
                       <div class="d-flex align-start">
                         <v-avatar class="mr-4" size="40">
-                          <v-img :src="review.userAvatar" />
+                          <v-img :src="review.user.avatar" />
                         </v-avatar>
                         <div class="flex-grow-1">
                           <div class="d-flex align-center mb-2">
-                            <span class="text-subtitle-2 font-weight-medium">{{ review.userName }}</span>
+                            <span class="text-subtitle-2 font-weight-medium">{{ review.user.nickName }}</span>
                             <v-rating
                               class="ml-2"
                               color="amber"
@@ -343,22 +373,20 @@
                               readonly
                               size="small"
                             />
-                            <span class="text-caption text-medium-emphasis ml-2">{{ review.createTime }}</span>
+                            <span class="text-caption text-medium-emphasis ml-2">{{ TimeFormatter.formatRelativeTime(review.createTime) }}</span>
                           </div>
                           <p class="text-body-2 mb-2">{{ review.content }}</p>
-                          <div v-if="review.images && review.images.length > 0" class="d-flex ga-2 mb-2">
-                            <v-img
+                          <div v-if="review.images && review.images.length > 0" class="d-flex ga-4">
+                            <img
                               v-for="(img, idx) in review.images"
                               :key="idx"
+                              alt=""
                               class="rounded"
-                              height="60"
+                              height="120"
                               :src="img"
-                              width="60"
+                              style="margin-right: 8px; margin-bottom: 4px;"
                               @click="previewImage(img)"
-                            />
-                          </div>
-                          <div v-if="review.specs" class="text-caption text-medium-emphasis">
-                            规格：{{ review.specs }}
+                            >
                           </div>
                         </div>
                       </div>
@@ -398,16 +426,17 @@
 <script setup lang="ts">
   import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
-  import { getFeaturedDetailServer } from '@/http/client/product.ts'
+  import { getFeaturedCommentServer, getFeaturedDetailServer } from '@/http/client/product.ts'
   import { publishCommentService } from '@/http/client/user.ts'
   import router from '@/router'
   import { useAppStore } from '@/stores/client/app.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
   import { useNotification } from '@/utils/notification.ts'
+  import { TimeFormatter } from '@/utils/timeForm.ts'
 
   const route = useRoute()
   const appStore = useAppStore()
-  const { showWarning } = useNotification()
+  const { showWarning, showSuccess } = useNotification()
 
   // 数据模型
   interface DetailImage {
@@ -464,13 +493,18 @@
   // 评价数据
   interface Review {
     id: number
-    userName: string
-    userAvatar: string
-    rating: number
+    productId: number
+    user: {
+      userId: string
+      nickName: string
+      avatar: string
+    }
     content: string
+    rating: number
+    images: string[] | null
+    type: number
+    ipAddress: string
     createTime: string
-    images?: string[]
-    specs?: string
   }
 
   const reviews = ref<Review[]>([])
@@ -570,9 +604,20 @@
     newReview.value.imageFiles.splice(index, 1)
   }
 
+  // 校验评论表单是否有效
+  const isReviewFormValid = computed(() => {
+    return (
+      newReview.value.rating > 0 // 评分必须大于0
+      && newReview.value.content.trim().length > 0 // 评价内容不能为空
+      && newReview.value.emoji.length > 0 // 表情必须选择
+    )
+  })
+
   // 提交评价
   async function submitReview () {
-    if (!newReview.value.rating || !newReview.value.content.trim()) {
+    // 再次校验表单
+    if (!isReviewFormValid.value) {
+      showWarning('请完善评价信息：评分、评价内容和表情都是必填项')
       return
     }
 
@@ -595,7 +640,7 @@
       }
 
       await publishCommentService(formData)
-
+      showSuccess('评论发布成功')
       // 重置表单
       newReview.value = {
         rating: 0,
@@ -774,68 +819,28 @@
    * 获取评价数据
    */
   async function getReviews () {
-    console.log('开始加载评价数据...')
-    // 模拟评价数据
-    reviews.value = [
-      {
-        id: 1,
-        userName: '张三',
-        userAvatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-        rating: 5,
-        content: '显示器质量很好，色彩鲜艳，144Hz刷新率玩游戏很流畅。包装也很仔细，物流很快。',
-        createTime: '2024-01-15',
-        images: [
-          'https://picsum.photos/200/200?random=1',
-          'https://picsum.photos/200/200?random=2',
-        ],
-        specs: '颜色：黑色，尺寸：27英寸',
-      },
-      {
-        id: 2,
-        userName: '李四',
-        userAvatar: 'https://randomuser.me/api/portraits/women/2.jpg',
-        rating: 4,
-        content: '整体不错，但是支架有点松动，不过不影响使用。画质清晰，性价比很高。',
-        createTime: '2024-01-10',
-        specs: '颜色：白色，尺寸：27英寸',
-      },
-      {
-        id: 3,
-        userName: '王五',
-        userAvatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-        rating: 5,
-        content: '非常满意！4K分辨率看电影效果很棒，HDR效果也很不错。推荐购买！',
-        createTime: '2024-01-08',
-        images: [
-          'https://picsum.photos/200/200?random=3',
-        ],
-        specs: '颜色：黑色，尺寸：27英寸',
-      },
-      {
-        id: 4,
-        userName: '赵六',
-        userAvatar: 'https://randomuser.me/api/portraits/women/4.jpg',
-        rating: 3,
-        content: '显示器还可以，但是有个坏点，联系客服后很快就处理了。服务态度不错。',
-        createTime: '2024-01-05',
-        specs: '颜色：银色，尺寸：27英寸',
-      },
-      {
-        id: 5,
-        userName: '钱七',
-        userAvatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-        rating: 5,
-        content: '完美！从下单到收货只用了2天，显示器没有任何问题，画质清晰，色彩准确。',
-        createTime: '2024-01-03',
-        images: [
-          'https://picsum.photos/200/200?random=4',
-          'https://picsum.photos/200/200?random=5',
-          'https://picsum.photos/200/200?random=6',
-        ],
-        specs: '颜色：黑色，尺寸：27英寸',
-      },
-    ]
-    console.log('评价数据加载完成:', reviews.value.length, '条评价')
+    try {
+      const res = await getFeaturedCommentServer(route.query.productId!.toString(), 1, 10)
+      reviews.value = res.data.list.map((item: any) => ({
+        id: item.id,
+        productId: item.productId,
+        user: {
+          userId: item.user.userId,
+          nickName: item.user.nickName,
+          avatar: item.user.avatar,
+        },
+        content: item.content,
+        rating: item.rating,
+        images: item.images,
+        type: item.type,
+        ipAddress: item.ipAddress,
+        createTime: item.createTime,
+      }))
+      console.log('评价数据加载完成:', reviews.value.length, '条评价')
+    } catch (error) {
+      console.error('获取评价数据失败:', error)
+      reviews.value = []
+    }
   }
 
   onMounted(() => {
