@@ -15,6 +15,7 @@
     "@fontsource/roboto": "5.2.6",
     "@mdi/font": "7.4.47",
     "axios": "^1.12.2",
+    "event-source-polyfill": "^1.0.31",
     "js-base64": "^3.7.8",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.5.0",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
+    "@types/event-source-polyfill": "^1.0.5",
     "@types/node": "^22.9.0",
     "@types/qs": "^6.14.0",
     "@vitejs/plugin-vue": "^5.2.3",

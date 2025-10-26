@@ -131,36 +131,42 @@
           <div class="mb-3">
             <div class="d-flex justify-space-between mb-1">
               <span class="text-body-2">CPU使用率</span>
-              <span class="text-body-2">45%</span>
+              <span class="text-body-2">{{ systemStatus.cpuUsage.toFixed(1) }}%</span>
             </div>
             <v-progress-linear
               color="primary"
               height="6"
-              model-value="45"
+              :model-value="systemStatus.cpuUsage"
               rounded
             />
           </div>
           <div class="mb-3">
             <div class="d-flex justify-space-between mb-1">
               <span class="text-body-2">内存使用</span>
-              <span class="text-body-2">68%</span>
+              <span class="text-body-2">{{ memoryUsagePercent.toFixed(1) }}%</span>
+            </div>
+            <div class="text-caption text-medium-emphasis mb-1">
+              {{ usedMemoryGB.toFixed(2) }}GB / {{ totalMemoryGB.toFixed(2) }}GB
             </div>
             <v-progress-linear
               color="warning"
               height="6"
-              model-value="68"
+              :model-value="memoryUsagePercent"
               rounded
             />
           </div>
           <div>
             <div class="d-flex justify-space-between mb-1">
               <span class="text-body-2">存储空间</span>
-              <span class="text-body-2">82%</span>
+              <span class="text-body-2">{{ diskUsagePercent.toFixed(1) }}%</span>
+            </div>
+            <div class="text-caption text-medium-emphasis mb-1">
+              {{ usedDiskGB.toFixed(2) }}GB / {{ totalDiskGB.toFixed(2) }}GB
             </div>
             <v-progress-linear
               color="error"
               height="6"
-              model-value="82"
+              :model-value="diskUsagePercent"
               rounded
             />
           </div>
@@ -172,6 +178,8 @@
 
 <script lang="ts" setup>
 // 统计数据
+  import { getSystemInfoServer } from '@/http/admin/event.ts'
+
   const statsCards = [
     {
       title: '总用户数',
@@ -271,11 +279,57 @@
     },
   ]
 
+  // 系统状态响应式数据
+  const systemStatus = ref({
+    cpuUsage: 0,
+    totalMemory: 0,
+    usedMemory: 0,
+    totalDisk: 0,
+    usedDisk: 0,
+  })
+
+  // 计算内存使用率（百分比）
+  const memoryUsagePercent = computed(() => {
+    if (systemStatus.value.totalMemory === 0) return 0
+    return (systemStatus.value.usedMemory / systemStatus.value.totalMemory) * 100
+  })
+
+  // 计算磁盘使用率（百分比）
+  const diskUsagePercent = computed(() => {
+    if (systemStatus.value.totalDisk === 0) return 0
+    return (systemStatus.value.usedDisk / systemStatus.value.totalDisk) * 100
+  })
+
+  // 内存GB单位换算
+  const totalMemoryGB = computed(() => systemStatus.value.totalMemory)
+  const usedMemoryGB = computed(() => systemStatus.value.usedMemory)
+
+  // 磁盘GB单位换算
+  const totalDiskGB = computed(() => systemStatus.value.totalDisk)
+  const usedDiskGB = computed(() => systemStatus.value.usedDisk)
+
+  // 关闭SSE连接的函数
+  let closeSSE: (() => void) | null = null
+
   // 处理快速操作
   function handleQuickAction (action: string) {
     console.log('执行快速操作:', action)
   // 这里可以根据action类型执行相应的操作
   }
+
+  onMounted(() => {
+    // 启动SSE连接
+    closeSSE = getSystemInfoServer(data => {
+      systemStatus.value = data
+    })
+  })
+
+  onBeforeUnmount(() => {
+    // 组件卸载时关闭SSE连接
+    if (closeSSE) {
+      closeSSE()
+    }
+  })
 </script>
 
 <style scoped>
