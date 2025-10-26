@@ -25,8 +25,12 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   response => {
-    if (response.data && response.data.code !== undefined && response.data.code != 200) {
+    if (response.data.code === 401) {
+      router.push('/admin/login')
       notification.showError(response.data.message)
+      return Promise.reject(response.data.message)
+    } else if (response.data.code != 200) {
+      notification.showError(response.data.massage)
       return Promise.reject(response.data.message)
     }
     return response.data
