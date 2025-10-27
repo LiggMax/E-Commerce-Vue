@@ -9,7 +9,7 @@
     </div>
     <v-chip color="success" variant="tonal">
       <v-icon start>mdi-check-circle</v-icon>
-      系统正常
+      系统运行({{ ((systemStatus.systemUptime) / (24 * 60 * 60)).toFixed(2) }})天
     </v-chip>
   </div>
 
@@ -133,6 +133,10 @@
               <span class="text-body-2">CPU使用率</span>
               <span class="text-body-2">{{ systemStatus.cpuUsage.toFixed(1) }}%</span>
             </div>
+            <div class="text-caption d-flex align-center text-medium-emphasis mb-1">
+              <span>{{ systemStatus.cpuModel }}</span>
+              <span v-if="systemStatus.cpuTemperature > 0" class="ml-2">({{ systemStatus.cpuTemperature }}°C)</span>
+            </div>
             <v-progress-linear
               color="primary"
               height="6"
@@ -169,6 +173,34 @@
               :model-value="diskUsagePercent"
               rounded
             />
+          </div>
+
+          <!-- 网络接口信息 -->
+          <v-divider class="my-3" />
+          <div class="text-body-2 font-weight-medium mb-2">网络接口</div>
+          <div
+            v-for="(network, index) in systemStatus.networkInfo"
+            :key="index"
+            class="mb-3"
+          >
+            <div class="d-flex align-center mb-1">
+              <v-icon class="mr-1" size="small">mdi-network</v-icon>
+              <span class="text-body-2 font-weight-medium">{{ network.name }}</span>
+            </div>
+            <div class="text-caption text-medium-emphasis mb-1">
+              <div>MAC: {{ network.macAddr }}</div>
+              <div v-if="network.ipv4Addr && network.ipv4Addr.length > 0">
+                IP: {{ network.ipv4Addr.join(', ') }}
+              </div>
+              <div class="d-flex justify-space-between mt-1">
+                <span>已上传:{{ formatBytes(network.bytesSent) }}</span>
+                <span>已下载:{{ formatBytes(network.bytesRecv) }}</span>
+              </div>
+              <div class="d-flex justify-space-between mt-1">
+                <span class="text-success">⬆ {{ formatSpeed(network.uploadSpeed) }}</span>
+                <span class="text-primary">⬇ {{ formatSpeed(network.downloadSpeed) }}</span>
+              </div>
+            </div>
           </div>
         </v-card-text>
       </v-card>
@@ -281,11 +313,23 @@
 
   // 系统状态响应式数据
   const systemStatus = ref({
+    systemUptime: 0,
     cpuUsage: 0,
+    cpuModel: '',
+    cpuTemperature: 0,
     totalMemory: 0,
     usedMemory: 0,
     totalDisk: 0,
     usedDisk: 0,
+    networkInfo: [] as Array<{
+      name: string
+      macAddr: string
+      ipv4Addr: string[]
+      bytesSent: number
+      bytesRecv: number
+      uploadSpeed: number
+      downloadSpeed: number
+    }>,
   })
 
   // 计算内存使用率（百分比）
@@ -307,6 +351,24 @@
   // 磁盘GB单位换算
   const totalDiskGB = computed(() => systemStatus.value.totalDisk)
   const usedDiskGB = computed(() => systemStatus.value.usedDisk)
+
+  // 格式化网络流量大小
+  function formatBytes (bytes: number): string {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
+  }
+
+  // 格式化网络速度 (B/s)
+  function formatSpeed (bytesPerSecond: number): string {
+    if (bytesPerSecond === 0) return '0 B/s'
+    const k = 1024
+    const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s']
+    const i = Math.floor(Math.log(bytesPerSecond) / Math.log(k))
+    return `${(bytesPerSecond / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
+  }
 
   // 关闭SSE连接的函数
   let closeSSE: (() => void) | null = null
