@@ -37,3 +37,8 @@ export const CLEAR_TOKEN = '/api/admin/user/remove_token'
  * 规格
  */
 export const SPECIFICATION = '/api/admin/spec'
+
+/**
+ * 系统信息
+ */
+export const SYSTEM_INFO = '/api/admin/system/info'

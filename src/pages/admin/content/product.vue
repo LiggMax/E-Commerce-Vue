@@ -250,7 +250,7 @@
   import FeaturedEditDialog from '@/components/admin/FeaturedEditDialog.vue'
   import ImageUploadDialog from '@/components/admin/ImageUploadDialog.vue'
   import SpecEditDialog from '@/components/admin/SpecEditDialog.vue'
-  import { deleteFeaturedById, getFeatured } from '@/http/admin/featured.ts'
+  import { deleteProductById, getProduct } from '@/http/admin/product.ts'
   import { useNotification } from '@/utils/notification'
 
   // 响应数据
@@ -339,7 +339,7 @@
   async function fetchFeaturedList () {
     loading.value = true
     try {
-      const response = await getFeatured(pagination.page, pagination.pageSize)
+      const response = await getProduct(pagination.page, pagination.pageSize)
       const featuredData = response.data.list || []
       // 更新分页信息
       pagination.totalItems = response.data.total || 0
@@ -458,7 +458,7 @@
     if (!itemToDelete.value) return
 
     try {
-      await deleteFeaturedById(itemToDelete.value.id)
+      await deleteProductById(itemToDelete.value.id)
       featuredList.value = featuredList.value.filter(i => i.id !== itemToDelete.value!.id)
       showSuccess(`${itemToDelete.value.title}删除成功`)
       deleteDialog.value = false

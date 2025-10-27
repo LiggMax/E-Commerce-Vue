@@ -209,13 +209,20 @@
 </template>
 
 <script lang="ts" setup>
-// 统计数据
-  import { getSystemInfoServer } from '@/http/admin/event.ts'
+  import { getSystemInfoService } from '@/http/admin/dashboard.ts'
+  // 统计数据
+  import { getSystemStatusServer } from '@/http/admin/event.ts'
 
-  const statsCards = [
+  const systemInfo = ref({
+    userCount: 0,
+    todayOrderCount: 0,
+    orderTotalAmount: 0,
+  })
+
+  const statsCards = computed(() => [
     {
       title: '总用户数',
-      value: '1,234',
+      value: systemInfo.value?.userCount ?? 0,
       change: '+12%',
       trend: 'up',
       color: 'primary',
@@ -223,7 +230,7 @@
     },
     {
       title: '今日订单',
-      value: '89',
+      value: systemInfo.value?.todayOrderCount ?? 0,
       change: '+5%',
       trend: 'up',
       color: 'success',
@@ -231,7 +238,7 @@
     },
     {
       title: '总收入',
-      value: '¥45,678',
+      value: `¥${(systemInfo.value?.orderTotalAmount ?? 0).toFixed(2)}`,
       change: '+18%',
       trend: 'up',
       color: 'info',
@@ -239,13 +246,13 @@
     },
     {
       title: '系统负载',
-      value: '68%',
+      value: `${systemStatus.value.cpuUsage.toFixed(0)}%`,
       change: '-3%',
       trend: 'down',
       color: 'warning',
       icon: 'mdi-server',
     },
-  ]
+  ])
 
   // 最近活动
   const recentActivities = [
@@ -310,6 +317,13 @@
       action: 'export-data',
     },
   ]
+
+  // 获取系统信息
+  async function getSystemInfo () {
+    await getSystemInfoService().then(response => {
+      systemInfo.value = response.data
+    })
+  }
 
   // 系统状态响应式数据
   const systemStatus = ref({
@@ -381,9 +395,10 @@
 
   onMounted(() => {
     // 启动SSE连接
-    closeSSE = getSystemInfoServer(data => {
+    closeSSE = getSystemStatusServer(data => {
       systemStatus.value = data
     })
+    getSystemInfo()
   })
 
   onBeforeUnmount(() => {

@@ -137,7 +137,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { addFeatured, updateFeatured } from '@/http/admin/featured.ts'
+  import { addProduct, updateProduct } from '@/http/admin/product.ts'
 
   // 定义精选商品项目的接口
   interface FeaturedItem {
@@ -292,12 +292,12 @@
           imageFileError.value = '请选择有效的图片文件'
           return
         }
-        await addFeatured(data)
+        await addProduct(data)
       } else {
         // 编辑模式
         if (formData.id) {
           data.append('id', formData.id)
-          await updateFeatured(data)
+          await updateProduct(data)
         }
       }
 

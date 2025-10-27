@@ -26,7 +26,7 @@ interface SystemInfo {
  * 获取系统状态信息
  * @param callback 接收到数据时的回调函数
  */
-export function getSystemInfoServer (callback: (data: SystemInfo) => void) {
+export function getSystemStatusServer (callback: (data: SystemInfo) => void) {
   const evtSource = new EventSourcePolyfill('/api/admin/system/status', {
     heartbeatTimeout: 60_000,
     headers: {

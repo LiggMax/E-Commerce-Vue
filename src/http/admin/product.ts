@@ -1,10 +1,10 @@
 import request from '@/http/admin/adminRequest.ts'
-import { FEATURED, UPLOAD_IMAGE } from '@/http/admin/api.ts'
+import { FEATURED } from '@/http/admin/api.ts'
 
 /**
- * 添加精选商品
+ * 添加商品
  */
-export async function addFeatured (data: any) {
+export async function addProduct (data: any) {
   return await request.post(FEATURED, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -15,7 +15,7 @@ export async function addFeatured (data: any) {
 /**
  * 更新精选商品
  */
-export async function updateFeatured (data: any) {
+export async function updateProduct (data: any) {
   return await request.put(FEATURED, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -26,7 +26,7 @@ export async function updateFeatured (data: any) {
 /**
  * 获取精选商品数据
  */
-export async function getFeatured (pageNumber: number, pageSize: number) {
+export async function getProduct (pageNumber: number, pageSize: number) {
   return await request.get(FEATURED, {
     pageNumber,
     pageSize,
@@ -36,17 +36,6 @@ export async function getFeatured (pageNumber: number, pageSize: number) {
 /**
  * 删除精选商品
  */
-export async function deleteFeaturedById (id: string) {
+export async function deleteProductById (id: string) {
   return await request.delete(`${FEATURED}/${id}`)
-}
-
-/**
- * 上传图片
- */
-export async function uploadFeaturedImage (data: FormData) {
-  return await request.post(UPLOAD_IMAGE, data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
 }
