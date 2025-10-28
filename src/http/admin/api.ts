@@ -14,16 +14,6 @@ export const CAROUSEL = '/api/admin/carousel'
 export const FEATURED = '/api/admin/featured'
 
 /**
- * 更新轮播图状态
- */
-export const UPDATE_CAROUSEL_STATUS = `${CAROUSEL}/status`
-
-/**
- * 更新轮播图排序
- */
-export const UPDATE_CAROUSEL_SORT = `${CAROUSEL}/sort`
-
-/**
  * 图片接口
  */
 export const UPLOAD_IMAGE = '/api/admin/featured/image'
@@ -42,3 +32,8 @@ export const SPECIFICATION = '/api/admin/spec'
  * 系统信息
  */
 export const SYSTEM_INFO = '/api/admin/system/info'
+
+/**
+ * 用户管理
+ */
+export const USERS = '/api/admin/users/management'

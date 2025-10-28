@@ -1,5 +1,5 @@
 import request from '@/http/admin/adminRequest.ts'
-import { CAROUSEL, UPDATE_CAROUSEL_SORT, UPDATE_CAROUSEL_STATUS } from '@/http/admin/api.ts'
+import { CAROUSEL } from '@/http/admin/api.ts'
 
 /**
  * 添加轮播图
@@ -37,7 +37,7 @@ export async function getCarousel (pageNumber: number, pageSize: number) {
  * 更新轮播图状态
  */
 export async function updateCarouselStatus (id: number, status: boolean) {
-  return await request.patch(UPDATE_CAROUSEL_STATUS, null, {
+  return await request.patch(`${CAROUSEL}/status`, null, {
     params: {
       id,
       status,
@@ -49,7 +49,7 @@ export async function updateCarouselStatus (id: number, status: boolean) {
  * 更新轮播图排序
  */
 export async function updateCarouselSort (id: number, sort: number) {
-  return await request.patch(UPDATE_CAROUSEL_SORT, { id, sort })
+  return await request.patch(`{CAROUSEL}/sort`, { id, sort })
 }
 
 /**
