@@ -15,6 +15,7 @@
     "@fontsource/roboto": "5.2.6",
     "@mdi/font": "7.4.47",
     "axios": "^1.12.2",
+    "echarts": "^6.0.0",
     "event-source-polyfill": "^1.0.31",
     "js-base64": "^3.7.8",
     "pinia": "^3.0.3",

@@ -59,6 +59,17 @@
     </v-col>
   </v-row>
 
+  <!-- 网络波动图 -->
+  <v-card class="mb-6">
+    <v-card-title class="d-flex align-center">
+      <v-icon class="mr-2">mdi-chart-line</v-icon>
+      网络速度监控
+    </v-card-title>
+    <v-card-text>
+      <div id="networkChart" style="height: 300px;" />
+    </v-card-text>
+  </v-card>
+
   <!-- 主要内容区域 -->
   <v-row>
     <!-- 左侧内容 -->
@@ -209,8 +220,8 @@
 </template>
 
 <script lang="ts" setup>
+  import * as echarts from 'echarts'
   import { getSystemInfoService } from '@/http/admin/dashboard.ts'
-  // 统计数据
   import { getSystemStatusServer } from '@/http/admin/event.ts'
 
   const systemInfo = ref({
@@ -387,6 +398,123 @@
   // 关闭SSE连接的函数
   let closeSSE: (() => void) | null = null
 
+  // ECharts 图表实例
+  let networkChart: echarts.ECharts | null = null
+
+  // 网络速度历史数据（保存最近的数据点）
+  const networkHistory = ref<Array<{ time: string, upload: number, download: number }>>([])
+  const maxDataPoints = 50 // 最多保存50个数据点
+
+  // 初始化网络图表
+  function initNetworkChart () {
+    const chartDom = document.querySelector('#networkChart')
+    if (!chartDom) return
+
+    networkChart = echarts.init(chartDom as HTMLElement)
+
+    const option = {
+      title: {
+        text: '实时网络速度',
+        left: 'center',
+      },
+      tooltip: {
+        trigger: 'axis',
+        formatter: (params: any) => {
+          const upload = params.find((p: any) => p.seriesName === '上传速度')
+          const download = params.find((p: any) => p.seriesName === '下载速度')
+          return `
+            <div>${params[0].axisValue}</div>
+            <div>${upload ? `上传: ${formatSpeed(upload.value)}` : ''}</div>
+            <div>${download ? `下载: ${formatSpeed(download.value)}` : ''}</div>
+          `
+        },
+      },
+      legend: {
+        data: ['上传速度', '下载速度'],
+        bottom: 0,
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        containLabel: true,
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: [],
+      },
+      yAxis: {
+        type: 'value',
+        name: '速度 (B/s)',
+        axisLabel: {
+          formatter: (value: number) => formatSpeed(value),
+        },
+      },
+      series: [
+        {
+          name: '上传速度',
+          type: 'line',
+          smooth: true,
+          data: [],
+          itemStyle: {
+            color: '#4caf50',
+          },
+        },
+        {
+          name: '下载速度',
+          type: 'line',
+          smooth: true,
+          data: [],
+          itemStyle: {
+            color: '#2196f3',
+          },
+        },
+      ],
+    }
+
+    networkChart.setOption(option)
+  }
+
+  // 更新网络图表数据
+  function updateNetworkChart (uploadSpeed: number, downloadSpeed: number) {
+    if (!networkChart) return
+
+    const now = new Date()
+    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`
+
+    // 添加新数据
+    networkHistory.value.push({
+      time: timeStr,
+      upload: uploadSpeed,
+      download: downloadSpeed,
+    })
+
+    // 保持最多maxDataPoints个数据点
+    if (networkHistory.value.length > maxDataPoints) {
+      networkHistory.value.shift()
+    }
+
+    // 更新图表
+    const times = networkHistory.value.map(d => d.time)
+    const uploadData = networkHistory.value.map(d => d.upload)
+    const downloadData = networkHistory.value.map(d => d.download)
+
+    networkChart.setOption({
+      xAxis: {
+        data: times,
+      },
+      series: [
+        {
+          data: uploadData,
+        },
+        {
+          data: downloadData,
+        },
+      ],
+    })
+  }
+
   // 处理快速操作
   function handleQuickAction (action: string) {
     console.log('执行快速操作:', action)
@@ -394,9 +522,21 @@
   }
 
   onMounted(() => {
+    // 初始化图表
+    nextTick(() => {
+      initNetworkChart()
+    })
+
     // 启动SSE连接
     closeSSE = getSystemStatusServer(data => {
       systemStatus.value = data
+
+      // 计算所有网络接口的总速度
+      if (data.networkInfo && data.networkInfo.length > 0) {
+        const totalUploadSpeed = data.networkInfo.reduce((sum, network) => sum + network.uploadSpeed, 0)
+        const totalDownloadSpeed = data.networkInfo.reduce((sum, network) => sum + network.downloadSpeed, 0)
+        updateNetworkChart(totalUploadSpeed, totalDownloadSpeed)
+      }
     })
     getSystemInfo()
   })
@@ -405,6 +545,11 @@
     // 组件卸载时关闭SSE连接
     if (closeSSE) {
       closeSSE()
+    }
+
+    // 销毁图表
+    if (networkChart) {
+      networkChart.dispose()
     }
   })
 </script>
