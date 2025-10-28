@@ -72,48 +72,9 @@
 
   <!-- 主要内容区域 -->
   <v-row>
-    <!-- 左侧内容 -->
-    <v-col cols="12" md="8">
-      <!-- 最近活动 -->
-      <v-card class="mb-4">
-        <v-card-title class="d-flex align-center">
-          <v-icon class="mr-2">mdi-clock-outline</v-icon>
-          最近活动
-        </v-card-title>
-        <v-card-text>
-          <v-timeline align="start" density="compact">
-            <v-timeline-item
-              v-for="activity in recentActivities"
-              :key="activity.id"
-              :dot-color="activity.color"
-              size="small"
-            >
-              <template #icon>
-                <v-icon :icon="activity.icon" size="small" />
-              </template>
-              <div class="d-flex justify-space-between align-start">
-                <div>
-                  <div class="text-body-2 font-weight-medium">
-                    {{ activity.title }}
-                  </div>
-                  <div class="text-caption text-medium-emphasis">
-                    {{ activity.description }}
-                  </div>
-                </div>
-                <div class="text-caption text-medium-emphasis">
-                  {{ activity.time }}
-                </div>
-              </div>
-            </v-timeline-item>
-          </v-timeline>
-        </v-card-text>
-      </v-card>
-    </v-col>
-
-    <!-- 右侧内容 -->
-    <v-col cols="12" md="4">
-      <!-- 快速操作 -->
-      <v-card class="mb-4">
+    <!-- 快速操作 -->
+    <v-col cols="12" md="6">
+      <v-card height="100%">
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
           快速操作
@@ -131,9 +92,11 @@
           </v-list>
         </v-card-text>
       </v-card>
+    </v-col>
 
-      <!-- 系统状态 -->
-      <v-card>
+    <!-- 系统状态 -->
+    <v-col cols="12" md="6">
+      <v-card height="100%">
         <v-card-title class="d-flex align-center">
           <v-icon class="mr-2">mdi-server</v-icon>
           系统状态
@@ -264,42 +227,6 @@
       icon: 'mdi-server',
     },
   ])
-
-  // 最近活动
-  const recentActivities = [
-    {
-      id: 1,
-      title: '新用户注册',
-      description: '用户 张三 完成注册',
-      time: '2分钟前',
-      color: 'success',
-      icon: 'mdi-account-plus',
-    },
-    {
-      id: 2,
-      title: '订单创建',
-      description: '订单 #12345 已创建',
-      time: '5分钟前',
-      color: 'primary',
-      icon: 'mdi-shopping',
-    },
-    {
-      id: 3,
-      title: '系统更新',
-      description: '系统已更新到最新版本',
-      time: '1小时前',
-      color: 'info',
-      icon: 'mdi-update',
-    },
-    {
-      id: 4,
-      title: '数据备份',
-      description: '定时备份任务完成',
-      time: '3小时前',
-      color: 'success',
-      icon: 'mdi-backup-restore',
-    },
-  ]
 
   // 快速操作
   const quickActions = [
