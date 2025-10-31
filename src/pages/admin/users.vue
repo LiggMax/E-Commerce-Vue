@@ -128,12 +128,17 @@
 
         <!-- 状态 -->
         <template #item.status="{ item }">
-          <v-chip :color="(item.status === 1 || item.status === true) ? 'success' : 'error'" size="small" variant="tonal">
-            <v-icon size="small" start>
-              {{ (item.status === 1 || item.status === true) ? 'mdi-check' : 'mdi-close' }}
-            </v-icon>
-            {{ (item.status === 1 || item.status === true) ? '启用' : '禁用' }}
-          </v-chip>
+          <v-switch
+            color="success"
+            density="compact"
+            hide-details
+            inset
+            :model-value="item.status === 1"
+            @update:model-value="(val) => {
+              item.status = val ? 1 : 0;
+              toggleUserStatus(item);
+            }"
+          />
         </template>
 
         <!-- 创建时间 -->
@@ -596,8 +601,8 @@
   // 切换用户状态
   async function toggleUserStatus (item: User) {
     try {
-      const newStatus = (item.status === 1 || item.status === true) ? 0 : 1
-      await toggleUserStatusApi(item.userId || item.id, newStatus === 1)
+      const newStatus = item.status === 1 ? 1 : 0
+      await toggleUserStatusApi(item.userId, newStatus === 1)
       item.status = newStatus
       showSuccess(`${newStatus === 1 ? '启用' : '禁用'}成功`)
     } catch (error) {
@@ -605,10 +610,6 @@
       showError('操作失败')
     }
   }
-
-  onMounted(() => {
-    fetchUserList()
-  })
 
   // 监听路由变化
   watch(
