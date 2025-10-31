@@ -164,14 +164,6 @@
                 </template>
                 <v-list-item-title>编辑</v-list-item-title>
               </v-list-item>
-              <v-list-item @click="toggleUserStatus(item)">
-                <template #prepend>
-                  <v-icon :icon="(item.status === 1 || item.status === true) ? 'mdi-cancel' : 'mdi-check'" />
-                </template>
-                <v-list-item-title>
-                  {{ (item.status === 1 || item.status === true) ? '禁用' : '启用' }}
-                </v-list-item-title>
-              </v-list-item>
               <v-list-item @click="openDeleteDialog(item)">
                 <template #prepend>
                   <v-icon icon="mdi-delete" />
@@ -229,13 +221,35 @@
         <v-form ref="formRef" v-model="formValid">
           <v-text-field
             v-model="userForm.account"
+            :bg-color="dialogMode === 'edit' ? 'grey-lighten-4' : undefined"
+            :color="dialogMode === 'edit' ? 'grey' : undefined"
             density="compact"
             label="用户名"
             placeholder="请输入用户名"
             prepend-inner-icon="mdi-account"
+            :readonly="dialogMode === 'edit'"
             :rules="[rules.required]"
             variant="outlined"
           />
+
+          <!-- 头像选择与预览 -->
+          <div class="d-flex align-center mb-4">
+            <v-avatar class="mr-4" size="64">
+              <v-img v-if="avatarPreview" :src="avatarPreview" />
+              <v-icon v-else>mdi-account</v-icon>
+            </v-avatar>
+            <v-file-input
+              accept="image/*"
+              clearable
+              density="compact"
+              hide-details
+              label="选择头像"
+              prepend-icon="mdi-camera"
+              style="max-width: 320px;"
+              variant="outlined"
+              @update:model-value="onAvatarChange"
+            />
+          </div>
 
           <v-text-field
             v-model="userForm.nickName"
@@ -280,9 +294,11 @@
           />
 
           <v-switch
-            v-model="userForm.status"
-            color="primary"
-            label="启用状态"
+            color="success"
+            density="compact"
+            hide-details
+            inset
+            :model-value="userForm.status === 1"
           />
         </v-form>
       </v-card-text>
@@ -332,6 +348,7 @@
 </template>
 
 <script lang="ts" setup>
+  import { Role } from '@/composables/enums/userRole.ts'
   import {
     addUser,
     deleteUserById,
@@ -350,7 +367,7 @@
     account: string
     email: string | null
     password?: string
-    role: string
+    role: Role
     status: number | boolean
     accountBalance: number
     createdAt: string
@@ -368,6 +385,8 @@
   const router = useRouter()
   const formRef = ref()
   const formValid = ref(false)
+  const avatarFile = ref<File | null>(null)
+  const avatarPreview = ref<string>('')
 
   const { showSuccess, showError } = useNotification()
 
@@ -380,7 +399,7 @@
     account: '',
     email: '',
     password: '',
-    role: 'USER',
+    role: Role.USER,
     status: true,
     accountBalance: 0,
     createdAt: '',
@@ -404,7 +423,6 @@
   const roleOptions = [
     { title: '普通用户', value: 'USER' },
     { title: '管理员', value: 'ADMIN' },
-    { title: '超级管理员', value: 'SUPER_ADMIN' },
   ]
 
   // 表格头部配置
@@ -543,17 +561,25 @@
         account: '',
         email: '',
         password: '',
-        role: 'USER',
+        role: Role.USER,
         status: true,
         accountBalance: 0,
         createdAt: '',
         createTime: '',
         lastLoginTime: null,
       }
+      // 重置头像选择和预览
+      if (avatarPreview.value) URL.revokeObjectURL(avatarPreview.value)
+      avatarFile.value = null
+      avatarPreview.value = ''
     } else {
       editItem.value = item
       if (item) {
         userForm.value = { ...item }
+        // 初始化预览为已有头像URL
+        if (avatarPreview.value) URL.revokeObjectURL(avatarPreview.value)
+        avatarFile.value = null
+        avatarPreview.value = item.avatar || ''
       }
     }
     dialog.value = true
@@ -562,11 +588,26 @@
   // 处理保存
   async function handleSave () {
     try {
+      const formData = new FormData()
+      formData.append()
+      const payload = { ...userForm.value }
+      // 编辑态避免把空密码传上去
+
+      for (const [key, val] of Object.entries(payload)) {
+        // 仅允许字符串或Blob，其他转字符串
+        formData.append(key, val == null ? '' : String(val))
+      }
+
+      // 单个头像文件（仅在选择时附带）
+      if (avatarFile.value) {
+        formData.append('avatarFile', avatarFile.value)
+      }
+
       if (dialogMode.value === 'add') {
-        await addUser(userForm.value)
+        await addUser(formData)
         showSuccess('用户添加成功')
       } else {
-        await updateUser(userForm.value)
+        await updateUser(formData)
         showSuccess('用户更新成功')
       }
       dialog.value = false
@@ -575,6 +616,20 @@
       console.error('保存失败:', error)
       showError('保存失败')
     }
+  }
+
+  // 头像文件选择变化
+  function onAvatarChange (files: File | File[] | null) {
+    const file = Array.isArray(files) ? files[0] : files
+    if (!file) {
+      avatarFile.value = null
+      // 恢复为已有头像或空
+      avatarPreview.value = dialogMode.value === 'edit' ? (userForm.value.avatar || '') : ''
+      return
+    }
+    avatarFile.value = file
+    if (avatarPreview.value) URL.revokeObjectURL(avatarPreview.value)
+    avatarPreview.value = URL.createObjectURL(file)
   }
 
   // 打开删除对话框

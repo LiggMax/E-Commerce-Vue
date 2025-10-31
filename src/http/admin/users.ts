@@ -1,3 +1,4 @@
+import type { Role } from '@/composables/enums/userRole.ts'
 import request from '@/http/admin/adminRequest.ts'
 import { USERS_MANAGEMENT } from '@/http/admin/api.ts'
 
@@ -21,15 +22,23 @@ export async function getUserById (id: string) {
 /**
  * 添加用户
  */
-export async function addUser (data: any) {
-  return await request.post(USERS_MANAGEMENT, data)
+export async function addUser (data: FormData) {
+  return await request.post(USERS_MANAGEMENT, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 }
 
 /**
  * 更新用户信息
  */
-export async function updateUser (data: any) {
-  return await request.put(USERS_MANAGEMENT, data)
+export async function updateUser (data: FormData) {
+  return await request.put(USERS_MANAGEMENT, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 }
 
 /**
@@ -44,6 +53,17 @@ export async function deleteUserById (id: string) {
  */
 export async function toggleUserStatus (userId: string, isStatus: boolean) {
   return await request.patch(`${USERS_MANAGEMENT}/status`, { userId, isStatus }, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
+/**
+ * 设置用户角色
+ */
+export async function setUserRole (userId: string, role: Role) {
+  return await request.patch(`${USERS_MANAGEMENT}/set_up_rolo`, { userId, role }, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
