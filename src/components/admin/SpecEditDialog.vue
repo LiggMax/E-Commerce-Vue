@@ -376,10 +376,10 @@
       // 构建数据
       const specsData = {
         productId: props.productId,
-        specs: structuredClone(specs.value).map((specs: any) => ({
-          name: specs.name,
-          sort: specs.sort,
-          specValues: specs.specValues.map((value: any) => ({
+        specs: specs.value.map((spec: any) => ({
+          name: spec.name,
+          sort: spec.sort,
+          specValues: spec.specValues.map((value: any) => ({
             value: value.value,
             sort: value.sort,
             price: value.price,
@@ -391,7 +391,7 @@
       closeDialog()
     } catch (error) {
       console.error('保存规格失败:', error)
-      alert('保存规格失败，请重试')
+      notification.showError('保存规格失败，请重试')
     } finally {
       saving.value = false
     }
@@ -400,8 +400,13 @@
   // 监听对话框打开，初始化规格数据
   watch(dialog, newValue => {
     if (newValue) {
-      // 深拷贝初始规格数据
-      specs.value = structuredClone(props.initialSpecs || [])
+      // 深拷贝
+      try {
+        specs.value = JSON.parse(JSON.stringify(props.initialSpecs || []))
+      } catch {
+        // 如果失败，使用默认空数组
+        specs.value = []
+      }
     }
   })
 </script>

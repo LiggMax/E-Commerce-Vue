@@ -220,7 +220,6 @@
         <v-form ref="formRef" v-model="formValid">
           <v-text-field
             v-model="userForm.account"
-            :bg-color="dialogMode === 'edit' ? 'grey-lighten-4' : undefined"
             :color="dialogMode === 'edit' ? 'grey' : undefined"
             density="compact"
             label="用户名"

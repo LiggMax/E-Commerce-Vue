@@ -1,11 +1,11 @@
 import request from '@/http/admin/adminRequest.ts'
-import { FEATURED } from '@/http/admin/api.ts'
+import { PRODUCT } from '@/http/admin/api.ts'
 
 /**
  * 添加商品
  */
 export async function addProduct (data: any) {
-  return await request.post(FEATURED, data, {
+  return await request.post(PRODUCT, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -16,7 +16,7 @@ export async function addProduct (data: any) {
  * 更新精选商品
  */
 export async function updateProduct (data: any) {
-  return await request.put(FEATURED, data, {
+  return await request.put(PRODUCT, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -27,7 +27,7 @@ export async function updateProduct (data: any) {
  * 获取精选商品数据
  */
 export async function getProduct (pageNumber: number, pageSize: number) {
-  return await request.get(FEATURED, {
+  return await request.get(PRODUCT, {
     pageNumber,
     pageSize,
   })
@@ -37,5 +37,5 @@ export async function getProduct (pageNumber: number, pageSize: number) {
  * 删除精选商品
  */
 export async function deleteProductById (id: string) {
-  return await request.delete(`${FEATURED}/${id}`)
+  return await request.delete(`${PRODUCT}/${id}`)
 }

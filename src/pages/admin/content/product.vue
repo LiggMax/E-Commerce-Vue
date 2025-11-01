@@ -479,10 +479,6 @@
     await fetchFeaturedList()
   }
 
-  onMounted(() => {
-    fetchFeaturedList()
-  })
-
   // 监听路由变化
   watch(
     () => route.query,

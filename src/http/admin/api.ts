@@ -11,12 +11,12 @@ export const CAROUSEL = '/api/admin/carousel'
 /**
  * 精选商品
  */
-export const FEATURED = '/api/admin/featured'
+export const PRODUCT = '/api/admin/product'
 
 /**
  * 图片接口
  */
-export const UPLOAD_IMAGE = '/api/admin/featured/image'
+export const UPLOAD_IMAGE = '/api/admin/product/image'
 
 /**
  * 清理Token
