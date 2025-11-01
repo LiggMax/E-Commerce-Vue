@@ -5,10 +5,11 @@ import { USERS_MANAGEMENT } from '@/http/admin/api.ts'
 /**
  * 获取用户列表
  */
-export async function getUsers (pageNumber: number, pageSize: number) {
+export async function getUsers (pageNumber: number, pageSize: number, search?: string) {
   return await request.get(USERS_MANAGEMENT, {
     pageNumber,
     pageSize,
+    search,
   })
 }
 

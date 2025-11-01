@@ -30,7 +30,7 @@
           v-model="search"
           density="compact"
           hide-details
-          placeholder="搜索用户..."
+          placeholder="搜索用账号/昵称/邮箱..."
           prepend-inner-icon="mdi-magnify"
           style="width: 300px;"
           variant="outlined"
@@ -47,7 +47,6 @@
         :items="filteredUserList"
         :items-per-page="-1"
         :loading="loading"
-        :search="search"
       >
         <template #header.account="{ column }">
           <div class="d-flex align-center">
@@ -253,6 +252,7 @@
 
           <v-text-field
             v-model="userForm.nickName"
+            class="mb-2"
             density="compact"
             label="昵称"
             placeholder="请输入昵称"
@@ -263,6 +263,7 @@
 
           <v-text-field
             v-model="userForm.email"
+            class="mb-2"
             density="compact"
             label="邮箱"
             placeholder="请输入邮箱"
@@ -274,6 +275,7 @@
           <v-text-field
             v-if="dialogMode === 'add'"
             v-model="userForm.password"
+            class="mb-2"
             density="compact"
             label="密码"
             placeholder="请输入密码"
@@ -291,14 +293,6 @@
             prepend-inner-icon="mdi-shield-account"
             :rules="[rules.required]"
             variant="outlined"
-          />
-
-          <v-switch
-            color="success"
-            density="compact"
-            hide-details
-            inset
-            :model-value="userForm.status === 1"
           />
         </v-form>
       </v-card-text>
@@ -365,7 +359,7 @@
     nickName: string
     avatar: string
     account: string
-    email: string | null
+    email: string
     password?: string
     role: Role
     status: number | boolean
@@ -378,15 +372,17 @@
   // 响应式数据
   const dialog = ref(false)
   const loading = ref(false)
-  const search = ref('')
-  const dialogMode = ref<'add' | 'edit'>('add')
-  const editItem = ref<User>()
   const route = useRoute()
   const router = useRouter()
+  const search = ref((route.query.search as string) || '')
+  const dialogMode = ref<'add' | 'edit'>('add')
+  const editItem = ref<User>()
   const formRef = ref()
   const formValid = ref(false)
   const avatarFile = ref<File | null>(null)
   const avatarPreview = ref<string>('')
+  let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+  let isSearchTriggeredRouteChange = false // 标记是否是搜索触发的路由变化
 
   const { showSuccess, showError } = useNotification()
 
@@ -457,12 +453,8 @@
   // 获取角色颜色
   function getRoleColor (role: string) {
     const colorMap: Record<string, string> = {
-      user: 'primary',
       USER: 'primary',
-      admin: 'success',
       ADMIN: 'success',
-      super_admin: 'warning',
-      SUPER_ADMIN: 'warning',
     }
     return colorMap[role] || 'default'
   }
@@ -484,7 +476,7 @@
   const rules = {
     required: (value: string) => !!value || '此字段为必填项',
     email: (value: string) => {
-      if (!value) return true // 允许为空
+      if (!value) return false
       const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
       return pattern.test(value) || '请输入有效的邮箱地址'
     },
@@ -495,7 +487,7 @@
   async function fetchUserList () {
     loading.value = true
     try {
-      const response = await getUsers(pagination.page, pagination.pageSize)
+      const response = await getUsers(pagination.page, pagination.pageSize, search?.value)
       const userData = response.data.list || []
       pagination.totalItems = response.data.total || 0
       pagination.totalPages = response.data.pages || 1
@@ -589,16 +581,10 @@
   async function handleSave () {
     try {
       const formData = new FormData()
-      formData.append()
-      const payload = { ...userForm.value }
-      // 编辑态避免把空密码传上去
-
-      for (const [key, val] of Object.entries(payload)) {
-        // 仅允许字符串或Blob，其他转字符串
-        formData.append(key, val == null ? '' : String(val))
-      }
-
-      // 单个头像文件（仅在选择时附带）
+      formData.append('userId', userForm.value.userId)
+      formData.append('nickName', userForm.value.nickName)
+      formData.append('role', userForm.value.role)
+      formData.append('email', userForm.value!.email)
       if (avatarFile.value) {
         formData.append('avatarFile', avatarFile.value)
       }
@@ -666,6 +652,52 @@
     }
   }
 
+  // 防抖搜索处理函数
+  function handleSearchDebounce () {
+    // 清除之前的定时器
+    if (searchDebounceTimer) {
+      clearTimeout(searchDebounceTimer)
+      searchDebounceTimer = null
+    }
+    // 设置新的定时器，500ms后执行
+    searchDebounceTimer = setTimeout(() => {
+      // 搜索时重置到第一页
+      pagination.page = 1
+      // 构建查询参数
+      const query: Record<string, string> = {
+        ...route.query,
+        page: '1',
+        pageSize: pagination.pageSize.toString(),
+      }
+      // 如果有搜索内容，添加到查询参数；如果为空，移除search参数
+      if (search.value && search.value.trim()) {
+        query.search = search.value.trim()
+      } else {
+        // 清空搜索时，移除search参数
+        delete query.search
+      }
+      // 标记这是搜索触发的路由变化
+      isSearchTriggeredRouteChange = true
+      router.push({ query }).finally(() => {
+        // 路由更新完成后重置标志
+        setTimeout(() => {
+          isSearchTriggeredRouteChange = false
+        }, 0)
+      })
+      // 清除定时器引用
+      searchDebounceTimer = null
+      // 注意：这里不直接调用 fetchUserList，因为路由变化会触发路由监听器
+    }, 500)
+  }
+
+  // 监听搜索内容变化
+  watch(
+    () => search.value,
+    () => {
+      handleSearchDebounce()
+    },
+  )
+
   // 监听路由变化
   watch(
     () => route.query,
@@ -676,10 +708,28 @@
       if (newQuery.pageSize) {
         pagination.pageSize = Number.parseInt(newQuery.pageSize as string)
       }
+      // 只在非搜索触发的路由变化时同步搜索框（避免循环触发）
+      if (!isSearchTriggeredRouteChange) {
+        // 同步搜索框的值（避免路由参数和搜索框不同步，比如浏览器前进/后退）
+        if (newQuery.search !== undefined && newQuery.search !== search.value) {
+          search.value = (newQuery.search as string) || ''
+        } else if (newQuery.search === undefined && search.value) {
+          // 如果路由中没有search参数，但搜索框有值，清空搜索框
+          search.value = ''
+        }
+      }
       fetchUserList()
     },
     { immediate: true },
   )
+
+  // 组件卸载时清理定时器
+  onBeforeUnmount(() => {
+    if (searchDebounceTimer) {
+      clearTimeout(searchDebounceTimer)
+      searchDebounceTimer = null
+    }
+  })
 </script>
 
 <style scoped>

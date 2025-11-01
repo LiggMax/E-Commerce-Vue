@@ -30,7 +30,7 @@ instance.interceptors.response.use(
       notification.showError(response.data.message)
       return Promise.reject(response.data.message)
     } else if (response.data.code != 200) {
-      notification.showError(response.data.massage)
+      notification.showError(response.data.message)
       return Promise.reject(response.data.message)
     }
     return response.data

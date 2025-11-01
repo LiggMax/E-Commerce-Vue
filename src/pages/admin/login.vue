@@ -23,7 +23,7 @@
 
         <!-- Login Form -->
         <v-card-text class="px-6 pb-6">
-          <v-form ref="form" v-model="valid" @submit.prevent="handleLogin">
+          <v-form v-model="valid">
             <!-- Username Field -->
             <v-text-field
               v-model="loginForm.username"
@@ -81,8 +81,9 @@
               :disabled="!valid"
               :loading="loading"
               size="large"
-              type="submit"
+              type="button"
               variant="flat"
+              @click="handleLogin"
             >
               <v-icon start>mdi-login</v-icon>
               登录
