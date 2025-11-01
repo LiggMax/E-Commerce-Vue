@@ -37,3 +37,8 @@ export const SYSTEM_INFO = '/api/admin/system/info'
  * 用户管理
  */
 export const USERS_MANAGEMENT = '/api/admin/users/management'
+
+/**
+ * 订单
+ */
+export const ORDERS = '/api/admin/order'

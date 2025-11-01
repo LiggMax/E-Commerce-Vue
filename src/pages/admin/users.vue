@@ -30,7 +30,7 @@
           v-model="search"
           density="compact"
           hide-details
-          placeholder="搜索用账号/昵称/邮箱..."
+          placeholder="搜索账号/昵称/邮箱..."
           prepend-inner-icon="mdi-magnify"
           style="width: 300px;"
           variant="outlined"
