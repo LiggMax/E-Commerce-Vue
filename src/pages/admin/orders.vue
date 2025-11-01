@@ -46,6 +46,7 @@
         class="elevation-0"
         :headers="headers"
         hide-default-footer
+        :items="orderList"
         :items-per-page="-1"
         :loading="loading"
       >
