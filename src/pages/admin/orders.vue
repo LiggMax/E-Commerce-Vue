@@ -148,7 +148,7 @@
 
         <!-- 创建时间 -->
         <template #item.createdAt="{ item }">
-          <div>{{ formatDate(item.createTime) }}</div>
+          <div>{{ TimeFormatter.formatDateTime(item.createTime) }}</div>
         </template>
 
         <!-- 操作 -->
@@ -323,7 +323,7 @@
                 创建时间
               </div>
               <div class="text-body-1">
-                {{ formatDate(selectedOrder.createTime) }}
+                {{ TimeFormatter.formatDateTime(selectedOrder.createTime) }}
               </div>
             </div>
           </v-col>
@@ -333,7 +333,7 @@
                 支付时间
               </div>
               <div class="text-body-1">
-                {{ formatDate(selectedOrder.payTime) }}
+                {{ TimeFormatter.formatDateTime(selectedOrder.payTime) }}
               </div>
             </div>
           </v-col>
@@ -410,6 +410,7 @@
   import { OrderStatus } from '@/composables/enums/orderStatus.ts'
   import { getOrderList } from '@/http/admin/order.ts'
   import { useNotification } from '@/utils/notification'
+  import { TimeFormatter } from '@/utils/timeForm'
 
   // 定义订单接口
   interface ProductSpec {
@@ -562,19 +563,6 @@
         textArea.remove()
       }
     }
-  }
-
-  // 格式化日期
-  function formatDate (dateString: string) {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
   }
 
   // 获取订单列表

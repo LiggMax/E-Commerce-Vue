@@ -142,7 +142,7 @@
 
         <!-- 创建时间 -->
         <template #item.createdAt="{ item }">
-          <div>{{ item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '' }}</div>
+          <div>{{ item.createdAt ? TimeFormatter.formatDateTime(item.createdAt) : '' }}</div>
         </template>
 
         <!-- 操作 -->
@@ -351,6 +351,7 @@
     updateUser,
   } from '@/http/admin/users.ts'
   import { useNotification } from '@/utils/notification'
+  import { TimeFormatter } from '@/utils/timeForm'
 
   // 定义用户接口
   interface User {
