@@ -37,6 +37,15 @@
           style="width: 150px;"
           variant="outlined"
         />
+        <v-select
+          v-model="sortOrder"
+          density="compact"
+          hide-details
+          :items="sortOptions"
+          label="时间排序"
+          style="width: 150px;"
+          variant="outlined"
+        />
       </div>
     </v-card-title>
 
@@ -408,6 +417,7 @@
 
 <script lang="ts" setup>
   import { OrderStatus } from '@/composables/enums/orderStatus.ts'
+  import { Sort } from '@/composables/enums/Sort.ts'
   import { getOrderList } from '@/http/admin/order.ts'
   import { useNotification } from '@/utils/notification'
   import { TimeFormatter } from '@/utils/timeForm'
@@ -461,6 +471,7 @@
   const router = useRouter()
   const search = ref((route.query.search as string) || '')
   const statusFilter = ref<OrderStatus | 'all'>((route.query.status as OrderStatus) || 'all')
+  const sortOrder = ref<Sort>((route.query.sortOrder as Sort) || Sort.DESC)
   const detailDialog = ref(false)
   const selectedOrder = ref<Order | null>(null)
   let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -486,6 +497,12 @@
     { title: '已取消', value: OrderStatus.CANCELED },
     { title: '退款中', value: OrderStatus.REFUNDING },
     { title: '已退款', value: OrderStatus.REFUNDED },
+  ]
+
+  // 排序选项
+  const sortOptions = [
+    { title: '时间倒序', value: Sort.DESC },
+    { title: '时间升序', value: Sort.ASC },
   ]
 
   // 表格头部配置
@@ -571,7 +588,7 @@
     try {
       const status = statusFilter.value === 'all' ? undefined : statusFilter.value
       const keyword = search.value && search.value.trim() ? search.value.trim() : undefined
-      const response = await getOrderList(pagination.page, pagination.pageSize, status, keyword)
+      const response = await getOrderList(pagination.page, pagination.pageSize, status, keyword, sortOrder.value)
       const orderData = response.data.list || []
       pagination.totalItems = response.data.total || 0
       pagination.totalPages = response.data.pages || 1
@@ -655,6 +672,8 @@
       } else {
         query.status = statusFilter.value
       }
+      // 添加排序参数
+      query.sortOrder = sortOrder.value
       isFilterTriggeredRouteChange = true
       router.push({ query }).finally(() => {
         // 路由更新完成后重置标志
@@ -688,6 +707,8 @@
     } else {
       query.status = statusFilter.value
     }
+    // 添加排序参数
+    query.sortOrder = sortOrder.value
     // 标记这是筛选触发的路由变化
     isFilterTriggeredRouteChange = true
     router.push({ query }).finally(() => {
@@ -709,6 +730,14 @@
   // 监听状态筛选变化
   watch(
     () => statusFilter.value,
+    () => {
+      handleStatusFilterChange()
+    },
+  )
+
+  // 监听排序变化
+  watch(
+    () => sortOrder.value,
     () => {
       handleStatusFilterChange()
     },
@@ -737,6 +766,12 @@
           statusFilter.value = (newQuery.status as OrderStatus) || 'all'
         } else if (newQuery.status === undefined && statusFilter.value !== 'all') {
           statusFilter.value = 'all'
+        }
+        // 同步排序的值
+        if (newQuery.sortOrder !== undefined && newQuery.sortOrder !== sortOrder.value) {
+          sortOrder.value = (newQuery.sortOrder as Sort) || Sort.DESC
+        } else if (newQuery.sortOrder === undefined && sortOrder.value !== Sort.DESC) {
+          sortOrder.value = Sort.DESC
         }
       }
       fetchOrderList()
