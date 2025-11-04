@@ -77,6 +77,12 @@
           </div>
         </template>
 
+        <template #header.stock="{ column }">
+          <div class="d-flex align-center">
+            <v-icon class="mr-2" size="small">mdi-cube</v-icon>
+            <span>{{ column.title }}</span>
+          </div>
+        </template>
         <template #header.createdAt="{ column }">
           <div class="d-flex align-center">
             <v-icon class="mr-2" size="small">mdi-calendar</v-icon>
@@ -212,7 +218,7 @@
   </v-card>
 
   <!-- 添加/编辑对话框 -->
-  <FeaturedEditDialog
+  <ProductEditDialog
     v-model="dialog"
     :item="editItem"
     :mode="dialogMode"
@@ -247,8 +253,8 @@
 
 <script lang="ts" setup>
   import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog.vue'
-  import FeaturedEditDialog from '@/components/admin/FeaturedEditDialog.vue'
   import ImageUploadDialog from '@/components/admin/ImageUploadDialog.vue'
+  import ProductEditDialog from '@/components/admin/ProductEditDialog.vue'
   import SpecEditDialog from '@/components/admin/SpecEditDialog.vue'
   import { deleteProductById, getProduct } from '@/http/admin/product.ts'
   import { useNotification } from '@/utils/notification'
@@ -290,6 +296,7 @@
   // 定义精选商品项目的接口
   interface FeaturedItem {
     id: string
+    stock: number
     title: string
     description: string
     images: {
@@ -324,12 +331,13 @@
 
   // 表格头部配置
   const headers = [
-    { title: '图片', key: 'image', icon: 'mdi-image-plus', sortable: false, width: 100 },
-    { title: '商品名称', key: 'title', sortable: true, minWidth: 150 },
-    { title: '价格', key: 'price', sortable: true, minWidth: 100 },
-    { title: '评分', key: 'rating', sortable: true, width: 200 },
-    { title: '创建时间', key: 'createdAt', sortable: true, minWidth: 150 },
-    { title: '操作', key: 'actions', sortable: false, width: 120 },
+    { title: '图片', key: 'image', icon: 'mdi-image', sortable: false, width: 100 },
+    { title: '商品名称', key: 'title', icon: 'mdi-format-title', sortable: true, minWidth: 150 },
+    { title: '价格', key: 'price', icon: 'mdi-currency-cny', sortable: true, minWidth: 100 },
+    { title: '评分', key: 'rating', icon: 'mdi-star', sortable: true, width: 200 },
+    { title: '库存', key: 'stock', icon: 'mdi-cube', sortable: true, width: 250 },
+    { title: '创建时间', key: 'createdAt', icon: 'mdi-calendar', sortable: true, minWidth: 150 },
+    { title: '操作', key: 'actions', icon: 'mdi-cog', sortable: false, width: 120 },
   ]
 
   // 精选商品数据
@@ -348,6 +356,7 @@
       featuredList.value = featuredData.map((item: {
         id: string
         title: string
+        stock: number
         images: {
           largeImage: string
           smallImage: string
@@ -362,6 +371,7 @@
       }) => ({
         id: item.id,
         title: item.title,
+        stock: item.stock,
         images: item.images,
         originalPrice: item.originalPrice,
         currentPrice: item.currentPrice,
@@ -390,6 +400,7 @@
       },
     })
   }
+
   // 每页条数变化处理
   function handlePageSizeChange (newSize: number) {
     pagination.pageSize = newSize
@@ -447,6 +458,7 @@
       console.error('保存规格失败:', error)
     }
   }
+
   // 打开删除确认框
   function openDeleteDialog (item: FeaturedItem) {
     itemToDelete.value = item
