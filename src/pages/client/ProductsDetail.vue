@@ -650,7 +650,8 @@
         emoji: '',
       }
 
-      console.log('评价提交成功:', reviewData)
+      await getReviews()
+      showSuccess('评论发布成功')
     } catch (error) {
       console.error('提交评价失败:', error)
     } finally {
