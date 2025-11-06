@@ -29,21 +29,14 @@ export const SUBSCRIBE = '/api/email'
 export const CAPTCHA = '/api/client/captcha'
 
 /**
- * 注册
+ * 授权
  */
-export const REGISTER = '/api/client/auth/register'
+export const AUTH = '/api/client/auth'
 
 /**
- * 登录
+ * 用户
  */
-export const LOGIN = '/api/client/auth/login'
-
 export const USER = '/api/client/user'
-
-/**
- * 获取用户信息
- */
-export const GET_USER_INFO = `${USER}/info`
 
 /**
  * 订单

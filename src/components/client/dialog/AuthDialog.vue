@@ -9,13 +9,13 @@
             color="primary"
             size="48"
           >
-            {{ isLogin ? 'mdi-account-circle' : 'mdi-account-plus' }}
+            {{ isForgotPassword ? 'mdi-lock-reset' : isLogin ? 'mdi-account-circle' : 'mdi-account-plus' }}
           </v-icon>
           <h2 class="text-h4 font-weight-bold text-primary">
-            {{ isLogin ? '用户登录' : '用户注册' }}
+            {{ isForgotPassword ? '找回密码' : isLogin ? '用户登录' : '用户注册' }}
           </h2>
           <p class="text-subtitle-1 text-medium-emphasis mt-2">
-            {{ isLogin ? '请输入您的登录凭据' : '创建您的账户' }}
+            {{ isForgotPassword ? '请输入您的账号信息重置密码' : isLogin ? '请输入您的登录凭据' : '创建您的账户' }}
           </p>
         </div>
       </v-card-title>
@@ -38,7 +38,7 @@
 
           <!-- Email Field (仅注册时显示) -->
           <v-text-field
-            v-if="!isLogin"
+            v-if="!isLogin && !isForgotPassword"
             v-model="authForm.email"
             class="mb-2"
             color="primary"
@@ -67,7 +67,7 @@
             @input="handlePasswordInput"
           />
 
-          <!-- Confirm Password Field (仅注册时显示) -->
+          <!-- Confirm Password Field (注册和找回密码时显示) -->
           <v-text-field
             v-if="!isLogin"
             v-model="authForm.confirmPassword"
@@ -85,7 +85,7 @@
             @input="clearError('confirmPassword')"
           />
 
-          <!-- Captcha Field (仅注册时显示，且在输入密码后) -->
+          <!-- Captcha Field (注册和找回密码时显示，且在输入密码后) -->
           <div v-if="!isLogin && showCaptcha">
             <div class="d-flex align-center mb-2">
               <v-text-field
@@ -127,9 +127,20 @@
             </div>
           </div>
 
+          <div class="d-flex justify-end">
+            <v-btn
+              v-if="isLogin && !isForgotPassword"
+              color="primary"
+              size="large"
+              variant="text"
+              @click="switchToForgotPassword"
+            >
+              忘记密码？
+            </v-btn>
+          </div>
           <!-- Remember Me (仅登录时显示) -->
           <v-checkbox
-            v-if="isLogin"
+            v-if="isLogin && !isForgotPassword"
             v-model="authForm.remember"
             color="primary"
             hide-details
@@ -148,23 +159,23 @@
             variant="flat"
           >
             <v-icon :start="true">
-              {{ isLogin ? 'mdi-login' : 'mdi-account-plus' }}
+              {{ isForgotPassword ? 'mdi-lock-reset' : isLogin ? 'mdi-login' : 'mdi-account-plus' }}
             </v-icon>
-            {{ isLogin ? '登录' : '注册' }}
+            {{ isForgotPassword ? '重置密码' : isLogin ? '登录' : '注册' }}
           </v-btn>
 
           <!-- Switch Auth Mode Link -->
           <div class="text-center">
             <span class="text-medium-emphasis">
-              {{ isLogin ? '还没有账户？' : '已有账户？' }}
+              {{ isForgotPassword ? '记起密码了？' : isLogin ? '还没有账户？' : '已有账户？' }}
             </span>
             <v-btn
               color="primary"
               size="small"
               variant="text"
-              @click="switchAuthMode"
+              @click="isForgotPassword ? switchToLogin() : switchAuthMode()"
             >
-              {{ isLogin ? '立即注册' : '立即登录' }}
+              {{ isForgotPassword ? '返回登录' : isLogin ? '立即注册' : '立即登录' }}
             </v-btn>
           </div>
         </v-form>
@@ -185,7 +196,7 @@
 
 <script setup lang="ts">
   import { getCaptchaService } from '@/http/client/captcha.ts'
-  import { loginService, registerService } from '@/http/client/user.ts'
+  import { forgetPasswordService, loginService, registerService } from '@/http/client/user.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
   import { useNotification } from '@/utils/notification.ts'
 
@@ -215,6 +226,7 @@
   const showPassword = ref(false)
   const showConfirmPassword = ref(false)
   const isLogin = ref(true) // true为登录模式，false为注册模式
+  const isForgotPassword = ref(false) // true为找回密码模式
   const showCaptcha = ref(false)
   const captchaLoading = ref(false)
 
@@ -291,8 +303,23 @@
     dialog.value = false
   }
 
+  // 切换到找回密码模式
+  function switchToForgotPassword () {
+    isForgotPassword.value = true
+    isLogin.value = false
+    resetForm()
+  }
+
+  // 切换回登录模式
+  function switchToLogin () {
+    isForgotPassword.value = false
+    isLogin.value = true
+    resetForm()
+  }
+
   // 切换认证模式（登录/注册）
   function switchAuthMode () {
+    isForgotPassword.value = false
     isLogin.value = !isLogin.value
     resetForm()
   }
@@ -314,7 +341,7 @@
   // 处理密码输入事件
   function handlePasswordInput () {
     clearError('password')
-    // 在注册模式下且密码不为空时才显示验证码
+    // 在注册模式或找回密码模式下且密码不为空时才显示验证码
     if (!isLogin.value && authForm.password) {
       showCaptcha.value = true
       // 如果还没有获取过验证码，则获取验证码
@@ -344,14 +371,24 @@
     }
   }
 
-  // 处理认证（登录或注册）
+  // 处理认证（登录、注册或找回密码）
   async function handleAuth () {
     if (!valid.value) return
 
     loading.value = true
 
     try {
-      if (isLogin.value) {
+      if (isForgotPassword.value) {
+        // 找回密码
+        await forgetPasswordService({
+          account: authForm.username,
+          password: authForm.password,
+          code: authForm.captcha,
+          uuid: captcha.value!.uuid,
+        })
+        showSuccess('密码重置成功，请使用新密码登录')
+        switchToLogin()
+      } else if (isLogin.value) {
         // 登录
         const res = await loginService({
           account: authForm.username,
@@ -390,6 +427,7 @@
     authForm.captcha = ''
     authForm.remember = false
     showCaptcha.value = false
+    captcha.value = undefined
     if (form.value) {
       form.value.resetValidation()
     }
@@ -401,6 +439,7 @@
       // 延迟重置，确保动画完成
       setTimeout(() => {
         isLogin.value = true
+        isForgotPassword.value = false
         resetForm()
       }, 300)
     }

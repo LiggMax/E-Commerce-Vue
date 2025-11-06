@@ -225,7 +225,7 @@
 
 <script setup lang="ts">
   import { useDisplay } from 'vuetify'
-  import AuthDialog from '@/components/client/AuthDialog.vue'
+  import AuthDialog from '@/components/client/dialog/AuthDialog.vue'
   import { useThemeToggle } from '@/composables/useTheme.ts'
   import { getUserInfoService } from '@/http/client/user.ts'
   import router from '@/router'

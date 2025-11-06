@@ -1,25 +1,32 @@
-import { GET_USER_INFO, LOGIN, RECHARGE, REGISTER, USER } from '@/http/client/api.ts'
+import { AUTH, RECHARGE, USER } from '@/http/client/api.ts'
 import request from '@/http/client/clientRequest.ts'
 
 /**
  * 注册
  */
 export async function registerService (account: any) {
-  return await request.post(REGISTER, account)
+  return await request.post(`${AUTH}/register`, account)
 }
 
 /**
  * 登录
  */
 export async function loginService (account: any) {
-  return await request.post(LOGIN, account)
+  return await request.post(`${AUTH}/login`, account)
+}
+
+/**
+ * 找回密码
+ */
+export async function forgetPasswordService (params: { account: string, password: string, code: string, uuid: string }) {
+  return await request.put(`${AUTH}/forget`, null, { params })
 }
 
 /**
  * 获取用户信息
  */
 export async function getUserInfoService () {
-  return await request.get(GET_USER_INFO)
+  return await request.get(`${USER}/info`)
 }
 
 /**
