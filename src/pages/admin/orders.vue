@@ -418,7 +418,7 @@
 <script lang="ts" setup>
   import { OrderStatus } from '@/composables/enums/orderStatus.ts'
   import { Sort } from '@/composables/enums/Sort.ts'
-  import { getOrderList } from '@/http/admin/order.ts'
+  import { getOrderList, updateOrderStatusService } from '@/http/admin/order.ts'
   import { useNotification } from '@/utils/notification'
   import { TimeFormatter } from '@/utils/timeForm'
 
@@ -636,8 +636,7 @@
   // 处理订单状态变更
   async function handleOrderStatus (order: Order, newStatus: OrderStatus) {
     try {
-      // TODO: 调用API更新订单状态
-      // await updateOrderStatus(order.orderNo, newStatus)
+      await updateOrderStatusService(order.orderNo, newStatus)
       order.status = newStatus
       showSuccess(`订单 ${order.orderNo} 状态已更新为：${getStatusText(newStatus)}`)
       await fetchOrderList()

@@ -159,7 +159,6 @@
           >
             <v-tab value="detail">详情</v-tab>
             <v-tab value="review">评价</v-tab>
-            <v-tab value="spec">参数</v-tab>
           </v-tabs>
           <v-divider />
           <v-card-text>
@@ -399,21 +398,6 @@
                   <h3 class="text-h6 text-medium-emphasis">暂无评价</h3>
                   <p class="text-body-2 text-medium-emphasis">成为第一个评价此商品的用户</p>
                 </div>
-              </v-window-item>
-
-              <!-- 参数 Tab -->
-              <v-window-item value="spec">
-                <v-list density="compact" subheader>
-                  <v-list-subheader>详细参数</v-list-subheader>
-                  <v-list-item subtitle="IPS" title="面板" />
-                  <v-list-item subtitle="3840 x 2160" title="分辨率" />
-                  <v-list-item subtitle="144Hz" title="刷新率" />
-                  <v-list-item subtitle="HDMI 2.1 / DP 1.4 / Type‑C" title="接口" />
-                  <v-list-item subtitle="27英寸" title="屏幕尺寸" />
-                  <v-list-item subtitle="1ms" title="响应时间" />
-                  <v-list-item subtitle="HDR400" title="HDR支持" />
-                  <v-list-item subtitle="FreeSync Premium Pro" title="同步技术" />
-                </v-list>
               </v-window-item>
             </v-window>
           </v-card-text>

@@ -15,3 +15,10 @@ export async function getOrderList (pageNumber: number, pageSize: number, status
     sortOrder,
   })
 }
+
+/**
+ * 更新订单状态
+ */
+export async function updateOrderStatusService (orderNo: string, status: OrderStatus) {
+  return await request.patch(`${ORDERS}/deliver/${orderNo}?status=${status}`)
+}
