@@ -3,9 +3,14 @@ import request from '@/http/admin/adminRequest.ts'
 import { USERS_MANAGEMENT } from '@/http/admin/api.ts'
 
 /**
+ * 获取当前登录账号信息
+ */
+export async function getCurrentUserInfo () {}
+
+/**
  * 获取用户列表
  */
-export async function getUsers (pageNumber: number, pageSize: number, search?: string) {
+export async function getUsersService (pageNumber: number, pageSize: number, search?: string) {
   return await request.get(USERS_MANAGEMENT, {
     pageNumber,
     pageSize,

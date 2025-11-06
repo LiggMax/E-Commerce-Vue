@@ -109,7 +109,7 @@
 
 <script lang="ts" setup>
   import { useThemeToggle } from '@/composables/useTheme.ts'
-  import { login } from '@/http/admin/login.ts'
+  import { loginService } from '@/http/admin/login.ts'
   import { userTokenStore } from '@/stores/admin/adminToken.ts'
 
   // 路由实例
@@ -168,7 +168,7 @@
     errorMessage.value = ''
 
     try {
-      const response = await login(loginForm.username, loginForm.password)
+      const response = await loginService(loginForm.username, loginForm.password)
       // 保存token
       setToken(response.data)
       await router.push('/admin/dashboard')

@@ -68,11 +68,13 @@
       <!-- 底部用户信息 -->
       <template #append>
         <v-divider />
-        <v-list>
+        <v-list class="d-flex align-center pa-2">
+          <v-avatar>
+            <v-img :src="userInfo?.avatar" />
+          </v-avatar>
           <v-list-item
-            prepend-icon="mdi-account-circle"
-            subtitle="admin@example.com"
-            title="管理员"
+            :subtitle="userInfo?.email"
+            :title="userInfo?.nickName"
           >
             <template #append>
               <v-btn
@@ -142,8 +144,9 @@
 </template>
 
 <script lang="ts" setup>
+  import type { Role } from '@/composables/enums/userRole.ts'
   import { useDisplay, useTheme } from 'vuetify'
-  import { cleanToken } from '@/http/admin/login.ts'
+  import { cleanTokenService, getUserInfoService } from '@/http/admin/login.ts'
   import { userTokenStore } from '@/stores/admin/adminToken.ts'
 
   // 主题管理
@@ -168,6 +171,19 @@
     return route.path === '/admin/login'
   })
 
+  interface UserInfo {
+    nickName: string
+    account: string
+    email: string
+    avatar: string
+    role: Role
+    status: string
+    accountBalance: number
+    createTime: string
+    lastLoginTime: string
+  }
+
+  const userInfo = ref<UserInfo>()
   // 菜单项配置（支持二级菜单）
   const menuItems = [
     {
@@ -264,6 +280,13 @@
     return crumbs
   })
 
+  // 获取账户信息
+  async function getUserInfo () {
+    await getUserInfoService().then(response => {
+      userInfo.value = response.data
+    })
+  }
+
   // 退出登录
   function handleLogout () {
     // 清除登录状态
@@ -271,12 +294,16 @@
     // 跳转到登录页面
     router.push('/admin/login')
     // 调用接口清除Token
-    cleanToken()
+    cleanTokenService()
   }
 
   // 监听屏幕尺寸变化
   watch(mobile, newVal => {
     drawer.value = !newVal
+  })
+
+  onMounted(() => {
+    getUserInfo()
   })
 </script>
 

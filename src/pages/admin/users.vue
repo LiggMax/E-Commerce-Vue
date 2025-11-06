@@ -345,7 +345,7 @@
   import {
     addUser,
     deleteUserById,
-    getUsers,
+    getUsersService,
     toggleUserStatus as toggleUserStatusApi,
     updateUser,
   } from '@/http/admin/users.ts'
@@ -487,7 +487,7 @@
   async function fetchUserList () {
     loading.value = true
     try {
-      const response = await getUsers(pagination.page, pagination.pageSize, search?.value)
+      const response = await getUsersService(pagination.page, pagination.pageSize, search?.value)
       const userData = response.data.list || []
       pagination.totalItems = response.data.total || 0
       pagination.totalPages = response.data.pages || 1

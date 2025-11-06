@@ -19,6 +19,11 @@ export const PRODUCT = '/api/admin/product'
 export const UPLOAD_IMAGE = '/api/admin/product/image'
 
 /**
+ * 用户
+ */
+export const USER = '/api/admin/user'
+
+/**
  * 清理Token
  */
 export const CLEAR_TOKEN = '/api/admin/user/remove_token'

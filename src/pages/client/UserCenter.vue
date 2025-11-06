@@ -140,11 +140,11 @@
       title: '收货地址',
       icon: 'mdi-map-marker',
     },
-    {
-      key: 'settings',
-      title: '账户设置',
-      icon: 'mdi-cog',
-    },
+    // {
+    //   key: 'settings',
+    //   title: '账户设置',
+    //   icon: 'mdi-cog',
+    // },
   ]
 
   // 计算属性：当前菜单项
