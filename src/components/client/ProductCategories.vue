@@ -4,7 +4,7 @@
       <v-row class="fill-height" no-gutters>
         <!-- 第一行卡片 -->
         <v-col class="pa-2" cols="6">
-          <!-- 衣橱捡漏 -->
+          <!-- 热门 -->
           <v-card
             class="h-100 category-card"
             elevation="2"
@@ -15,8 +15,8 @@
               <div class="d-flex align-center mb-3">
                 <v-icon class="mr-2" color="orange" size="24">mdi-wardrobe</v-icon>
                 <div>
-                  <div class="text-h6 font-weight-bold text-orange-darken-2">衣橱捡漏</div>
-                  <div class="text-caption text-orange-darken-1">时尚美衣低价淘</div>
+                  <div class="text-h6 font-weight-bold text-orange-darken-2">热门商品</div>
+                  <div class="text-caption text-orange-darken-1">热度商品推荐</div>
                 </div>
               </div>
               <div class="flex-grow-1 d-flex align-center justify-center">
