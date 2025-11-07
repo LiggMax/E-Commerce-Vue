@@ -13,7 +13,6 @@ declare module 'vue' {
     ConfirmDeleteDialog: typeof import('./components/client/dialog/ConfirmDeleteDialog.vue')['default']
     DeleteConfirmDialog: typeof import('./components/admin/DeleteConfirmDialog.vue')['default']
     FavoritesTab: typeof import('./components/client/user/FavoritesTab.vue')['default']
-    FeaturedEditDialog: typeof import('./components/admin/FeaturedEditDialog.vue')['default']
     FeaturedProducts: typeof import('./components/client/FeaturedProducts.vue')['default']
     Footer: typeof import('./components/client/Footer.vue')['default']
     Header: typeof import('./components/client/Header.vue')['default']
