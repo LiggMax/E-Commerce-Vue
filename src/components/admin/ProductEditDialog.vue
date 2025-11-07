@@ -102,11 +102,11 @@
 
             <v-col cols="12" md="6">
               <v-text-field
-                v-model.number="formData.reviews"
-                label="评论数"
+                v-model.number="formData.stock"
+                label="库存"
                 min="0"
-                prepend-inner-icon="mdi-comment"
-                :rules="[v => v >= 0 || '评论数不能为负']"
+                prepend-inner-icon="mdi-cube"
+                :rules="[v => v >= 0 || '库存数不能为负']"
                 type="number"
                 variant="outlined"
               />
@@ -143,6 +143,7 @@
   interface FeaturedItem {
     id: string
     title: string
+    stock: number
     description: string
     images: {
       largeImage: string
@@ -151,7 +152,6 @@
     imageFile?: File | undefined
     originalPrice: number
     currentPrice: number
-    reviews: number
     rating: number
     createdAt: string
   }
@@ -185,6 +185,7 @@
   const formData = reactive<FeaturedItem>({
     id: '',
     title: '',
+    stock: 0,
     description: '',
     images: {
       largeImage: '',
@@ -193,7 +194,6 @@
     imageFile: undefined,
     originalPrice: 0,
     currentPrice: 0,
-    reviews: 0,
     rating: 0,
     createdAt: '',
   })
@@ -279,7 +279,7 @@
       data.append('description', formData.description)
       data.append('originalPrice', formData.originalPrice.toString())
       data.append('currentPrice', formData.currentPrice.toString())
-      data.append('reviews', formData.reviews.toString())
+      data.append('stock', formData.stock.toString())
       data.append('rating', formData.rating.toString())
 
       // 添加图片文件

@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-  import mad from '@/assets/mad.svg'
+  import mad from '@/assets/icon/mad.svg'
   import { getFeaturedServer } from '@/http/client/product.ts'
   import router from '@/router'
 
