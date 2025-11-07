@@ -183,7 +183,6 @@
 </template>
 
 <script lang="ts" setup>
-  import * as echarts from 'echarts'
   import { getSystemInfoService } from '@/http/admin/dashboard.ts'
   import { getSystemStatusServer } from '@/http/admin/event.ts'
 
@@ -326,16 +325,19 @@
   let closeSSE: (() => void) | null = null
 
   // ECharts 图表实例
-  let networkChart: echarts.ECharts | null = null
+  let networkChart: any | null = null
 
   // 网络速度历史数据（保存最近的数据点）
   const networkHistory = ref<Array<{ time: string, upload: number, download: number }>>([])
   const maxDataPoints = 50 // 最多保存50个数据点
 
   // 初始化网络图表
-  function initNetworkChart () {
+  async function initNetworkChart () {
     const chartDom = document.querySelector('#networkChart')
     if (!chartDom) return
+
+    // 动态导入 echarts
+    const echarts = await import('echarts')
 
     networkChart = echarts.init(chartDom as HTMLElement)
 

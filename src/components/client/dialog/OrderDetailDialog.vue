@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="800px" max-height="90vh" persistent>
+  <v-dialog v-model="dialog" max-height="90vh" max-width="800px" persistent>
     <v-card class="order-detail-dialog d-flex flex-column" style="height: 90vh;">
       <!-- 头部 -->
       <v-card-title class="d-flex align-center pa-6 pb-4">
