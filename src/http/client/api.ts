@@ -26,7 +26,7 @@ export const SUBSCRIBE = '/api/email'
 /**
  * 验证码
  */
-export const CAPTCHA = '/api/client/captcha'
+export const CAPTCHA = '/api/captcha'
 
 /**
  * 授权

@@ -22,23 +22,9 @@
 
       <!-- Auth Form -->
       <v-card-text class="px-6 pb-6">
-        <v-form ref="form" v-model="valid" @submit.prevent="handleAuth">
-          <!-- Username Field -->
+        <v-form v-model="valid">
+          <!-- Email Field -->
           <v-text-field
-            v-model="authForm.username"
-            class="mb-2"
-            color="primary"
-            :error-messages="errors.username"
-            label="用户名"
-            prepend-inner-icon="mdi-account"
-            :rules="usernameRules"
-            variant="outlined"
-            @input="clearError('username')"
-          />
-
-          <!-- Email Field (仅注册时显示) -->
-          <v-text-field
-            v-if="!isLogin && !isForgotPassword"
             v-model="authForm.email"
             class="mb-2"
             color="primary"
@@ -58,7 +44,7 @@
             class="mb-2"
             color="primary"
             :error-messages="errors.password"
-            label="密码"
+            :label="isForgotPassword?'输入新密码':'密码'"
             prepend-inner-icon="mdi-lock"
             :rules="passwordRules"
             :type="showPassword ? 'text' : 'password'"
@@ -76,7 +62,7 @@
             class="mb-2"
             color="primary"
             :error-messages="errors.confirmPassword"
-            label="确认密码"
+            :label="isForgotPassword ? '确认密码密码' : '确认密码'"
             prepend-inner-icon="mdi-lock-check"
             :rules="confirmPasswordRules"
             :type="showConfirmPassword ? 'text' : 'password'"
@@ -155,8 +141,8 @@
             :disabled="!valid"
             :loading="loading"
             size="large"
-            type="submit"
             variant="flat"
+            @click="handleAuth"
           >
             <v-icon :start="true">
               {{ isForgotPassword ? 'mdi-lock-reset' : isLogin ? 'mdi-login' : 'mdi-account-plus' }}
@@ -197,6 +183,7 @@
 <script setup lang="ts">
   import { getCaptchaService } from '@/http/client/captcha.ts'
   import { forgetPasswordService, loginService, registerService } from '@/http/client/user.ts'
+  import router from '@/router'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
   import { useNotification } from '@/utils/notification.ts'
 
@@ -256,14 +243,6 @@
 
   // 验证码
   const captcha = ref<Captcha>()
-
-  // 表单验证规则
-  const usernameRules = [
-    (v: string) => !!v || '请输入用户名',
-    (v: string) => (v && v.length >= 6) || '用户名至少需要个6字符',
-    (v: string) => (v && v.length < 30) || '用户名不能超过30个字符',
-    (v: string) => v !== '123456' || '账号过于简单',
-  ]
 
   const emailRules = [
     (v: string) => !!v || '请输入邮箱',
@@ -380,18 +359,25 @@
     try {
       if (isForgotPassword.value) {
         // 找回密码
+        const email = authForm.email
         await forgetPasswordService({
-          account: authForm.username,
+          email: email,
           password: authForm.password,
           code: authForm.captcha,
           uuid: captcha.value!.uuid,
         })
-        showSuccess('密码重置成功，请使用新密码登录')
-        switchToLogin()
+        showSuccess('已发送重置密码邮件,请完成验证')
+        await router.push({
+          path: '/client/RegisterVerify',
+          query: {
+            email,
+            forget: 'true',
+          },
+        })
       } else if (isLogin.value) {
         // 登录
         const res = await loginService({
-          account: authForm.username,
+          email: authForm.email,
           password: authForm.password,
         })
         tokenStore.setToken(res.data)
@@ -400,15 +386,22 @@
         emit('login-success') // 发送登录成功事件
       } else {
         // 注册
+        const email = authForm.email
         await registerService({
-          account: authForm.username,
           password: authForm.password,
-          email: authForm.email,
+          email,
           code: authForm.captcha,
           uuid: captcha.value!.uuid,
         })
-        showSuccess('注册成功')
-        switchAuthMode()
+        showSuccess('注册成功，请前往邮箱完成验证')
+        closeDialog()
+        await router.push({
+          path: '/client/RegisterVerify',
+          query: {
+            email,
+            forget: 'false',
+          },
+        })
       }
 
       // 重置表单
@@ -445,6 +438,3 @@
     }
   })
 </script>
-
-<style scoped>
-</style>

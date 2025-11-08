@@ -1,3 +1,4 @@
+import type { SearchSort } from '@/composables/enums/Sort.ts'
 import { SEARCH } from '@/http/client/api.ts'
 import request from '@/http/client/clientRequest.ts'
 
@@ -7,6 +8,6 @@ import request from '@/http/client/clientRequest.ts'
  * @param pageNumber
  * @param sort
  */
-export async function searchServer (keyword: string, pageNumber: number, sort: number) {
+export async function searchServer (keyword: string, pageNumber: number, sort: SearchSort) {
   return request.get(SEARCH, { keyword, pageNumber, sort })
 }

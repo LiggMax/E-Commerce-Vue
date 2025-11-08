@@ -5,7 +5,7 @@
       <v-col cols="12">
         <div class="d-flex align-center justify-space-between">
           <div>
-            <h1 class="text-h4 font-weight-bold">
+            <h1 v-if="keyword != null" class="text-h4 font-weight-bold">
               搜索结果
               <span v-if="keyword" class="text-primary">"{{ keyword }}"</span>
             </h1>
@@ -23,7 +23,7 @@
             label="排序方式"
             style="max-width: 200px"
             variant="outlined"
-            @update:model-value="handleSearch"
+            @update:model-value="handleSortChange"
           />
         </div>
       </v-col>
@@ -150,6 +150,7 @@
 
 <script setup lang="ts">
   import { useRouter } from 'vue-router'
+  import { SearchSort } from '@/composables/enums/Sort.ts'
   import { searchServer } from '@/http/client/search.ts'
 
   const route = useRoute()
@@ -187,21 +188,19 @@
   const totalPages = ref(0)
   const currentPage = ref(1)
   const loading = ref(false)
-  const sortBy = ref(1)
+  const sortBy = ref(SearchSort.DEFAULT)
 
   const sortOptions = [
-    { label: '综合排序', value: 1 },
-    { label: '价格从低到高', value: 2 },
-    { label: '价格从高到低', value: 3 },
-    { label: '销量优先', value: 4 },
+    { label: '综合排序', value: SearchSort.DEFAULT },
+    { label: '价格排序', value: SearchSort.PRICE },
+    { label: '评分排序', value: SearchSort.RATING },
+    { label: '热门排序', value: SearchSort.HOT },
   ]
 
   /**
    * 搜索商品
    */
   async function handleSearch () {
-    if (!keyword.value) return
-
     loading.value = true
     try {
       const result: SearchResponse = await searchServer(keyword.value,
@@ -230,6 +229,20 @@
   }
 
   /**
+   * 排序更新时更新路由
+   */
+  function handleSortChange (value: SearchSort) {
+    sortBy.value = value
+    router.replace({
+      query: {
+        ...route.query,
+        categorzy: value,
+      },
+    })
+    handleSearch()
+  }
+
+  /**
    * 跳转到商品详情
    */
   function goToDetail (productId: string) {
@@ -242,6 +255,13 @@
   // 初始化
   onMounted(() => {
     handleSearch()
+  })
+
+  // 监听路由变化
+  watch(() => route.query.category, () => {
+    sortBy.value = route.query.category as SearchSort
+    handleSearch()
+    currentPage.value = 1
   })
 
   // 监听关键词变化

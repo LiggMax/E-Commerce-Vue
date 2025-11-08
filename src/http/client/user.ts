@@ -9,6 +9,13 @@ export async function registerService (account: any) {
 }
 
 /**
+ * 注册邮箱验证码校验
+ */
+export async function verifyRegisterService (params: { email: string, emailCode: string }) {
+  return await request.post(`${AUTH}/verify`, null, { params })
+}
+
+/**
  * 登录
  */
 export async function loginService (account: any) {
@@ -18,7 +25,7 @@ export async function loginService (account: any) {
 /**
  * 找回密码
  */
-export async function forgetPasswordService (params: { account: string, password: string, code: string, uuid: string }) {
+export async function forgetPasswordService (params: { email: string, password: string, code: string, uuid: string }) {
   return await request.put(`${AUTH}/forget`, null, { params })
 }
 

@@ -169,15 +169,6 @@
                   <v-col cols="12" md="8">
                     <p class="text-body-1 mb-4">{{ productDetail.description }}</p>
                   </v-col>
-                  <v-col cols="12" md="4">
-                    <v-list density="compact" subheader>
-                      <v-list-subheader>规格参数</v-list-subheader>
-                      <v-list-item subtitle="IPS" title="面板" />
-                      <v-list-item subtitle="3840 x 2160" title="分辨率" />
-                      <v-list-item subtitle="144Hz" title="刷新率" />
-                      <v-list-item subtitle="HDMI 2.1 / DP 1.4 / Type‑C" title="接口" />
-                    </v-list>
-                  </v-col>
                 </v-row>
               </v-window-item>
 
