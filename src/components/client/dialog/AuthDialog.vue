@@ -368,10 +368,10 @@
         })
         showSuccess('已发送重置密码邮件,请完成验证')
         await router.push({
-          path: '/client/RegisterVerify',
+          path: '/client/EmailVerify',
           query: {
             email,
-            forget: 'true',
+            type: 'false',
           },
         })
       } else if (isLogin.value) {
@@ -396,10 +396,10 @@
         showSuccess('注册成功，请前往邮箱完成验证')
         closeDialog()
         await router.push({
-          path: '/client/RegisterVerify',
+          path: '/client/EmailVerify',
           query: {
             email,
-            forget: 'false',
+            type: 'true',
           },
         })
       }

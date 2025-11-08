@@ -19,10 +19,10 @@ declare module 'vue-router/auto-routes' {
     '/admin/login': RouteRecordInfo<'/admin/login', '/admin/login', Record<never, never>, Record<never, never>>,
     '/admin/orders': RouteRecordInfo<'/admin/orders', '/admin/orders', Record<never, never>, Record<never, never>>,
     '/admin/users': RouteRecordInfo<'/admin/users', '/admin/users', Record<never, never>, Record<never, never>>,
+    '/client/EmailVerify': RouteRecordInfo<'/client/EmailVerify', '/client/EmailVerify', Record<never, never>, Record<never, never>>,
     '/client/OrderPayment': RouteRecordInfo<'/client/OrderPayment', '/client/OrderPayment', Record<never, never>, Record<never, never>>,
     '/client/OrderSubmit': RouteRecordInfo<'/client/OrderSubmit', '/client/OrderSubmit', Record<never, never>, Record<never, never>>,
     '/client/ProductsDetail': RouteRecordInfo<'/client/ProductsDetail', '/client/ProductsDetail', Record<never, never>, Record<never, never>>,
-    '/client/RegisterVerify': RouteRecordInfo<'/client/RegisterVerify', '/client/RegisterVerify', Record<never, never>, Record<never, never>>,
     '/client/Search': RouteRecordInfo<'/client/Search', '/client/Search', Record<never, never>, Record<never, never>>,
     '/client/UserCenter': RouteRecordInfo<'/client/UserCenter', '/client/UserCenter', Record<never, never>, Record<never, never>>,
   }

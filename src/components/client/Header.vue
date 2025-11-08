@@ -209,10 +209,13 @@
   <!-- 移动搜索对话框 -->
   <v-navigation-drawer v-model="searchDialog" location="end" temporary>
     <v-text-field
+      v-model="searchQuery"
       class="ma-5"
       label="搜索商品"
       prepend-inner-icon="mdi-magnify"
+      rounded
       variant="outlined"
+      @keyup.enter="handleSearch"
     />
   </v-navigation-drawer>
 

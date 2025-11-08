@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-  import { verifyRegisterService } from '@/http/client/user.ts'
+  import { verifyEmailService } from '@/http/client/user.ts'
   import { useAppStore } from '@/stores/app.ts'
   import { useNotification } from '@/utils/notification.ts'
 
@@ -85,7 +85,7 @@
   ]
 
   const email = computed(() => (route.query.email as string) || '')
-  const isForget = computed(() => route.query.forget === 'true')
+  const type = computed(() => route.query.type === 'true')
   const displayEmail = computed(() => email.value || '')
 
   onMounted(() => {
@@ -104,9 +104,10 @@
 
     submitting.value = true
     try {
-      await verifyRegisterService({
+      await verifyEmailService({
         email: email.value,
         emailCode: verifyCode.value,
+        type: type.value,
       })
       showSuccess('邮箱验证成功，请使用新账号登录')
       await router.replace('/')

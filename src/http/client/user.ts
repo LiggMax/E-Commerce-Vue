@@ -11,7 +11,7 @@ export async function registerService (account: any) {
 /**
  * 注册邮箱验证码校验
  */
-export async function verifyRegisterService (params: { email: string, emailCode: string }) {
+export async function verifyEmailService (params: { email: string, emailCode: string, type: boolean }) {
   return await request.post(`${AUTH}/verify`, null, { params })
 }
 

@@ -30,19 +30,11 @@
                   elevation="4"
                   rounded
                   size="large"
+                  tag="_self"
                   :to="slide.primaryAction.link"
                 >
                   {{ slide.primaryAction.text }}
                   <v-icon end icon="mdi-arrow-right" />
-                </v-btn>
-                <v-btn
-                  color="white"
-                  rounded
-                  size="large"
-                  :to="slide.secondaryAction.link"
-                  variant="outlined"
-                >
-                  {{ slide.secondaryAction.text }}
                 </v-btn>
               </div>
             </div>

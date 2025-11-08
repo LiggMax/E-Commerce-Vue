@@ -92,15 +92,10 @@
 
         <!-- 用户头像 -->
         <template #item.avatar="{ item }">
-          <v-avatar :color="getAvatarColor(item.account)" size="40">
+          <v-avatar :color="getAvatarColor(item.email)" size="40">
             <v-img v-if="item.avatar" :src="item.avatar" />
-            <span v-else class="text-h6">{{ getAvatarText(item.account) }}</span>
+            <span v-else class="text-h6">{{ getAvatarText(item.email) }}</span>
           </v-avatar>
-        </template>
-
-        <!-- 用户名 -->
-        <template #item.account="{ item }">
-          <div class="text-body-1 font-weight-medium">{{ item.account }}</div>
         </template>
 
         <!-- 昵称 -->
@@ -424,7 +419,6 @@
   // 表格头部配置
   const headers = [
     { title: '头像', key: 'avatar', sortable: false, width: 80 },
-    { title: '用户名', key: 'account', sortable: true, minWidth: 150 },
     { title: '昵称', key: 'nickName', sortable: true, minWidth: 150 },
     { title: '邮箱', key: 'email', sortable: true, minWidth: 200 },
     { title: '角色', key: 'role', sortable: true, minWidth: 120 },
@@ -438,9 +432,9 @@
   const userList = ref<User[]>([])
 
   // 获取用户头像颜色
-  function getAvatarColor (username: string) {
+  function getAvatarColor (email: string) {
     const colors = ['primary', 'secondary', 'success', 'warning', 'error', 'info']
-    const codePoint = username.codePointAt(0) || 0
+    const codePoint = email.codePointAt(0) || 0
     const index = codePoint % colors.length
     return colors[index]
   }
@@ -686,7 +680,7 @@
       })
       // 清除定时器引用
       searchDebounceTimer = null
-      // 注意：这里不直接调用 fetchUserList，因为路由变化会触发路由监听器
+    // 注意：这里不直接调用 fetchUserList，因为路由变化会触发路由监听器
     }, 500)
   }
 
