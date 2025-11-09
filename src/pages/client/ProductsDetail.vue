@@ -410,7 +410,7 @@
   import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
   import { getFeaturedCommentServer, getFeaturedDetailServer } from '@/http/client/product.ts'
-  import { publishCommentService } from '@/http/client/user.ts'
+  import { collectFeaturedServer, publishCommentService } from '@/http/client/user.ts'
   import router from '@/router'
   import { useAppStore } from '@/stores/client/app.ts'
   import { userTokenStore } from '@/stores/client/clientToken.ts'
