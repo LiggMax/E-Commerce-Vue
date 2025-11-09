@@ -610,14 +610,6 @@
 
     submittingReview.value = true
     try {
-      const reviewData = {
-        productId: productDetail.value!.id,
-        rating: newReview.value.rating,
-        content: newReview.value.content,
-        images: newReview.value.images,
-        specs: selectedSpecsText.value,
-      }
-
       const formData = new FormData()
       formData.append('productId', productDetail.value!.id)
       formData.append('rating', newReview.value.rating.toString())
@@ -639,8 +631,6 @@
 
       await getReviews()
       showSuccess('评论发布成功')
-    } catch (error) {
-      console.error('提交评价失败:', error)
     } finally {
       submittingReview.value = false
     }
