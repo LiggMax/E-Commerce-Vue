@@ -213,17 +213,6 @@
 
       <v-card-text>
         <v-form ref="formRef" v-model="formValid">
-          <v-text-field
-            v-model="userForm.account"
-            :color="dialogMode === 'edit' ? 'grey' : undefined"
-            density="compact"
-            label="用户名"
-            placeholder="请输入用户名"
-            prepend-inner-icon="mdi-account"
-            :readonly="dialogMode === 'edit'"
-            :rules="[rules.required]"
-            variant="outlined"
-          />
 
           <!-- 头像选择与预览 -->
           <div class="d-flex align-center mb-4">

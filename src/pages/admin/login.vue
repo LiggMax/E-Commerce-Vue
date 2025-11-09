@@ -26,15 +26,15 @@
           <v-form v-model="valid">
             <!-- Username Field -->
             <v-text-field
-              v-model="loginForm.username"
+              v-model="loginForm.email"
               class="mb-3"
               color="primary"
-              :error-messages="errors.username"
-              label="用户名"
+              :error-messages="errors.email"
+              label="邮箱"
               prepend-inner-icon="mdi-account"
               :rules="usernameRules"
               variant="outlined"
-              @input="clearError('username')"
+              @input="clearError('email')"
             />
 
             <!-- Password Field -->
@@ -51,6 +51,7 @@
               variant="outlined"
               @click:append-inner="showPassword = !showPassword"
               @input="clearError('password')"
+              @keydown.enter="handleLogin"
             />
 
             <!-- Remember Me -->
@@ -122,7 +123,6 @@
   const { setToken } = userTokenStore()
 
   // 响应式数据
-  const form = ref()
   const valid = ref(false)
   const loading = ref(false)
   const showPassword = ref(false)
@@ -130,14 +130,14 @@
 
   // 登录表单数据
   const loginForm = reactive({
-    username: '',
+    email: '',
     password: '',
     remember: false,
   })
 
   // 表单错误信息
   const errors = reactive({
-    username: '',
+    email: '',
     password: '',
   })
 
@@ -168,7 +168,7 @@
     errorMessage.value = ''
 
     try {
-      const response = await loginService(loginForm.username, loginForm.password)
+      const response = await loginService(loginForm.email, loginForm.password)
       // 保存token
       setToken(response.data)
       await router.push('/admin/dashboard')
