@@ -176,27 +176,27 @@
   ]
 
   const quickLinks = [
-    { text: '关于我们', to: '/about' },
-    { text: '新闻动态', to: '/news' },
-    { text: '招聘信息', to: '/careers' },
-    { text: '合作伙伴', to: '/partners' },
-    { text: '投资者关系', to: '/investor' },
+    { text: '关于我们', to: '' },
+    { text: '新闻动态', to: '' },
+    { text: '招聘信息', to: '' },
+    { text: '合作伙伴', to: '' },
+    { text: '投资者关系', to: '' },
   ]
 
   const footerCategories = [
-    { text: '时尚服装', to: '/category/fashion' },
-    { text: '数码电子', to: '/category/electronics' },
-    { text: '家居用品', to: '/category/home' },
-    { text: '运动健身', to: '/category/sports' },
-    { text: '美妆护肤', to: '/category/beauty' },
+    { text: '时尚服装', to: '' },
+    { text: '数码电子', to: '' },
+    { text: '家居用品', to: '' },
+    { text: '运动健身', to: '' },
+    { text: '美妆护肤', to: '' },
   ]
 
   const customerServices = [
-    { text: '帮助中心', to: '/help' },
-    { text: '退换货政策', to: '/returns' },
-    { text: '配送信息', to: '/shipping' },
-    { text: '支付方式', to: '/payment' },
-    { text: '售后服务', to: '/support' },
+    { text: '帮助中心', to: '' },
+    { text: '退换货政策', to: '' },
+    { text: '配送信息', to: '' },
+    { text: '支付方式', to: '' },
+    { text: '售后服务', to: '' },
   ]
 
   const paymentMethods = [
