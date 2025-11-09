@@ -48,9 +48,13 @@
                 v-for="item in navItems"
                 :key="item.title"
                 class="mx-1"
-                :to="item.to"
                 variant="text"
+                @click="router.push({
+                  path: item.to,
+                  query: {category: item.type,},
+                })"
               >
+                <v-icon class="mr-1" :icon="item.icon" size="16" />
                 {{ item.title }}
               </v-btn>
             </v-btn-toggle>
@@ -185,6 +189,21 @@
         :title="item.title"
         :to="item.to"
       />
+      <v-btn-toggle class="ml-4" variant="text">
+        <v-btn
+          v-for="item in navItems"
+          :key="item.title"
+          class="mx-1"
+          variant="text"
+          @click="router.push({
+            path: item.to,
+            query: {category: item.type,},
+          })"
+        >
+          <v-icon class="mr-1" :icon="item.icon" size="16" />
+          {{ item.title }}
+        </v-btn>
+      </v-btn-toggle>
     </v-list>
 
     <v-divider />
@@ -229,6 +248,7 @@
 <script setup lang="ts">
   import { useDisplay } from 'vuetify'
   import AuthDialog from '@/components/client/dialog/AuthDialog.vue'
+  import { SearchSort } from '@/composables/enums/Sort.ts'
   import { useThemeToggle } from '@/composables/useTheme.ts'
   import { getUserInfoService } from '@/http/client/user.ts'
   import router from '@/router'
@@ -267,10 +287,9 @@
 
   const navItems = [
     { title: '首页', to: '/', icon: 'mdi-home' },
-    { title: '分类', to: '', icon: 'mdi-view-grid' },
-    { title: '热销', to: '', icon: 'mdi-fire' },
-    { title: '新品', to: '', icon: 'mdi-new-box' },
-    { title: '优惠', to: '', icon: 'mdi-tag' },
+    { title: '热门', to: '/client/Search', type: SearchSort.HOT, icon: 'mdi-view-grid' },
+    { title: '精选', to: '/client/Search', type: SearchSort.PRICE, icon: 'mdi-fire' },
+    { title: '特价', to: '/client/Search', type: SearchSort.RATING, icon: 'mdi-new-box' },
   ]
 
   const userMenuItems = [
@@ -378,13 +397,6 @@
   opacity: 0.8;
   transform: scale(1.05);
   transition: all 0.2s ease;
-}
-
-.v-btn-toggle {
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
 /* 隐藏滚动条的样式 */
