@@ -44,7 +44,7 @@
 * **后台管理地址**: http://localhost:3000/admin
 
 ## 📂 项目结构
-
+```
 E-commerce/                     # 仓库根目录（示例）
 ├── e-commerce-server/          # 后端服务（Spring Boot）
 │   ├── common/                 # 公共模块（工具、常量等）
@@ -74,6 +74,8 @@ E-commerce/                     # 仓库根目录（示例）
     ├── index.html              # 前端入口页
     ├── package.json            # 依赖与脚本
     └── vite.config.ts          # Vite 配置
+```
+
 
 说明：
 - 后端（e-commerce-server）为 Spring Boot 项目，包含模块化结构与数据库脚本。
