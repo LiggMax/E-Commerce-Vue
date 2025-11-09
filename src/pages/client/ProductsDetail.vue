@@ -127,10 +127,10 @@
             </div>
 
             <div class="d-flex ga-4">
-              <v-btn color="primary" rounded="lg" size="large" @click="addToCart">
-                <v-icon icon="mdi-cart-plus" start />
-                加入购物车
-              </v-btn>
+              <!--              <v-btn color="primary" rounded="lg" size="large" @click="addToCart">-->
+              <!--                <v-icon icon="mdi-cart-plus" start />-->
+              <!--                加入购物车-->
+              <!--              </v-btn>-->
               <v-btn
                 color="error"
                 rounded="lg"
@@ -140,7 +140,12 @@
               >
                 立即购买
               </v-btn>
-              <v-btn icon="mdi-heart-outline" variant="outlined" />
+              <v-btn
+                :color="productDetail.user.favorite? 'error' : ''"
+                :icon="productDetail.user.favorite? 'mdi-heart' : 'mdi-heart-outline'"
+                variant="outlined"
+                @click="addToFavorites"
+              />
             </div>
             <v-divider class="my-6" />
           </div>
@@ -363,7 +368,9 @@
                               readonly
                               size="small"
                             />
-                            <span class="text-caption text-medium-emphasis ml-2">{{ TimeFormatter.formatRelativeTime(review.createTime) }}</span>
+                            <span class="text-caption text-medium-emphasis ml-2">{{
+                              TimeFormatter.formatRelativeTime(review.createTime)
+                            }}</span>
                           </div>
                           <p class="text-body-2 mb-2">{{ review.content }}</p>
                           <div v-if="review.images && review.images.length > 0" class="d-flex ga-4">
@@ -401,7 +408,7 @@
 <script setup lang="ts">
   import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
-  import { getFeaturedCommentServer, getFeaturedDetailServer } from '@/http/client/product.ts'
+  import { collectFeaturedServer, getFeaturedCommentServer, getFeaturedDetailServer } from '@/http/client/product.ts'
   import { publishCommentService } from '@/http/client/user.ts'
   import router from '@/router'
   import { useAppStore } from '@/stores/client/app.ts'
@@ -444,6 +451,9 @@
     images: {
       largeImage: string
       smallImage: string
+    }
+    user: {
+      favorite: boolean
     }
     originalPrice: number
     currentPrice: number
@@ -691,6 +701,14 @@
       return false
     }
     return true
+  }
+
+  // 商品收藏
+  async function addToFavorites () {
+    const favorite = productDetail.value!.user.favorite
+    await collectFeaturedServer(productDetail.value!.id, !favorite)
+    productDetail.value!.user.favorite = !favorite
+    showSuccess(favorite ? '取消收藏' : '收藏成功')
   }
 
   function addToCart () {

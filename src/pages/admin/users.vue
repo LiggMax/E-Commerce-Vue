@@ -562,29 +562,24 @@
 
   // 处理保存
   async function handleSave () {
-    try {
-      const formData = new FormData()
-      formData.append('userId', userForm.value.userId)
-      formData.append('nickName', userForm.value.nickName)
-      formData.append('role', userForm.value.role)
-      formData.append('email', userForm.value!.email)
-      if (avatarFile.value) {
-        formData.append('avatarFile', avatarFile.value)
-      }
-
-      if (dialogMode.value === 'add') {
-        await addUser(formData)
-        showSuccess('用户添加成功')
-      } else {
-        await updateUser(formData)
-        showSuccess('用户更新成功')
-      }
-      dialog.value = false
-      await fetchUserList()
-    } catch (error) {
-      console.error('保存失败:', error)
-      showError('保存失败')
+    const formData = new FormData()
+    formData.append('userId', userForm.value.userId)
+    formData.append('nickName', userForm.value.nickName)
+    formData.append('role', userForm.value.role)
+    formData.append('email', userForm.value!.email)
+    if (avatarFile.value) {
+      formData.append('avatarFile', avatarFile.value)
     }
+
+    if (dialogMode.value === 'add') {
+      await addUser(formData)
+      showSuccess('用户添加成功')
+    } else {
+      await updateUser(formData)
+      showSuccess('用户更新成功')
+    }
+    dialog.value = false
+    await fetchUserList()
   }
 
   // 头像文件选择变化

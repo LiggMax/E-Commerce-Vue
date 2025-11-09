@@ -1,4 +1,4 @@
-import { FEATURED, PRODUCT_DETAIL } from '@/http/client/api.ts'
+import { FEATURED, PRODUCT_DETAIL, USER } from '@/http/client/api.ts'
 import request from '@/http/client/clientRequest.ts'
 
 /**
@@ -25,5 +25,19 @@ export async function getFeaturedCommentServer (productId: string, pageNumber: n
     productId,
     pageNumber,
     pageSize,
+  })
+}
+
+/**
+ * 收藏商品
+ */
+export async function collectFeaturedServer (productId: string, isFavorite: boolean) {
+  return request.post(`${USER}/favorite`, {
+    productId,
+    isFavorite,
+  }, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
   })
 }

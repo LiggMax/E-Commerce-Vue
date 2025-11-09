@@ -185,6 +185,7 @@
 <script lang="ts" setup>
   import { getSystemInfoService } from '@/http/admin/dashboard.ts'
   import { getSystemStatusServer } from '@/http/admin/event.ts'
+  import router from '@/router'
 
   const systemInfo = ref({
     userCount: 0,
@@ -230,28 +231,28 @@
   // 快速操作
   const quickActions = [
     {
-      title: '创建用户',
+      title: '用户管理',
       subtitle: '添加新的系统用户',
       icon: 'mdi-account-plus',
-      action: 'create-user',
+      action: '/admin/users',
     },
     {
       title: '查看订单',
       subtitle: '管理所有订单',
       icon: 'mdi-shopping',
-      action: 'view-orders',
+      action: '/admin/orders',
     },
     {
-      title: '系统设置',
+      title: '商品管理',
       subtitle: '配置系统参数',
       icon: 'mdi-cog',
-      action: 'settings',
+      action: '/admin/content/product',
     },
     {
-      title: '数据导出',
-      subtitle: '导出统计数据',
+      title: '轮播图',
+      subtitle: '管理所有的轮播图',
       icon: 'mdi-download',
-      action: 'export-data',
+      action: '/admin/content/carousel',
     },
   ]
 
@@ -446,8 +447,8 @@
 
   // 处理快速操作
   function handleQuickAction (action: string) {
-    console.log('执行快速操作:', action)
-  // 这里可以根据action类型执行相应的操作
+    // 路由跳转
+    router.push(action)
   }
 
   onMounted(() => {

@@ -99,7 +99,7 @@
 
         <!-- 商品图片 -->
         <template #item.image="{ item }">
-          <div class="my-2 rounded-lg overflow-hidden" style="width: 160px; height: 80px;">
+          <div class="my-2 rounded-lg overflow-hidden" style="width: 100px; height: 120px;">
             <v-img :alt="item.title" cover :src="item.images?.largeImage || ''" />
           </div>
         </template>

@@ -223,12 +223,12 @@
       value: 'orders',
       to: '/admin/orders',
     },
-    {
-      title: '系统设置',
-      icon: 'mdi-cog',
-      value: 'settings',
-      to: '/admin/settings',
-    },
+    // {
+    //   title: '系统设置',
+    //   icon: 'mdi-cog',
+    //   value: 'settings',
+    //   to: '/admin/settings',
+    // },
   ]
 
   // 获取所有菜单项（包括子菜单）

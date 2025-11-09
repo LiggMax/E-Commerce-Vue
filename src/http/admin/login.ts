@@ -5,8 +5,8 @@ import { LOGIN, USER } from '@/http/admin/api.ts'
 /**
  * 登录
  */
-export async function loginService (account: string, password: string) {
-  return await request.post(LOGIN, qs.stringify({ account, password }), {
+export async function loginService (email: string, password: string) {
+  return await request.post(LOGIN, qs.stringify({ email, password }), {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
