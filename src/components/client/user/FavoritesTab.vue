@@ -78,26 +78,6 @@
           sm="6"
         >
           <v-card class="favorite-card" elevation="1">
-            <!-- 选择框 -->
-            <div class="position-absolute" style="top: 8px; left: 8px; z-index: 2;">
-              <v-checkbox
-                color="primary"
-                hide-details
-                :model-value="selectedItems.includes(item.id)"
-                @update:model-value="toggleSelection(item.id)"
-              />
-            </div>
-
-            <!-- 删除按钮 -->
-            <v-btn
-              class="position-absolute"
-              icon="mdi-close"
-              size="small"
-              style="top: 8px; right: 8px; z-index: 2;"
-              variant="text"
-              @click=""
-            />
-
             <!-- 商品图片 -->
             <v-img
               cover
@@ -153,10 +133,13 @@
                 color="primary"
                 size="small"
                 variant="flat"
-                @click="addToCart(item)"
+                @click="router.push({
+                  path: '/client/ProductsDetail',
+                  query: {productId: item.productId}
+                })"
               >
                 <v-icon icon="mdi-cart-plus" start />
-                加入购物车
+                查看商品
               </v-btn>
 
               <v-btn
@@ -193,6 +176,9 @@
 </template>
 
 <script setup lang="ts">
+  import { computed, onMounted, ref } from 'vue'
+  import { getCollectFeaturedServer } from '@/http/client/user.ts'
+  import router from '@/router'
   import { useNotification } from '@/utils/notification.ts'
 
   const { showSuccess, showError } = useNotification()
@@ -212,8 +198,10 @@
     name: string
     image: string
     price: number
+    originalPrice?: number
     rating: number
     reviewCount: number
+    stock: number
     category: string
     inStock: boolean
     favoriteTime: string
@@ -227,7 +215,7 @@
     let filtered = favorites.value
 
     // 按分类筛选
-    if (selectedCategory.value) {
+    if (selectedCategory.value && selectedCategory.value !== '全部') {
       filtered = filtered.filter(item => item.category === selectedCategory.value)
     }
 
@@ -242,7 +230,7 @@
   })
 
   const totalPages = computed(() =>
-    Math.ceil(filteredFavorites.value.length / pageSize.value),
+    Math.max(1, Math.ceil(filteredFavorites.value.length / pageSize.value)),
   )
 
   const paginatedFavorites = computed(() => {
@@ -263,14 +251,11 @@
 
   // 查看商品详情
   function viewProduct (productId: string) {
-    // 跳转到商品详情页
-    // this.$router.push(`/products/${productId}`)
     console.log('查看商品详情:', productId)
   }
 
   // 加入购物车
   function addToCart (item: FavoriteItem) {
-    // 添加购物车逻辑
     console.log('加入购物车:', item)
     showSuccess('已加入购物车')
   }
@@ -285,8 +270,39 @@
     currentPage.value = page
   }
 
-  // 页面初始化
-  onMounted(() => {})
+  // 获取收藏商品数据并适配后端结构
+  async function getFavorites () {
+    loading.value = true
+    try {
+      const res = await getCollectFeaturedServer()
+      const data = res?.data ?? []
+      favorites.value = data.map((it: any) => ({
+        id: String(it.productId),
+        productId: String(it.productId),
+        name: it.title ?? '',
+        image: it.imagePath ?? '',
+        price: Number(it.currentPrice ?? 0),
+        originalPrice: Number(it.originalPrice ?? 0),
+        rating: Number(it.rating ?? 0),
+        reviewCount: Number(it.views ?? 0),
+        stock: Number(it.stock ?? 0),
+        category: '全部',
+        inStock: Number(it.stock ?? 0) > 0,
+        favoriteTime: new Date().toISOString(),
+      }))
+      // 初始化分类
+      categories.value = ['全部']
+    } catch (error) {
+      console.error(error)
+      showError('获取收藏数据失败')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onMounted(() => {
+    getFavorites()
+  })
 </script>
 
 <style scoped>

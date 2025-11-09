@@ -27,17 +27,3 @@ export async function getFeaturedCommentServer (productId: string, pageNumber: n
     pageSize,
   })
 }
-
-/**
- * 收藏商品
- */
-export async function collectFeaturedServer (productId: string, isFavorite: boolean) {
-  return request.post(`${USER}/favorite`, {
-    productId,
-    isFavorite,
-  }, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  })
-}

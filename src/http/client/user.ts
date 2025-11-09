@@ -56,3 +56,24 @@ export async function rechargeService (recharge: any) {
 export async function publishCommentService (comment: any) {
   return await request.post(`${USER}/comment`, comment)
 }
+
+/**
+ * 收藏商品
+ */
+export async function collectFeaturedServer (productId: string, isFavorite: boolean) {
+  return request.post(`${USER}/favorite`, {
+    productId,
+    isFavorite,
+  }, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
+/**
+ * 获取收藏商品
+ */
+export async function getCollectFeaturedServer () {
+  return request.get(`${USER}/favorite`)
+}

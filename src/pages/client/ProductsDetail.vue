@@ -61,7 +61,7 @@
                 readonly
                 size="small"
               />
-              <span class="text-caption ml-2">{{ productDetail.rating }} 分 · {{ productDetail.reviews }} 条评价</span>
+              <span class="text-caption ml-2">{{ productDetail.rating }} 分 · {{ productDetail.views }} 阅览量</span>
             </div>
 
             <v-sheet class=" mb-4 rounded-lg">
@@ -141,8 +141,9 @@
                 立即购买
               </v-btn>
               <v-btn
-                :color="productDetail.user.favorite? 'error' : ''"
-                :icon="productDetail.user.favorite? 'mdi-heart' : 'mdi-heart-outline'"
+                v-if="productDetail.user"
+                :color="productDetail.user.favorite ? 'error' : ''"
+                :icon="productDetail.user.favorite ? 'mdi-heart' : 'mdi-heart-outline'"
                 variant="outlined"
                 @click="addToFavorites"
               />
@@ -408,7 +409,7 @@
 <script setup lang="ts">
   import { Base64 } from 'js-base64'
   import { useRoute } from 'vue-router'
-  import { collectFeaturedServer, getFeaturedCommentServer, getFeaturedDetailServer } from '@/http/client/product.ts'
+  import { getFeaturedCommentServer, getFeaturedDetailServer } from '@/http/client/product.ts'
   import { publishCommentService } from '@/http/client/user.ts'
   import router from '@/router'
   import { useAppStore } from '@/stores/client/app.ts'
@@ -455,6 +456,7 @@
     user: {
       favorite: boolean
     }
+    views: number
     originalPrice: number
     currentPrice: number
     reviews: number
