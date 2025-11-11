@@ -7,102 +7,111 @@ import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
 // Utilities
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
 import Layouts from 'vite-plugin-vue-layouts-next'
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-import { BACKEND } from './src/http/api'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    VueRouter({
-      dts: 'src/typed-router.d.ts',
-    }),
-    Layouts({
-      layoutsDirs: 'src/layouts',
-      defaultLayout: 'default',
-    }),
-    AutoImport({
-      imports: [
-        'vue',
-        VueRouterAutoImports,
-        {
-          pinia: ['defineStore', 'storeToRefs'],
-        },
-      ],
-      dts: 'src/auto-imports.d.ts',
-      eslintrc: {
-        enabled: true,
-      },
-      vueTemplate: true,
-    }),
-    Components({
-      dts: 'src/components.d.ts',
-    }),
-    Vue({
-      template: { transformAssetUrls },
-    }),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
-    Vuetify({
-      autoImport: true,
-      styles: {
-        configFile: 'src/styles/settings.scss',
-      },
-    }),
-    Fonts({
-      fontsource: {
-        families: [
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const backend = env.BACKEND
+  const minioBackend = env.MINIO_BACKEND
+
+  return {
+    plugins: [
+      VueRouter({
+        dts: 'src/typed-router.d.ts',
+      }),
+      Layouts({
+        layoutsDirs: 'src/layouts',
+        defaultLayout: 'default',
+      }),
+      AutoImport({
+        imports: [
+          'vue',
+          VueRouterAutoImports,
           {
-            name: 'Roboto',
-            weights: [100, 300, 400, 500, 700, 900],
-            styles: ['normal', 'italic'],
+            pinia: ['defineStore', 'storeToRefs'],
           },
         ],
-      },
-    }),
-  ],
-  optimizeDeps: {
-    exclude: [
-      'vuetify',
-      'vue-router',
-      'unplugin-vue-router/runtime',
-      'unplugin-vue-router/data-loaders',
-      'unplugin-vue-router/data-loaders/basic',
+        dts: 'src/auto-imports.d.ts',
+        eslintrc: {
+          enabled: true,
+        },
+        vueTemplate: true,
+      }),
+      Components({
+        dts: 'src/components.d.ts',
+      }),
+      Vue({
+        template: { transformAssetUrls },
+      }),
+      // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
+      Vuetify({
+        autoImport: true,
+        styles: {
+          configFile: 'src/styles/settings.scss',
+        },
+      }),
+      Fonts({
+        fontsource: {
+          families: [
+            {
+              name: 'Roboto',
+              weights: [100, 300, 400, 500, 700, 900],
+              styles: ['normal', 'italic'],
+            },
+          ],
+        },
+      }),
     ],
-  },
-  define: { 'process.env': {} },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('src', import.meta.url)),
+    optimizeDeps: {
+      exclude: [
+        'vuetify',
+        'vue-router',
+        'unplugin-vue-router/runtime',
+        'unplugin-vue-router/data-loaders',
+        'unplugin-vue-router/data-loaders/basic',
+      ],
     },
-    extensions: [
-      '.js',
-      '.json',
-      '.jsx',
-      '.mjs',
-      '.ts',
-      '.tsx',
-      '.vue',
-    ],
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: BACKEND,
-        changeOrigin: true,
+    define: { 'process.env': {} },
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('src', import.meta.url)),
+      },
+      extensions: [
+        '.js',
+        '.json',
+        '.jsx',
+        '.mjs',
+        '.ts',
+        '.tsx',
+        '.vue',
+      ],
+    },
+    server: {
+      port: 3000,
+      proxy: {
+        '/api': {
+          target: backend,
+          changeOrigin: true,
+        },
+        '/resources': {
+          target: minioBackend,
+          changeOrigin: true,
+        },
       },
     },
-  },
-  css: {
-    preprocessorOptions: {
-      sass: {
-        api: 'modern-compiler',
-      },
-      scss: {
-        api: 'modern-compiler',
+    css: {
+      preprocessorOptions: {
+        sass: {
+          api: 'modern-compiler',
+        },
+        scss: {
+          api: 'modern-compiler',
+        },
       },
     },
-  },
+  }
 })
