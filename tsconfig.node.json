@@ -6,7 +6,6 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "src/http/api.ts"
   ],
   "compilerOptions": {
     "composite": true,

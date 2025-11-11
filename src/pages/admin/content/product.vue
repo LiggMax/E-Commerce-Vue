@@ -100,7 +100,7 @@
         <!-- 商品图片 -->
         <template #item.image="{ item }">
           <div class="my-2 rounded-lg overflow-hidden" style="width: 100px; height: 120px;">
-            <v-img :alt="item.title" cover :src="item.images?.largeImage || ''" />
+            <v-img :alt="item.title" cover :src="item.images" />
           </div>
         </template>
 
@@ -299,10 +299,7 @@
     stock: number
     title: string
     description: string
-    images: {
-      largeImage: string
-      smallImage: string
-    }
+    images: string
     imageFile?: File | undefined
     originalPrice: number
     currentPrice: number
@@ -357,10 +354,7 @@
         id: string
         title: string
         stock: number
-        images: {
-          largeImage: string
-          smallImage: string
-        }
+        images: string
         description: string
         originalPrice: number
         currentPrice: number
