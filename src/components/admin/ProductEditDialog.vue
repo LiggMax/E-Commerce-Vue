@@ -145,10 +145,7 @@
     title: string
     stock: number
     description: string
-    images: {
-      largeImage: string
-      smallImage: string
-    }
+    images: string
     imageFile?: File | undefined
     originalPrice: number
     currentPrice: number
@@ -187,10 +184,7 @@
     title: '',
     stock: 0,
     description: '',
-    images: {
-      largeImage: '',
-      smallImage: '',
-    },
+    images: '',
     imageFile: undefined,
     originalPrice: 0,
     currentPrice: 0,
