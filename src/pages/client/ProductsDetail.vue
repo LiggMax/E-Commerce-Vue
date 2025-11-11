@@ -449,10 +449,7 @@
   interface Product {
     id: string
     title: string
-    images: {
-      largeImage: string
-      smallImage: string
-    }
+    images: string
     user: {
       favorite: boolean
     }
@@ -534,7 +531,7 @@
   const allImages = computed(() => {
     if (!productDetail.value) return []
     return [
-      productDetail.value.images.largeImage,
+      productDetail.value.images,
       ...productDetail.value.detailImages.map(img => img.url),
     ]
   })
@@ -781,7 +778,7 @@
   /**
    * 获取商品数据
    */
-  async function getProduct () {
+  async function getProductDetail () {
     const productId = route.query.productId
     if (productId != null) {
       const res = await getFeaturedDetailServer(productId.toString())
@@ -830,7 +827,7 @@
   }
 
   onMounted(() => {
-    getProduct()
+    getProductDetail()
     getReviews()
   })
 </script>

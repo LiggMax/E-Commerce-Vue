@@ -27,7 +27,7 @@
             class="rounded-lg"
             cover
             height="200"
-            :src="product.images.largeImage"
+            :src="product.images"
           />
 
           <!-- Discount Badge -->
@@ -117,10 +117,7 @@
   interface CarouselItem {
     id: string
     title: string
-    images: {
-      largeImage: string
-      smallImage: string
-    }
+    images: string
     originalPrice: number
     currentPrice: number
     reviews: number
